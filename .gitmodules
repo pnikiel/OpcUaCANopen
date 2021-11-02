@@ -1,0 +1,3 @@
+[submodule "CanModule"]
+	path = CanModule
+	url = git@github.com:quasar-team/CanModule.git
