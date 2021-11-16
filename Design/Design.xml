@@ -1,16 +1,84 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<d:design projectShortName="OpcUaNewCANopenServer"
-	xmlns:d="http://cern.ch/quasar/Design"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd "
-	author="Piotr Nikiel (ATLAS Central DCS)">
-	<d:class name="Bus">
-		<d:hasobjects instantiateUsing="configuration" class="Node"></d:hasobjects>
-		<d:configentry dataType="UaString" name="provider">
-			<d:documentation>AA</d:documentation></d:configentry>
-	</d:class>
-	<d:class name="Node">
-	</d:class>
-	<d:root >
-		<d:hasobjects instantiateUsing="configuration" class="Bus"></d:hasobjects></d:root>
+<d:design xmlns:d="http://cern.ch/quasar/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" projectShortName="OpcUaNewCANopenServer" xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd " author="Piotr Nikiel (ATLAS Central DCS)">
+  <d:class name="Bus">
+    <d:devicelogic/>
+    <d:hasobjects instantiateUsing="configuration" class="Node"/>
+    <d:configentry dataType="UaString" name="provider" storedInDeviceObject="true">
+      <d:documentation>CanModule implementation type name.
+			The following known implementations are listed below (note, some implementations are operating system dependent
+			or may be disabled from the build process):
+			<ul><li>sock - Linux only, standard Linux SocketCAN interface. Works with VCAN, Systec (systec_can driver), Peak and other SocketCAN compatible interfaces.</li><li>an - Linux+Windows, Anagate Ethernet-CAN bridges from the Analytica company.</li></ul>
+			</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="sock"/>
+          <d:enumerationValue value="an"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="port" storedInDeviceObject="true">
+      <d:documentation>
+				CAN port identifier in the system, which will be opened
+				using the provider (see provider attribute). Is
+				provider-dependent though standardized names (e.g. "0",
+				"1") work for most providers. When using "sock" provider in Linux, it is common to use full port names (e.g. can0) instead of the numbers.
+				
+			</d:documentation>
+    </d:configentry>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Int16" name="portError" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+		</d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+		</d:cachevariable>
+    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
+      <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
+      <d:documentation>The NG interval in miliseconds for all nodes on the bus. 10000 to 60000 are the typical values for average DCS systems. 0 means that NG is disabled.</d:documentation>
+    </d:cachevariable>
+  </d:class>
+  <d:class name="Node">
+    <d:devicelogic/>
+    <d:configentry dataType="OpcUa_Byte" name="id" isKey="true" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="1"/>
+      </d:configRestriction>
+      <d:documentation>CANopen node id. Typically configured by switches or jumpers on the actual hardware.</d:documentation>
+    </d:configentry>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="bootupCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
+      <d:documentation>Number of bootup messages that the server from the node since server's start-up.</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_SByte" name="state" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>CANopen state of the node understood as what node-guarding returns (toggling is not filtered out).</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="stateNoToggle" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>TODO me ;-)</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="stateAsText" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>CANopen state, enhanced with DISCONNECTED and UNKNOWN state, shown as text, one of:
+			<ul><li>STOPPED - online but intentionally stopped. Not replying to SDOs and PDOs.</li><li>PREOPERATIONAL - preoperational. Replying to SDOs but not performing any PDO info exchange.</li><li>OPERATIONAL - in full operation</li><li>DISCONNECTED - node not responding while the server believes that the infrastructure (especially the CAN interface) is alright</li><li>UNKNOWN - the state is not known due to identified issues, e.g. CAN interface down or so.</li></ul>
+			</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="emergencyPlaceHolder" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good">
+		</d:cachevariable>
+    <d:cachevariable initializeWith="configuration" dataType="UaString" name="requestedState" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
+      <d:documentation>
+			Specifies the intended state of a node. Is applicable both for configuration (then it specifies the initial state that the node should be brought into)
+			as well as in the usual runtime (then it can be used to control the state).
+			</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="OPERATIONAL"/>
+          <d:enumerationValue value="PREOPERATIONAL"/>
+          <d:enumerationValue value="STOPPED"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:cachevariable>
+    <d:method name="reset" executionSynchronicity="asynchronous">
+      <d:returnvalue dataType="OpcUa_Boolean" name="bootupReceived"/>
+      <d:documentation>Attempts node reset by sending NMT request. Will return success if the node replied within bootup message. Otherwise will fail.</d:documentation>
+    </d:method>
+  </d:class>
+  <d:root>
+    <d:hasobjects instantiateUsing="configuration" class="Bus"/>
+  </d:root>
 </d:design>

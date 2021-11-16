@@ -5,8 +5,8 @@
 
 set(CUSTOM_SERVER_MODULES CanModule )
 set(EXECUTABLE OpcUaServer)
-set(SERVER_INCLUDE_DIRECTORIES  )
-set(SERVER_LINK_LIBRARIES  )
+set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan CANopen/include )
+set(SERVER_LINK_LIBRARIES -lsocketcan )
 set(SERVER_LINK_DIRECTORIES  )
 
 ##
@@ -22,3 +22,11 @@ set(BUILD_SERVER_SHARED_LIB OFF)
 set(ADDITIONAL_BOOST_LIBS filesystem )
 
 add_definitions(-fPIC)
+
+set(CANMODULE_BUILD_VENDORS ON)
+set(CANMODULE_BUILD_ANAGATE OFF)
+
+#include_directories(
+#    CanModule/CanLibLoader/include
+#    CanModule/CanInterface/include
+#)
