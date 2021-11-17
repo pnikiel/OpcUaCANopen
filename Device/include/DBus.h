@@ -73,7 +73,7 @@ public:
 private:
     GhostPointer<CanModule::CCanAccess> m_canAccess;
 
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
+    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
     std::chrono::steady_clock::time_point m_lastSyncTimePoint;
 
     void invokeNodeGuarding();

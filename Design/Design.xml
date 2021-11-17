@@ -47,7 +47,7 @@
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="bootupCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
       <d:documentation>Number of bootup messages that the server from the node since server's start-up.</d:documentation>
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_SByte" name="state" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="state" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
       <d:documentation>CANopen state of the node understood as what node-guarding returns (toggling is not filtered out).</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="stateNoToggle" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">

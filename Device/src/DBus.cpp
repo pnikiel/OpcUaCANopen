@@ -105,6 +105,8 @@ void DBus::tick()
         this->invokeNodeGuarding();
         m_lastNodeGuardingTimePoint = now;
     }
+    for (DNode* node : nodes())
+        node->tick();
 }
 
 void DBus::invokeNodeGuarding()

@@ -3,9 +3,9 @@
 ## information how to use this file.
 ## ----------------------------------------------------
 
-set(CUSTOM_SERVER_MODULES CanModule )
+set(CUSTOM_SERVER_MODULES CanModule CANopen )
 set(EXECUTABLE OpcUaServer)
-set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan CANopen/include )
+set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan )
 set(SERVER_LINK_LIBRARIES -lsocketcan )
 set(SERVER_LINK_DIRECTORIES  )
 
