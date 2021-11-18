@@ -119,11 +119,10 @@ void DBus::invokeNodeGuarding()
 void DBus::onMessageReceived (const CanMessage& msg)
 {
     // TOD?O: option question, how do we deal with long msgs ?
-    LOG(Log::INF) << "msg came, " << msg.c_id;
+    //LOG(Log::INF) << "msg came, " << msg.c_id; // some separate levels ... ?
     // what is the message
     unsigned int functionCode = msg.c_id >> 7;
     unsigned int nodeId = msg.c_id & 0x7f;
-    LOG(Log::INF) << "function code: " << functionCode << " nodeId: " << nodeId;
     // TODO shall everything be passed to specific node
     DNode* node = getNodeById(nodeId);
     if (node)
