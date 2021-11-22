@@ -29,6 +29,10 @@
 #include <SockCanScan.h>
 #include <DNode.h>
 
+#include <Logging.hpp>
+
+using namespace Logging;
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -128,7 +132,7 @@ void DBus::onMessageReceived (const CanMessage& msg)
     if (node)
         node->onMessageReceived(msg);
     else
-        LOG(Log::WRN, "Spooky") << Quasar::TermColors::ForeYellow() << "received msg to unknown node " << Quasar::TermColors::StyleReset() << "#id " << nodeId << " bus " << getFullName();
+        SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) << ", fix your hardware or your configuration." << SPOOKY_;
 
 }
 

@@ -8,7 +8,7 @@ namespace CANopen
 {
 
 /** This FSM is Piotr's approach to handle the NG. Not related to anything particular in the CANopen standard */
-enum NodeGuardingStates
+enum NodeGuardingOperationsState
 {
     IDLE = 0,
     AWAITING_REPLY

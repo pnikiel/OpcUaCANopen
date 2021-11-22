@@ -1,3 +1,5 @@
+#pragma once
+
 // author @pnikiel
 // according to Henk's doc, the frame formats.
 
