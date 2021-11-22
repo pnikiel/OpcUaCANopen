@@ -11,4 +11,14 @@ CanMessage makeNodeGuardingRequest (uint8_t targetId)
     return ngRequestMessage;
 }
 
+CanMessage makeNodeManagementServiceRequest (uint8_t targetId, uint8_t commandSpecifier)
+{
+    CanMessage nmtServiceRequest;
+    nmtServiceRequest.c_id = 0;
+    nmtServiceRequest.c_data[0] = commandSpecifier;
+    nmtServiceRequest.c_data[1] = targetId;
+    nmtServiceRequest.c_dlc = 2;
+    return nmtServiceRequest;
+}
+
 }

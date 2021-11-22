@@ -23,8 +23,8 @@ set(ADDITIONAL_BOOST_LIBS filesystem )
 
 add_definitions(-fPIC)
 
-set(CANMODULE_BUILD_VENDORS ON)
-set(CANMODULE_BUILD_ANAGATE OFF)
+#set(CANMODULE_BUILD_VENDORS ON)
+#set(CANMODULE_BUILD_ANAGATE OFF)
 
 #include_directories(
 #    CanModule/CanLibLoader/include

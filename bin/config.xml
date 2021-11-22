@@ -6,7 +6,7 @@
 				<ComponentLogLevel logLevel="ERR" componentName="CanModule" /></ComponentLogLevels></Log></StandardMetaData>
 	<Bus name="bus" provider="sock" port="vcan0"
 		nodeGuardIntervalMs="10000" syncIntervalMs="10000">
-		<Node name="elmb1" requestedState="PREOPERATIONAL" id="1"></Node>
+		<Node name="elmb1" requestedState="OPERATIONAL" id="1"></Node>
 	</Bus>
 
 </configuration>

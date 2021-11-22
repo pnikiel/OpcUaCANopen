@@ -1,4 +1,8 @@
+#pragma once
+
 #include <string>
+
+#include <Definitions.hpp>
 
 namespace CANopen
 {
@@ -11,9 +15,12 @@ enum NodeGuardingStates
 };
 
 //! Textual repr of the state.
-std::string stateToText (uint8_t state);
+std::string stateEnumToText (NodeState state);
 
 // TODO at a map for consistency? state <-> text representation
-uint8_t textToState (const std::string& text);
+//! throws!
+NodeState textToStateEnum (const std::string& text);
+
+NodeState noToggleNgReplyToStateEnum (uint8_t noToggleReply);
 
 }
