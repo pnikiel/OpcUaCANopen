@@ -18,34 +18,29 @@
  */
 
 
-#ifndef __DBus__H__
-#define __DBus__H__
+#ifndef __DMultiplexedChannel__H__
+#define __DMultiplexedChannel__H__
 
-#include <chrono>
+#include <Base_DMultiplexedChannel.h>
 
-#include <GhostPointer.h>
-#include <CCanAccess.h>
-
-#include <NodeGuarding.hpp>
-
-#include <Base_DBus.h>
+#include <CanMessage.h>
 
 namespace Device
 {
 
 class
-    DBus
-    : public Base_DBus
+    DMultiplexedChannel
+    : public Base_DMultiplexedChannel
 {
 
 public:
     /* sample constructor */
-    explicit DBus (
-        const Configuration::Bus& config,
-        Parent_DBus* parent
+    explicit DMultiplexedChannel (
+        const Configuration::MultiplexedChannel& config,
+        Parent_DMultiplexedChannel* parent
     ) ;
     /* sample dtr */
-    ~DBus ();
+    ~DMultiplexedChannel ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -55,8 +50,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DBus( const DBus& other );
-    DBus& operator=(const DBus& other);
+    DMultiplexedChannel( const DMultiplexedChannel& other );
+    DMultiplexedChannel& operator=(const DMultiplexedChannel& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -64,23 +59,9 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    //! Call it 1/sec or so to run internal state machines and other timed actions.
-    void tick();
-
-    //! This is to be used by device logic of this as well as child classes for sending msgs to the CAN interface.
-    void sendMessage(const CanMessage& msg);
+    void onReplyReceived(const CanMessage& msg);
 
 private:
-    GhostPointer<CanModule::CCanAccess> m_canAccess;
-
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
-    std::chrono::steady_clock::time_point m_lastSyncTimePoint;
-
-    void invokeNodeGuarding();
-    void tickSync();
-
-    //! Every message received (by CanModule) goes via this function.
-    void onMessageReceived (const CanMessage& msg);
 
 
 
@@ -88,4 +69,4 @@ private:
 
 }
 
-#endif // __DBus__H__
+#endif // __DMultiplexedChannel__H__

@@ -18,34 +18,27 @@
  */
 
 
-#ifndef __DBus__H__
-#define __DBus__H__
+#ifndef __DSdo__H__
+#define __DSdo__H__
 
-#include <chrono>
-
-#include <GhostPointer.h>
-#include <CCanAccess.h>
-
-#include <NodeGuarding.hpp>
-
-#include <Base_DBus.h>
+#include <Base_DSdo.h>
 
 namespace Device
 {
 
 class
-    DBus
-    : public Base_DBus
+    DSdo
+    : public Base_DSdo
 {
 
 public:
     /* sample constructor */
-    explicit DBus (
-        const Configuration::Bus& config,
-        Parent_DBus* parent
+    explicit DSdo (
+        const Configuration::Sdo& config,
+        Parent_DSdo* parent
     ) ;
     /* sample dtr */
-    ~DBus ();
+    ~DSdo ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -55,8 +48,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DBus( const DBus& other );
-    DBus& operator=(const DBus& other);
+    DSdo( const DSdo& other );
+    DSdo& operator=(const DSdo& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -64,23 +57,8 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    //! Call it 1/sec or so to run internal state machines and other timed actions.
-    void tick();
-
-    //! This is to be used by device logic of this as well as child classes for sending msgs to the CAN interface.
-    void sendMessage(const CanMessage& msg);
 
 private:
-    GhostPointer<CanModule::CCanAccess> m_canAccess;
-
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
-    std::chrono::steady_clock::time_point m_lastSyncTimePoint;
-
-    void invokeNodeGuarding();
-    void tickSync();
-
-    //! Every message received (by CanModule) goes via this function.
-    void onMessageReceived (const CanMessage& msg);
 
 
 
@@ -88,4 +66,4 @@ private:
 
 }
 
-#endif // __DBus__H__
+#endif // __DSdo__H__

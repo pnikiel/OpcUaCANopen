@@ -28,6 +28,8 @@
 #include <DBus.h>
 #include <ASBus.h>
 
+#include <DTpdoMultiplex.h>
+#include <DTpdo.h>
 
 #include <FrameFactory.hpp>
 
@@ -137,13 +139,23 @@ UaStatus DNode::callReset (
 
 void DNode::onMessageReceived (const CanMessage& msg)
 {
+    /* Doc: check table 4 in the Henk's document */
     // TODO impl
     unsigned int functionCode = msg.c_id >> 7;
     switch (functionCode)
     {
+        // TPDOs
+        case 0x3: // TPDO1
+        case 0x5: // TPDO2
+        case 0x7: // TPDO3
+        case 0x9: // TPDO4
+            onTpdoReceived(msg); break; 
+
+        // various NMts
         case 0xe: onNodeManagementReplyReceived(msg); break;
+        
         default:
-            LOG(Log::WRN, "Spooky") << "Received unintelligible message, ignoring"; // TODO which one
+            SPOOKY(getFullName()) << "Received unintelligible message, fnc code " << wrapValue(std::to_string(functionCode)) << " " << msg.toString() << SPOOKY_;
     }
 }
 
@@ -235,11 +247,45 @@ void DNode::onNodeManagementReplyReceived (const CanMessage& msg)
     }
 }
 
+void DNode::onTpdoReceived (const CanMessage& msg)
+{
+    unsigned int functionCode = msg.c_id >> 7;
+    unsigned int pdoSelector = (functionCode-1) / 2;
+
+    DTpdo* tpdo = getTpdoBySelector(pdoSelector);
+    DTpdoMultiplex* multiplex = getTpdoMultiplexBySelector(pdoSelector);
+    if (!multiplex && !tpdo)
+    {
+        SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. This is a *GRAVE* configuration problem." << SPOOKY_;
+        return;
+    }
+    if (tpdo)
+        tpdo->onReplyReceived(msg);
+    if (multiplex) 
+        multiplex->onReplyReceived(msg);
+    
+
+}
+
 void DNode::tick()
 {
     // Feature FN1.1
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    if (std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastNodeGuardingTimePoint).count() >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
+
+    unsigned int millisecondsSinceLastNgRequest = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastNodeGuardingTimePoint).count();
+    // Nodes non-replying to NG requests, notice the timeout.
+
+    // TODO: natural condition that the node guarding interval should be bigger than 1000
+    if (m_nodeGuardingOperationsState == CANopen::NodeGuardingOperationsState::AWAITING_REPLY && millisecondsSinceLastNgRequest >= 1000)
+    {
+        // this is an official report that we did not get the reply to the NG
+        m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
+        // TODO move the current state to unknown
+        
+        SPOOKY(getFullName()) << "Timeout for NodeGuarding reply." << SPOOKY_; 
+    }
+
+    if (millisecondsSinceLastNgRequest >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
     {
         getParent()->sendMessage(CANopen::makeNodeGuardingRequest(id()));
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;

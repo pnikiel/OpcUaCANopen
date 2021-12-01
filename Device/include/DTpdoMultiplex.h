@@ -18,34 +18,29 @@
  */
 
 
-#ifndef __DBus__H__
-#define __DBus__H__
+#ifndef __DTpdoMultiplex__H__
+#define __DTpdoMultiplex__H__
 
-#include <chrono>
+#include <Base_DTpdoMultiplex.h>
 
-#include <GhostPointer.h>
-#include <CCanAccess.h>
-
-#include <NodeGuarding.hpp>
-
-#include <Base_DBus.h>
+#include <CanMessage.h>
 
 namespace Device
 {
 
 class
-    DBus
-    : public Base_DBus
+    DTpdoMultiplex
+    : public Base_DTpdoMultiplex
 {
 
 public:
     /* sample constructor */
-    explicit DBus (
-        const Configuration::Bus& config,
-        Parent_DBus* parent
+    explicit DTpdoMultiplex (
+        const Configuration::TpdoMultiplex& config,
+        Parent_DTpdoMultiplex* parent
     ) ;
     /* sample dtr */
-    ~DBus ();
+    ~DTpdoMultiplex ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -55,8 +50,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DBus( const DBus& other );
-    DBus& operator=(const DBus& other);
+    DTpdoMultiplex( const DTpdoMultiplex& other );
+    DTpdoMultiplex& operator=(const DTpdoMultiplex& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -64,23 +59,9 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    //! Call it 1/sec or so to run internal state machines and other timed actions.
-    void tick();
-
-    //! This is to be used by device logic of this as well as child classes for sending msgs to the CAN interface.
-    void sendMessage(const CanMessage& msg);
+    void onReplyReceived(const CanMessage& msg);
 
 private:
-    GhostPointer<CanModule::CCanAccess> m_canAccess;
-
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
-    std::chrono::steady_clock::time_point m_lastSyncTimePoint;
-
-    void invokeNodeGuarding();
-    void tickSync();
-
-    //! Every message received (by CanModule) goes via this function.
-    void onMessageReceived (const CanMessage& msg);
 
 
 
@@ -88,4 +69,4 @@ private:
 
 }
 
-#endif // __DBus__H__
+#endif // __DTpdoMultiplex__H__

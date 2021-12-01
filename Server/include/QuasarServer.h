@@ -25,6 +25,8 @@
 
 #include "BaseQuasarServer.h"
 
+namespace Configuration { class Configuration; }
+
 /*
  * Example class. This class overrides functionality from BaseQuasarServer in order to make the logic fit an specific implementation.
  * THIS CLASS SHOULD BE MODIFIED BY THE FINAL USER to contain his custom logic, or taken as an example to create his own separate file.
@@ -44,6 +46,12 @@ public:
     virtual void initialize();
     //Method for deinitialising Custom Modules, to be overwritten by the final user
     virtual void shutdown();
+
+    bool overridableConfigure(const std::string& fileName, AddressSpace::ASNodeManager *nm);
+
+    bool processConfiguration(Configuration::Configuration& configuration);
+
+
 private:
     //Disable copy-constructor and assignment-operator
     QuasarServer( const QuasarServer& server );

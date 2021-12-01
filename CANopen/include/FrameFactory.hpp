@@ -10,4 +10,5 @@ namespace CANopen
 {
     CanMessage makeNodeGuardingRequest (uint8_t targetId);
     CanMessage makeNodeManagementServiceRequest (uint8_t targetId, uint8_t commandSpecifier);
+    CanMessage makeSyncRequest ();
 }

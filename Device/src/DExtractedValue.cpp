@@ -18,21 +18,14 @@
  */
 
 
+#include <cstdint>
+
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DBus.h>
-#include <ASBus.h>
-
-#include <CanLibLoader.h>
-
-#include <Utils.h>
-#include <SockCanScan.h>
-#include <DNode.h>
+#include <DExtractedValue.h>
+#include <ASExtractedValue.h>
 
 #include <Logging.hpp>
-#include <FrameFactory.hpp>
-
-using namespace Logging;
 
 namespace Device
 {
@@ -58,33 +51,19 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DBus::DBus (
-    const Configuration::Bus& config,
-    Parent_DBus* parent
+DExtractedValue::DExtractedValue (
+    const Configuration::ExtractedValue& config,
+    Parent_DExtractedValue* parent
 ):
-    Base_DBus( config, parent)
+    Base_DExtractedValue( config, parent)
 
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
-    //CanModule::CanLibLoader* loader = CanModule::CanLibLoader::createInstance("sock");
-    //CanModule::CCanAccess* canAccess = loader->openCanBus("sock:vcan0", "Unspecified");
-    CSockCanScan* sockCanAccess = new CSockCanScan;
-    sockCanAccess->initialiseLogging(LogItInstance::getInstance());
-    sockCanAccess->createBus("sock:"+port(), "Unspecified");
-    sockCanAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
-
-    CanModule::CCanAccess* canAccess = sockCanAccess;
-    
-
-    if (!canAccess)
-        throw std::runtime_error("port is not available");
-    m_canAccess.assign(canAccess);
-    m_canAccess.enableAccess();
 }
 
 /* sample dtr */
-DBus::~DBus ()
+DExtractedValue::~DExtractedValue ()
 {
 }
 
@@ -100,47 +79,51 @@ DBus::~DBus ()
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
 
-void DBus::tick()
+void DExtractedValue::onReplyReceived(const CanMessage& msg)
 {
-	LOG(Log::TRC) << "Tick called";
-    for (DNode* node : nodes())
-        node->tick();
-    tickSync();
-}
-
-void DBus::onMessageReceived (const CanMessage& msg)
-{
-    // TOD?O: option question, how do we deal with long msgs ?
-    //LOG(Log::INF) << "msg came, " << msg.c_id; // some separate levels ... ?
-    // what is the message
-    //unsigned int functionCode = msg.c_id >> 7;
-    unsigned int nodeId = msg.c_id & 0x7f;
-    // TODO shall everything be passed to specific node
-    DNode* node = getNodeById(nodeId);
-    if (node)
-        node->onMessageReceived(msg);
-    else
-        SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) << ", fix your hardware or your configuration." << SPOOKY_;
-
-}
-
-void DBus::sendMessage(const CanMessage& msg)
-{
-    // TODO handle disable functions ...
-    // TODO handle spy mode ...
-    CanMessage copy (msg);
-    m_canAccess->sendMessage(&copy);
-}
-
-void DBus::tickSync()
-{
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-    unsigned int millisecondsSinceLastSync = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastSyncTimePoint).count();
-    if (millisecondsSinceLastSync >= getAddressSpaceLink()->getSyncIntervalMs())
+    UaVariant output;
+    if (dataType() == "Int32")
     {
-        sendMessage(CANopen::makeSyncRequest());
-        m_lastSyncTimePoint = now;
+        // need to be sure that the frame which arrived is of good size ()
+        if (offset() + sizeof (int32_t) > msg.c_dlc)
+        {
+            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
+            return;
+        }
+        int32_t val = *(int32_t*)&msg.c_data[offset()];
+        output.setInt32(val);
     }
+    else if (dataType() == "Byte")
+    {
+        if (offset() > msg.c_dlc)
+        {
+            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
+            return;
+        }
+        output.setByte(msg.c_data[offset()]);
+    }
+    else if (dataType() == "Boolean")
+    {
+        if (offset() > msg.c_dlc)
+        {
+            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
+            return;      
+        }
+        unsigned char byte = msg.c_data[offset()];
+        if (booleanFromBit() == "-") // whole word
+            output.setBoolean(byte != 0);
+        else
+        {
+            unsigned int bitIndex = std::stoi(booleanFromBit()); // TODO: check if we cover all cases!
+            output.setBoolean(byte & 1<<bitIndex);
+        }
+
+
+    }
+    else
+        throw std::logic_error("This dataType is not supportes");
+    // TODO else some shit...
+    getAddressSpaceLink()->setValue(output, OpcUa_Good);
 
 }
 

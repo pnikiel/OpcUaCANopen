@@ -29,7 +29,7 @@
 		</d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
 		</d:cachevariable>
-    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
+    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="regular">
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
@@ -77,9 +77,111 @@
       <d:returnvalue dataType="OpcUa_Boolean" name="bootupReceived"/>
       <d:documentation>Attempts node reset by sending NMT request. Will return success if the node replied within bootup message. Otherwise will fail.</d:documentation>
     </d:method>
-    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"></d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="Tpdo"/>
+    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
+    <d:hasobjects instantiateUsing="configuration" class="Sdo">
+</d:hasobjects>
+  </d:class>
+  <d:class name="Tpdo">
+    <d:devicelogic/>
+    <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
+    <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="1"/>
+          <d:enumerationValue value="2"/>
+          <d:enumerationValue value="3"/>
+          <d:enumerationValue value="4"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
   </d:class>
   <d:class name="TpdoMultiplex">
+    <d:devicelogic/>
+    <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
+      <d:documentation>
+  			The selector code of the TPDO, for TPDO3 it should be 3,
+  			etc.
+  		</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="1"/>
+          <d:enumerationValue value="2"/>
+          <d:enumerationValue value="3"/>
+          <d:enumerationValue value="4"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
+    <d:hasobjects instantiateUsing="configuration" class="GenerateIdenticalChannels"/>
+  </d:class>
+  <d:class name="MultiplexedChannel">
+    <d:devicelogic/>
+    <d:configentry dataType="OpcUa_UInt16" name="id" isKey="true"/>
+    <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
+  </d:class>
+  <d:class name="ExtractedValue" singleVariableNode="true">
+    <d:devicelogic/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaVariant" name="value" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+  	</d:cachevariable>
+    <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="Boolean"/>
+          <d:enumerationValue value="Byte"/>
+          <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Int32"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Byte" name="offset" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByBounds maxInclusive="7"/>
+      </d:configRestriction>
+      <d:documentation>
+  			At which octet in the data of the received TPDO frame this
+  			value starts?
+  		</d:documentation>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="booleanFromBit" defaultValue="-" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="0|1|2|3|4|5|6|7|-"/>
+      </d:configRestriction>
+    </d:configentry>
+  </d:class>
+  <d:class name="GenerateIdenticalChannels">
+    <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
+    <d:configentry dataType="OpcUa_Byte" name="numberOfChannels"/>
+  </d:class>
+  <d:class name="Sdo">
+    <d:devicelogic></d:devicelogic>
+    <d:hasobjects instantiateUsing="configuration" class="SdoItem"/>
+    <d:configentry dataType="UaString" name="index">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
+      </d:configRestriction>
+    </d:configentry>
+  </d:class>
+  <d:class name="SdoItem" singleVariableNode="true">
+    <d:devicelogic></d:devicelogic>
+    <d:configentry dataType="UaString" name="subIndex">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="dataType">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="Boolean"/>
+          <d:enumerationValue value="Byte"/>
+          <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Int32"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="access"/>
+    <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">
+</d:sourcevariable>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>

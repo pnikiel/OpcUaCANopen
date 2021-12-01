@@ -30,6 +30,12 @@
 #include <DBus.h>
 #include <DRoot.h>
 
+#include <Configuration.hxx>
+#include <Configurator.h>
+#include <ConfigurationDecorationUtils.h>
+
+using namespace Configuration;
+
 QuasarServer::QuasarServer() : BaseQuasarServer()
 {
 
@@ -75,4 +81,53 @@ void QuasarServer::initializeLogIt()
 	Log::registerLoggingComponent("Spooky");
     Log::registerLoggingComponent("NodeMgmt");
     LOG(Log::INF) << "Logging initialized.";
+}
+
+bool QuasarServer::overridableConfigure(const std::string& fileName, AddressSpace::ASNodeManager *nm)
+{
+    return configure(fileName, nm, std::bind(&QuasarServer::processConfiguration, this, std::placeholders::_1));
+}
+
+bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
+{
+    for (Bus& bus : configuration.Bus())
+    {
+        for (Node& node : bus.Node())
+        {
+            for (TpdoMultiplex& multiplex : node.TpdoMultiplex())
+            {
+                for (GenerateIdenticalChannels& generator : multiplex.GenerateIdenticalChannels())
+                {
+                    if (generator.MultiplexedChannel().size() != 1)
+                        throw std::runtime_error ("Bad configuration: GenerateIdenticalChannels must contain precisely one MultiplexedChannel to server as a specimen.");
+                    MultiplexedChannel& specimen = generator.MultiplexedChannel().front();
+                    
+                    if (specimen.name() != "specimen")
+                        throw std::runtime_error ("Specimen must be called specimen ;-) ");
+                    LOG(Log::INF) << "found GenerateIdenticalChannels!";
+                    for (unsigned int chno=0; chno < generator.numberOfChannels(); chno++)
+                    {
+                        // Note from Piotr: 
+                        // we first make a copy and then fix name and id,
+                        // reason for it is for cleaner memory handling for temporary objects we'd have to create,
+                        // now we let XSD-CXX to handle it for us, so one problem less.
+                        DecorationUtils::push_back(
+                            multiplex, 
+                            multiplex.MultiplexedChannel(), 
+                            specimen, 
+                            TpdoMultiplex::MultiplexedChannel_id);
+                        multiplex.MultiplexedChannel().back().name() = "ch" + std::to_string(chno);
+                        multiplex.MultiplexedChannel().back().id() = chno;
+
+                    }
+                }
+
+                //! Generators has been run, throw them away.
+                DecorationUtils::clear(multiplex, multiplex.GenerateIdenticalChannels(), TpdoMultiplex::GenerateIdenticalChannels_id);
+
+            }
+        }
+    }
+    
+    return true;
 }

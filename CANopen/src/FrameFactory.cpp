@@ -21,4 +21,12 @@ CanMessage makeNodeManagementServiceRequest (uint8_t targetId, uint8_t commandSp
     return nmtServiceRequest;
 }
 
+CanMessage makeSyncRequest ()
+{
+    CanMessage syncRequest;
+    syncRequest.c_id = 0x80;
+    syncRequest.c_dlc = 0;
+    return syncRequest;
+}
+
 }
