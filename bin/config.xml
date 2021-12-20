@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration [
+        <!ENTITY ELMB SYSTEM "NODETYPE_ELMB.xml">
+        ]>
 <configuration xmlns="http://cern.ch/quasar/Configuration"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://cern.ch/quasar/Configuration ../Configuration/Configuration.xsd ">
@@ -10,20 +13,9 @@
 			</ComponentLogLevels>
 		</Log>
 	</StandardMetaData>
-	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000">
+	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000" settings="DontConfigure">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1">
-			<TpdoMultiplex name="TPDO3" selector="3">
-				
-				<GenerateIdenticalChannels numberOfChannels="2 "
-					name="gic">
-				<MultiplexedChannel name="specimen" id="1">
-                    <ExtractedValue dataType="Byte" name="adcFlag" offset="1" />
-
-                    <ExtractedValue name="value" dataType="Int32" offset="2" />				
-				</MultiplexedChannel>
-				
-				</GenerateIdenticalChannels>
-			</TpdoMultiplex>
+			&ELMB;
 		</Node>
 	</Bus>
 

@@ -33,6 +33,7 @@
 #include <FrameFactory.hpp>
 
 using namespace Logging;
+using namespace std::placeholders;
 
 namespace Device
 {
@@ -73,6 +74,7 @@ DBus::DBus (
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
     sockCanAccess->createBus("sock:"+port(), "Unspecified");
     sockCanAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
+    sockCanAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3));
 
     CanModule::CCanAccess* canAccess = sockCanAccess;
     
@@ -106,6 +108,7 @@ void DBus::tick()
     for (DNode* node : nodes())
         node->tick();
     tickSync();
+    tickPublishingStatistics();
 }
 
 void DBus::onMessageReceived (const CanMessage& msg)
@@ -141,7 +144,24 @@ void DBus::tickSync()
         sendMessage(CANopen::makeSyncRequest());
         m_lastSyncTimePoint = now;
     }
+}
 
+void DBus::onError (const int errorCode, const char* errorDescription, timeval&)
+{
+    getAddressSpaceLink()->setPortError(errorCode, OpcUa_Good);
+    getAddressSpaceLink()->setPortErrorDescription(errorDescription, OpcUa_Good);
+}
+
+void DBus::tickPublishingStatistics ()
+{
+
+    CanStatistics stats;
+    m_canAccess->getStatistics(stats);
+    getAddressSpaceLink()->setStatsTotalReceived(stats.totalReceived(), OpcUa_Good);
+    getAddressSpaceLink()->setStatsTotalTransmitted(stats.totalTransmitted(), OpcUa_Good);
+    getAddressSpaceLink()->setStatsTxRate(stats.txRate(), OpcUa_Good);
+    getAddressSpaceLink()->setStatsRxRate(stats.rxRate(), OpcUa_Good);
+    
 }
 
 }

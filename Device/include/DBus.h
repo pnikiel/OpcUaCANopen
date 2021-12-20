@@ -75,12 +75,16 @@ private:
 
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
     std::chrono::steady_clock::time_point m_lastSyncTimePoint;
+    std::chrono::steady_clock::time_point m_lastStatsCalc;
 
     void invokeNodeGuarding();
     void tickSync();
+    void tickPublishingStatistics ();
 
     //! Every message received (by CanModule) goes via this function.
     void onMessageReceived (const CanMessage& msg);
+
+    void onError (const int errorCode, const char* errorDescription, timeval&);
 
 
 

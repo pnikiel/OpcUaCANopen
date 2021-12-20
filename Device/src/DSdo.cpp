@@ -51,7 +51,8 @@ DSdo::DSdo (
     const Configuration::Sdo& config,
     Parent_DSdo* parent
 ):
-    Base_DSdo( config, parent)
+    Base_DSdo( config, parent),
+    m_index(std::stoi(config.index(), nullptr, /*base*/ 16))
 
     /* fill up constructor initialization list here */
 {

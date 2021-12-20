@@ -68,6 +68,7 @@ private:
 public:
 
 private:
+    uint16_t m_subIndex;
 
 
 

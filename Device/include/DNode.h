@@ -23,6 +23,7 @@
 
 #include <Definitions.hpp>
 #include <NodeGuarding.hpp>
+#include <Sdo.h>
 
 #include <stdint.h>
 
@@ -74,6 +75,8 @@ public:
     void onTpdoReceived (const CanMessage& msg);
     void tick();
 
+    CANopen::SdoEngine& sdoEngine() { return m_sdoEngine; }
+
 private:
     void onNodeManagementReplyReceived (const CanMessage& msg);
     void onBootupReceived (const CanMessage& msg);
@@ -82,6 +85,8 @@ private:
     CANopen::NodeState m_requestedStateEnum;
     CANopen::NodeState m_previousState;
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
+    CANopen::SdoEngine m_sdoEngine;
+    
 
 };
 

@@ -23,6 +23,9 @@
 #include <DSdoItem.h>
 #include <ASSdoItem.h>
 
+#include <DSdo.h>
+#include <DNode.h>
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -56,6 +59,7 @@ DSdoItem::DSdoItem (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    m_subIndex = std::stoi(config.subIndex(), nullptr, /*base*/ 16);
 }
 
 /* sample dtr */
@@ -72,8 +76,14 @@ UaStatus DSdoItem::readValue (
     UaDateTime& sourceTime
 )
 {
+    
+    std::vector<unsigned char> readData;
+    bool status = getParent()->getParent()->sdoEngine().readExpedited(getParent()->index(), m_subIndex, readData); // TODO 0
+    if (!status)
+        return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
-    return OpcUa_BadNotImplemented;
+    value.setUInt32(*(uint32_t*)&readData[0]);
+    return OpcUa_Good;
 }
 /* ASYNCHRONOUS !! */
 UaStatus DSdoItem::writeValue (

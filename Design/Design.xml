@@ -25,6 +25,9 @@
 				
 			</d:documentation>
     </d:configentry>
+    <d:configentry dataType="UaString" name="settings">
+    	<d:configRestriction>
+    		<d:restrictionByPattern pattern="50k|125k|250k|DontConfigure" /></d:configRestriction></d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Int16" name="portError" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
 		</d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
@@ -34,6 +37,18 @@
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
       <d:documentation>The NG interval in miliseconds for all nodes on the bus. 10000 to 60000 are the typical values for average DCS systems. 0 means that NG is disabled.</d:documentation>
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalReceived"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsTxRate"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsRxRate"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
   </d:class>
   <d:class name="Node">
@@ -173,8 +188,8 @@
       <d:configRestriction>
         <d:restrictionByEnumeration>
           <d:enumerationValue value="Boolean"/>
-          <d:enumerationValue value="Byte"/>
-          <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Byte"/><d:enumerationValue value="UInt16" ></d:enumerationValue>
+        	<d:enumerationValue value="UInt32"></d:enumerationValue>
           <d:enumerationValue value="Int32"/>
         </d:restrictionByEnumeration>
       </d:configRestriction>

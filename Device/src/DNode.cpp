@@ -68,7 +68,8 @@ DNode::DNode (
     Base_DNode( config, parent),
         m_requestedStateEnum(CANopen::textToStateEnum(config.requestedState())),
         m_previousState(CANopen::NodeState::UNKNOWN),
-        m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE)
+        m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
+        m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id())
 
     /* fill up constructor initialization list here */
 {
@@ -151,6 +152,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
         case 0x9: // TPDO4
             onTpdoReceived(msg); break; 
 
+        case 0xb: m_sdoEngine.replyCame(msg); break;
         // various NMts
         case 0xe: onNodeManagementReplyReceived(msg); break;
         
