@@ -26,8 +26,24 @@
 			</d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="settings">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="50k|125k|250k|DontConfigure"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="spyMode" defaultValue="inheritFromGlobalSettings">
     	<d:configRestriction>
-    		<d:restrictionByPattern pattern="50k|125k|250k|DontConfigure" /></d:configRestriction></d:configentry>
+    		<d:restrictionByEnumeration>
+    			<d:enumerationValue value="true" />
+    			<d:enumerationValue value="false" />
+    			<d:enumerationValue value="inheritFromGlobalSettings"></d:enumerationValue>
+    		</d:restrictionByEnumeration>
+    	</d:configRestriction>
+    	<d:documentation>
+    		When activated (i.e. true, or inheriting true from global settings) the server will never
+    		transmit anything on that particular bus and will listen only. This mode is useful
+
+    	</d:documentation>
+    </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Int16" name="portError" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
 		</d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
@@ -38,17 +54,13 @@
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
       <d:documentation>The NG interval in miliseconds for all nodes on the bus. 10000 to 60000 are the typical values for average DCS systems. 0 means that NG is disabled.</d:documentation>
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted"
-    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalReceived"
-    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalReceived" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsTxRate"
-    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsTxRate" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsRxRate"
-    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsRxRate" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
   </d:class>
   <d:class name="Node">
@@ -94,8 +106,7 @@
     </d:method>
     <d:hasobjects instantiateUsing="configuration" class="Tpdo"/>
     <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
-    <d:hasobjects instantiateUsing="configuration" class="Sdo">
-</d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="Sdo"/>
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic/>
@@ -169,7 +180,7 @@
     <d:configentry dataType="OpcUa_Byte" name="numberOfChannels"/>
   </d:class>
   <d:class name="Sdo">
-    <d:devicelogic></d:devicelogic>
+    <d:devicelogic/>
     <d:hasobjects instantiateUsing="configuration" class="SdoItem"/>
     <d:configentry dataType="UaString" name="index">
       <d:configRestriction>
@@ -178,21 +189,22 @@
     </d:configentry>
   </d:class>
   <d:class name="SdoItem" singleVariableNode="true">
-    <d:devicelogic></d:devicelogic>
+    <d:devicelogic/>
     <d:configentry dataType="UaString" name="subIndex">
-      <d:configRestriction>
-        <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
-      </d:configRestriction>
+    	<d:configRestriction>
+    		<d:restrictionByPattern pattern="[0-9A-F]{1,4}" />
+    	</d:configRestriction>
     </d:configentry>
-    <d:configentry dataType="UaString" name="dataType">
-      <d:configRestriction>
-        <d:restrictionByEnumeration>
-          <d:enumerationValue value="Boolean"/>
-          <d:enumerationValue value="Byte"/><d:enumerationValue value="UInt16" ></d:enumerationValue>
-        	<d:enumerationValue value="UInt32"></d:enumerationValue>
-          <d:enumerationValue value="Int32"/>
-        </d:restrictionByEnumeration>
-      </d:configRestriction>
+    <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
+    	<d:configRestriction>
+    		<d:restrictionByEnumeration>
+    			<d:enumerationValue value="Boolean" />
+    			<d:enumerationValue value="Byte" />
+    			<d:enumerationValue value="UInt16" />
+    			<d:enumerationValue value="UInt32" />
+    			<d:enumerationValue value="Int32" />
+    		</d:restrictionByEnumeration>
+    	</d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="access"/>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">

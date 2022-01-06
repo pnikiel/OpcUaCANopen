@@ -26,6 +26,8 @@
 #include <DSdo.h>
 #include <DNode.h>
 
+#include <ValueMapper.h>
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -82,7 +84,15 @@ UaStatus DSdoItem::readValue (
     if (!status)
         return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
-    value.setUInt32(*(uint32_t*)&readData[0]);
+    try
+    {
+        value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, "");
+    }
+    catch(const std::exception& e)
+    {
+        LOG(Log::ERR) << e.what();
+        return OpcUa_Bad;
+    }
     return OpcUa_Good;
 }
 /* ASYNCHRONOUS !! */

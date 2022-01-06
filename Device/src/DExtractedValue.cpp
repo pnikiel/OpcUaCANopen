@@ -121,7 +121,7 @@ void DExtractedValue::onReplyReceived(const CanMessage& msg)
 
     }
     else
-        throw std::logic_error("This dataType is not supportes");
+        throw std::logic_error("This dataType is not supported");
     // TODO else some shit...
     getAddressSpaceLink()->setValue(output, OpcUa_Good);
 

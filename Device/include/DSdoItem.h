@@ -66,8 +66,10 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void setIndex (uint16_t index);
 
 private:
+    uint16_t m_index;
     uint16_t m_subIndex;
 
 
