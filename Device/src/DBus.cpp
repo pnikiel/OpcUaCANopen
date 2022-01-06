@@ -22,6 +22,7 @@
 
 #include <DBus.h>
 #include <ASBus.h>
+#include <DRoot.h>
 
 #include <CanLibLoader.h>
 
@@ -130,10 +131,17 @@ void DBus::onMessageReceived (const CanMessage& msg)
 void DBus::sendMessage(const CanMessage& msg)
 {
     // TODO handle disable functions ...
-    // TODO handle spy mode ...
-    CanMessage copy (msg);
-    m_canAccess->sendMessage(&copy);
+    if (this->isInSpyMode())
+    {
+        LOG(Log::TRC) << wrapId(getFullName()) << " message not sent, bus is in spy mode";
+    }
+    else
+    {
+        CanMessage copy (msg);
+        m_canAccess->sendMessage(&copy); // TODO: suggest to Michael that sendMessage should be const-ref
+    }
 }
+
 
 void DBus::tickSync()
 {
@@ -162,6 +170,18 @@ void DBus::tickPublishingStatistics ()
     getAddressSpaceLink()->setStatsTxRate(stats.txRate(), OpcUa_Good);
     getAddressSpaceLink()->setStatsRxRate(stats.rxRate(), OpcUa_Good);
     
+}
+
+bool DBus::isInSpyMode () const
+{
+
+    // TODO implement
+    return false;
+}
+
+void DBus::shutDown()
+{
+    m_canAccess->stopBus();
 }
 
 }

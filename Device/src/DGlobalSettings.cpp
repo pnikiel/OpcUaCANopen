@@ -20,14 +20,8 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DTpdoMultiplex.h>
-#include <ASTpdoMultiplex.h>
-
-#include <DMultiplexedChannel.h>
-
-#include <Logging.hpp>
-
-using namespace Logging;
+#include <DGlobalSettings.h>
+#include <ASGlobalSettings.h>
 
 namespace Device
 {
@@ -53,11 +47,11 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DTpdoMultiplex::DTpdoMultiplex (
-    const Configuration::TpdoMultiplex& config,
-    Parent_DTpdoMultiplex* parent
+DGlobalSettings::DGlobalSettings (
+    const Configuration::GlobalSettings& config,
+    Parent_DGlobalSettings* parent
 ):
-    Base_DTpdoMultiplex( config, parent)
+    Base_DGlobalSettings( config, parent)
 
     /* fill up constructor initialization list here */
 {
@@ -65,7 +59,7 @@ DTpdoMultiplex::DTpdoMultiplex (
 }
 
 /* sample dtr */
-DTpdoMultiplex::~DTpdoMultiplex ()
+DGlobalSettings::~DGlobalSettings ()
 {
 }
 
@@ -80,25 +74,5 @@ DTpdoMultiplex::~DTpdoMultiplex ()
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
-
-void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
-{
-    LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
-    // getting the channel number ...
-    // Note: this is the standard channel demultiplexer
-    if (msg.c_dlc < 1)
-        throw std::runtime_error("not-implemented");
-    unsigned int channelNumber = msg.c_data[0]; // this is the MPDO algorithm.
-    // do we have such a channel??
-    DMultiplexedChannel* channel = this->getMultiplexedChannelById(channelNumber);
-    if (!channel)
-    {
-        SPOOKY(getFullName()) << "Channel number " << wrapValue(std::to_string(channelNumber)) << " is not in the configuration, but we seem to be getting data from it. Fix the configuration of your ELMBs or fix your configuration" << SPOOKY_;
-        return;
-    }
-    
-    channel->onReplyReceived(msg);
-
-}
 
 }

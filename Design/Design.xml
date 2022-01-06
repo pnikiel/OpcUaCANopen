@@ -1,5 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <d:design xmlns:d="http://cern.ch/quasar/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" projectShortName="OpcUaNewCANopenServer" xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd " author="Piotr Nikiel (ATLAS Central DCS)">
+  <d:class name="GlobalSettings">
+  	<d:devicelogic></d:devicelogic>
+  	<d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse">
+  		<d:configRestriction>
+  			<d:restrictionByEnumeration>
+  				<d:enumerationValue value="enforceTrue" />
+  				<d:enumerationValue value="suggestFalse" />
+  			</d:restrictionByEnumeration>
+  		</d:configRestriction>
+  	</d:configentry>
+  </d:class>
   <d:class name="Bus">
     <d:devicelogic/>
     <d:hasobjects instantiateUsing="configuration" class="Node"/>
@@ -211,6 +222,7 @@
 </d:sourcevariable>
   </d:class>
   <d:root>
+    <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"></d:hasobjects>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>
 </d:design>

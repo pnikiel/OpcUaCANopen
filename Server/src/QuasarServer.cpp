@@ -70,8 +70,13 @@ void QuasarServer::initialize()
 }
 
 void QuasarServer::shutdown()
-{
+{   
 	LOG(Log::INF) << "Shutting down Quasar server.";
+    LOG(Log::INF) << "Stopping processing CAN buses";
+    for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
+    {
+        bus->shutDown();
+    }
 }
 
 void QuasarServer::initializeLogIt()
@@ -90,6 +95,15 @@ bool QuasarServer::overridableConfigure(const std::string& fileName, AddressSpac
 
 bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
 {
+    if (configuration.GlobalSettings().size() < 1)
+    {
+        DecorationUtils::push_back(
+            configuration,
+            configuration.GlobalSettings(),
+            Configuration::GlobalSettings("GlobalSettings"),
+            Configuration::Configuration::GlobalSettings_id
+        );
+    }
     for (Bus& bus : configuration.Bus())
     {
         for (Node& node : bus.Node())
