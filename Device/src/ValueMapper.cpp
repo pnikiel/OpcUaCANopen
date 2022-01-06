@@ -16,6 +16,7 @@ UaVariant ValueMapper::extractFromBytesIntoVariant (
     unsigned int offset, 
     const std::string& booleanFromBit)
 {
+    // TODO Certain data types are missing here, e.g. float.
     UaVariant output;
     if (dataType == "Int32")
         output.setInt32(bytesAsTypePrimitiveCast<int32_t>(bytes, size, offset));

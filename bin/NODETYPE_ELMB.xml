@@ -1,0 +1,231 @@
+<!-- Note: the order here is by Sdo index, and it follows Henk's ELMBio documentation chapter about
+object dictionary -->
+
+<!-- NodeError is gone as being useless for ELMB -->
+
+<Sdo index="1009" name="hwVersion">
+  <SdoItem subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
+</Sdo>
+
+<Sdo index="100A" name="elmbSw" >
+  <SdoItem subIndex="0" access="R" dataType="UInt32" name="swVersion" />
+  <SdoItem subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
+</Sdo>
+
+<Sdo index="100C" name="guardTime">
+  <SdoItem subIndex="0" access="R" dataType="UInt16" name="guardTime" />
+</Sdo>
+
+<Sdo index="100D" name="lifeTime">
+  <SdoItem subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
+</Sdo>
+
+<Sdo index="1010" name="storeParams">
+  <SdoItem subIndex="1" access="RW" dataType="UInt32" name="save"/>
+</Sdo>
+
+<Sdo index="1011" name="RestoreParams">
+  <SdoItem subIndex="1" access="RW" dataType="UInt32" name="Load"/>
+</Sdo>
+
+<Sdo index="1800" name="diTransmit">
+  <SdoItem subIndex="2" access="RW" dataType="Byte" name="diTransmissionType" />
+  <SdoItem subIndex="5" access="RW" dataType="UInt16" name="diEventTimer" />
+</Sdo>
+
+<!-- Analog inputs SDOs -->
+<Sdo index="1801" name="aiTransmitTPDO2" >
+ <SdoItem subIndex="2" access="RW" dataType="Byte" name="aiTransmissionType" />
+ <SdoItem subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
+</Sdo>
+
+<Sdo index="1802" name="aiTransmit" >
+ <SdoItem subIndex="2" access="RW" dataType="Byte" name="aiTransmissionType" />
+ <SdoItem subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
+</Sdo>
+
+<Sdo index="2100" name="aiConfig" >
+ <SdoItem subIndex="1" access="RW" dataType="Byte" name="channelMax" />
+ <SdoItem subIndex="2" access="RW" dataType="Byte" name="rate" />
+ <SdoItem subIndex="3" access="RW" dataType="Byte" name="range" />
+ <SdoItem subIndex="4" access="RW" dataType="Byte" name="mode" />
+</Sdo>
+
+<Sdo index="2200" name="diDebounceTimer">
+  <SdoItem subIndex="0" access="RW" dataType="Byte" name="diDebounceTimer"/>
+</Sdo>
+
+<Sdo index="2404" name="aisdo">
+   <SdoItem subIndex="1" access="R" dataType="Int32" name="aisdo_0"/>
+   <SdoItem subIndex="2" access="R" dataType="Int32" name="aisdo_1"/>
+   <SdoItem subIndex="3" access="R" dataType="Int32" name="aisdo_2"/>
+   <SdoItem subIndex="4" access="R" dataType="Int32" name="aisdo_3"/>
+   <SdoItem subIndex="5" access="R" dataType="Int32" name="aisdo_4"/>
+   <SdoItem subIndex="6" access="R" dataType="Int32" name="aisdo_5"/>
+   <SdoItem subIndex="7" access="R" dataType="Int32" name="aisdo_6"/>
+   <SdoItem subIndex="8" access="R" dataType="Int32" name="aisdo_7"/>
+   <SdoItem subIndex="9" access="R" dataType="Int32" name="aisdo_8"/>
+   <SdoItem subIndex="A" access="R" dataType="Int32" name="aisdo_9"/>
+   <SdoItem subIndex="B" access="R" dataType="Int32" name="aisdo_10"/>
+   <SdoItem subIndex="C" access="R" dataType="Int32" name="aisdo_11"/>
+   <SdoItem subIndex="D" access="R" dataType="Int32" name="aisdo_12"/>
+   <SdoItem subIndex="E" access="R" dataType="Int32" name="aisdo_13"/>
+   <SdoItem subIndex="F" access="R" dataType="Int32" name="aisdo_14"/>
+   <SdoItem subIndex="10" access="R" dataType="Int32" name="aisdo_15"/>
+   <SdoItem subIndex="11" access="R" dataType="Int32" name="aisdo_16"/>
+   <SdoItem subIndex="12" access="R" dataType="Int32" name="aisdo_17"/>
+   <SdoItem subIndex="13" access="R" dataType="Int32" name="aisdo_18"/>
+   <SdoItem subIndex="14" access="R" dataType="Int32" name="aisdo_19"/>
+   <SdoItem subIndex="15" access="R" dataType="Int32" name="aisdo_20"/>
+   <SdoItem subIndex="16" access="R" dataType="Int32" name="aisdo_21"/>
+   <SdoItem subIndex="17" access="R" dataType="Int32" name="aisdo_22"/>
+   <SdoItem subIndex="18" access="R" dataType="Int32" name="aisdo_23"/>
+   <SdoItem subIndex="19" access="R" dataType="Int32" name="aisdo_24"/>
+   <SdoItem subIndex="1A" access="R" dataType="Int32" name="aisdo_25"/>
+   <SdoItem subIndex="1B" access="R" dataType="Int32" name="aisdo_26"/>
+   <SdoItem subIndex="1C" access="R" dataType="Int32" name="aisdo_27"/>
+   <SdoItem subIndex="1D" access="R" dataType="Int32" name="aisdo_28"/>
+   <SdoItem subIndex="1E" access="R" dataType="Int32" name="aisdo_29"/>
+   <SdoItem subIndex="1F" access="R" dataType="Int32" name="aisdo_30"/>
+   <SdoItem subIndex="20" access="R" dataType="Int32" name="aisdo_31"/>
+   <SdoItem subIndex="21" access="R" dataType="Int32" name="aisdo_32"/>
+   <SdoItem subIndex="22" access="R" dataType="Int32" name="aisdo_33"/>
+   <SdoItem subIndex="23" access="R" dataType="Int32" name="aisdo_34"/>
+   <SdoItem subIndex="24" access="R" dataType="Int32" name="aisdo_35"/>
+   <SdoItem subIndex="25" access="R" dataType="Int32" name="aisdo_36"/>
+   <SdoItem subIndex="26" access="R" dataType="Int32" name="aisdo_37"/>
+   <SdoItem subIndex="27" access="R" dataType="Int32" name="aisdo_38"/>
+   <SdoItem subIndex="28" access="R" dataType="Int32" name="aisdo_39"/>
+   <SdoItem subIndex="29" access="R" dataType="Int32" name="aisdo_40"/>
+   <SdoItem subIndex="2A" access="R" dataType="Int32" name="aisdo_41"/>
+   <SdoItem subIndex="2B" access="R" dataType="Int32" name="aisdo_42"/>
+   <SdoItem subIndex="2C" access="R" dataType="Int32" name="aisdo_43"/>
+   <SdoItem subIndex="2D" access="R" dataType="Int32" name="aisdo_44"/>
+   <SdoItem subIndex="2E" access="R" dataType="Int32" name="aisdo_45"/>
+   <SdoItem subIndex="2F" access="R" dataType="Int32" name="aisdo_46"/>
+   <SdoItem subIndex="30" access="R" dataType="Int32" name="aisdo_47"/>
+   <SdoItem subIndex="31" access="R" dataType="Int32" name="aisdo_48"/>
+   <SdoItem subIndex="32" access="R" dataType="Int32" name="aisdo_49"/>
+   <SdoItem subIndex="33" access="R" dataType="Int32" name="aisdo_50"/>
+   <SdoItem subIndex="34" access="R" dataType="Int32" name="aisdo_51"/>
+   <SdoItem subIndex="35" access="R" dataType="Int32" name="aisdo_52"/>
+   <SdoItem subIndex="36" access="R" dataType="Int32" name="aisdo_53"/>
+   <SdoItem subIndex="37" access="R" dataType="Int32" name="aisdo_54"/>
+   <SdoItem subIndex="38" access="R" dataType="Int32" name="aisdo_55"/>
+   <SdoItem subIndex="39" access="R" dataType="Int32" name="aisdo_56"/>
+   <SdoItem subIndex="3A" access="R" dataType="Int32" name="aisdo_57"/>
+   <SdoItem subIndex="3B" access="R" dataType="Int32" name="aisdo_58"/>
+   <SdoItem subIndex="3C" access="R" dataType="Int32" name="aisdo_59"/>
+   <SdoItem subIndex="3D" access="R" dataType="Int32" name="aisdo_60"/>
+   <SdoItem subIndex="3E" access="R" dataType="Int32" name="aisdo_61"/>
+   <SdoItem subIndex="3F" access="R" dataType="Int32" name="aisdo_62"/>
+   <SdoItem subIndex="40" access="R" dataType="Int32" name="aisdo_63"/>
+</Sdo>
+
+<!--SPI interface-->
+<Sdo index="2600" name="SPIaccess">
+  <SdoItem subIndex="1" access="RW" dataType="UInt32" name="oneByteData"/>
+  <SdoItem subIndex="2" access="RW" dataType="UInt32" name="twoByteData"/>
+  <SdoItem subIndex="3" access="RW" dataType="UInt32" name="threeByteData"/>
+  <SdoItem subIndex="4" access="RW" dataType="UInt32" name="fourByteData"/>
+</Sdo>
+
+<Sdo index="2601" name="chipSelect">
+  <SdoItem subIndex="0" access="RW" dataType="Byte"  name="chipSelect"/>
+</Sdo>
+
+<Sdo index="2602" name="SPIconfig">
+  <SdoItem subIndex="1" access="RW" dataType="Byte" name="sclkHighPeriod"/>
+  <SdoItem subIndex="2" access="RW" dataType="Boolean" name="sclkRisingEdge"/>
+</Sdo>
+
+<Sdo index="3100" name="serialNumber">
+  <SdoItem subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
+</Sdo>
+
+<Sdo index="6006" name="diInterrupt" >
+  <SdoItem subIndex="1" access="RW" dataType="Byte" name="diInterruptMaskF" />
+  <SdoItem subIndex="2" access="RW" dataType="Byte" name="diInterruptMaskA" />
+  <SdoItem subIndex="3" access="RW" dataType="Byte" name="diInterruptMaskC" />
+</Sdo>
+
+<Sdo index="6208" name="dioPortA" >
+  <SdoItem subIndex="2" access="RW" dataType="Byte" name="dioOutputMaskA" />
+</Sdo>
+
+<Sdo index="6208" name="dioPortC" >
+  <SdoItem subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
+</Sdo>
+
+<Sdo index="6005" name="diGlobalInterruptEnable">
+  <SdoItem subIndex="0" access="RW" dataType="Boolean" name="diGlobalInterruptEnable" />
+</Sdo>
+
+<Sdo index="6200" name="do_read" >
+ <SdoItem subIndex="1" access="R" dataType="Byte" name="do_C_read" />
+ <SdoItem subIndex="2" access="R" dataType="Byte" name="do_A_read" />
+</Sdo>
+
+<Sdo index="6220" name="do_Booleanwise">
+ <SdoItem subIndex="1" access="RW" dataType="Boolean" name="do_C_0"/>
+ <SdoItem subIndex="2" access="RW" dataType="Boolean" name="do_C_1"/>
+ <SdoItem subIndex="3" access="RW" dataType="Boolean" name="do_C_2"/>
+ <SdoItem subIndex="4" access="RW" dataType="Boolean" name="do_C_3"/>
+ <SdoItem subIndex="5" access="RW" dataType="Boolean" name="do_C_4"/>
+ <SdoItem subIndex="6" access="RW" dataType="Boolean" name="do_C_5"/>
+ <SdoItem subIndex="7" access="RW" dataType="Boolean" name="do_C_6"/>
+ <SdoItem subIndex="8" access="RW" dataType="Boolean" name="do_C_7"/>
+
+ <SdoItem subIndex="9" access="RW" dataType="Boolean" name="do_A_0"/>
+ <SdoItem subIndex="10" access="RW" dataType="Boolean" name="do_A_1"/>
+ <SdoItem subIndex="11" access="RW" dataType="Boolean" name="do_A_2"/>
+ <SdoItem subIndex="12" access="RW" dataType="Boolean" name="do_A_3"/>
+ <SdoItem subIndex="13" access="RW" dataType="Boolean" name="do_A_4"/>
+ <SdoItem subIndex="14" access="RW" dataType="Boolean" name="do_A_5"/>
+ <SdoItem subIndex="15" access="RW" dataType="Boolean" name="do_A_6"/>
+ <SdoItem subIndex="16" access="RW" dataType="Boolean" name="do_A_7"/>
+
+ <SdoItem subIndex="17" access="RW" dataType="Boolean" name="do_F_0"/>
+ <SdoItem subIndex="18" access="RW" dataType="Boolean" name="do_F_1"/>
+ <SdoItem subIndex="19" access="RW" dataType="Boolean" name="do_F_2"/>
+ <SdoItem subIndex="20" access="RW" dataType="Boolean" name="do_F_3"/>
+ <SdoItem subIndex="21" access="RW" dataType="Boolean" name="do_F_4"/>
+ <SdoItem subIndex="22" access="RW" dataType="Boolean" name="do_F_5"/>
+ <SdoItem subIndex="23" access="RW" dataType="Boolean" name="do_F_6"/>
+ <SdoItem subIndex="24" access="RW" dataType="Boolean" name="do_F_7"/>
+</Sdo>
+
+<Tpdo name="TPDO1" selector="1">
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_F_1" offset="0" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_F_2" offset="0" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_F_3" offset="0" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_F_4" offset="0" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_F_5" offset="0" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_F_6" offset="0" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_F_7" offset="0" />
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_A_0" offset="1" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_A_1" offset="1" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_A_2" offset="1" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_A_3" offset="1" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_A_4" offset="1" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_A_5" offset="1" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_A_6" offset="1" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_A_7" offset="1" />
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_C_0" offset="2" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_C_1" offset="2" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_C_2" offset="2" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_C_3" offset="2" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_C_4" offset="2" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_C_5" offset="2" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_C_6" offset="2" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_C_7" offset="2" />
+</Tpdo>
+<TpdoMultiplex name="TPDO3" selector="3">
+  <GenerateIdenticalChannels numberOfChannels="64" name="gic">
+    <MultiplexedChannel name="specimen" id="1">
+      <ExtractedValue name="adcFlag" dataType="Byte" offset="1" />
+      <ExtractedValue name="value" dataType="Int32" offset="2" />
+    </MultiplexedChannel>
+  </GenerateIdenticalChannels>
+</TpdoMultiplex>

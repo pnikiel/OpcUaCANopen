@@ -27,6 +27,10 @@
 
 #include <Logging.hpp>
 
+#include <ValueMapper.h>
+
+using namespace Logging;
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -82,48 +86,16 @@ DExtractedValue::~DExtractedValue ()
 void DExtractedValue::onReplyReceived(const CanMessage& msg)
 {
     UaVariant output;
-    if (dataType() == "Int32")
+    try
     {
-        // need to be sure that the frame which arrived is of good size ()
-        if (offset() + sizeof (int32_t) > msg.c_dlc)
-        {
-            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
-            return;
-        }
-        int32_t val = *(int32_t*)&msg.c_data[offset()];
-        output.setInt32(val);
+        output = ValueMapper::extractFromFrameIntoVariant(msg, dataType(), offset(), booleanFromBit());
+        getAddressSpaceLink()->setValue(output, OpcUa_Good);
     }
-    else if (dataType() == "Byte")
+    catch (const std::exception& ex)
     {
-        if (offset() > msg.c_dlc)
-        {
-            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
-            return;
-        }
-        output.setByte(msg.c_data[offset()]);
+        LOG(Log::INF) << "For node " << wrapId(getFullName()) << " value mapping failed: " << ex.what();
     }
-    else if (dataType() == "Boolean")
-    {
-        if (offset() > msg.c_dlc)
-        {
-            SPOOKY(getFullName()) << "frame that came was too small to extract the information" << SPOOKY_; // TODO more details?
-            return;      
-        }
-        unsigned char byte = msg.c_data[offset()];
-        if (booleanFromBit() == "-") // whole word
-            output.setBoolean(byte != 0);
-        else
-        {
-            unsigned int bitIndex = std::stoi(booleanFromBit()); // TODO: check if we cover all cases!
-            output.setBoolean(byte & 1<<bitIndex);
-        }
-
-
-    }
-    else
-        throw std::logic_error("This dataType is not supported");
-    // TODO else some shit...
-    getAddressSpaceLink()->setValue(output, OpcUa_Good);
+    
 
 }
 

@@ -78,7 +78,7 @@ UaStatus DSdoItem::readValue (
     UaDateTime& sourceTime
 )
 {
-    
+    // TODO: check if "R" is included in the arguments
     std::vector<unsigned char> readData;
     bool status = getParent()->getParent()->sdoEngine().readExpedited(getParent()->index(), m_subIndex, readData); // TODO 0
     if (!status)
