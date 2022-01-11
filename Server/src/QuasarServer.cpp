@@ -104,6 +104,12 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
             Configuration::Configuration::GlobalSettings_id
         );
     }
+    else
+    {
+    	// for a user-supplied GlobalSettings make sure it is called "GlobalSettings" as we can't force it via quasar
+        if (configuration.GlobalSettings()[0].name() != "GlobalSettings")
+            throw std::runtime_error("Error: user supplied GlobalSettings name must be GlobalSettings. Fix your configuration file.");
+    }
     for (Bus& bus : configuration.Bus())
     {
         for (Node& node : bus.Node())

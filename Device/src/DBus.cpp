@@ -23,6 +23,7 @@
 #include <DBus.h>
 #include <ASBus.h>
 #include <DRoot.h>
+#include <DGlobalSettings.h>
 
 #include <CanLibLoader.h>
 
@@ -174,8 +175,10 @@ void DBus::tickPublishingStatistics ()
 
 bool DBus::isInSpyMode () const
 {
-
+    Device::DGlobalSettings* globalSettings = DRoot::getInstance()->globalsettings();
     // TODO implement
+    if (globalSettings->spyMode() == "enforceTrue")
+        return true;
     return false;
 }
 

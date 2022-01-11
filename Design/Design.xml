@@ -2,14 +2,19 @@
 <d:design xmlns:d="http://cern.ch/quasar/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" projectShortName="OpcUaNewCANopenServer" xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd " author="Piotr Nikiel (ATLAS Central DCS)">
   <d:class name="GlobalSettings">
   	<d:devicelogic></d:devicelogic>
-  	<d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse">
+  	<d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse"
+  		storedInDeviceObject="true">
   		<d:configRestriction>
   			<d:restrictionByEnumeration>
   				<d:enumerationValue value="enforceTrue" />
   				<d:enumerationValue value="suggestFalse" />
   			</d:restrictionByEnumeration>
   		</d:configRestriction>
+  		<d:documentation>enforceTrue enables spy mode on all buses declared in the configuration. See FC4.1 for exact documentation of the spy mode feature.</d:documentation>
   	</d:configentry>
+  	<d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
+  </d:class>
+  <d:class name="Warnings">
   </d:class>
   <d:class name="Bus">
     <d:devicelogic/>
@@ -116,8 +121,10 @@
       <d:documentation>Attempts node reset by sending NMT request. Will return success if the node replied within bootup message. Otherwise will fail.</d:documentation>
     </d:method>
     <d:hasobjects instantiateUsing="configuration" class="Tpdo"/>
-    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
-    <d:hasobjects instantiateUsing="configuration" class="Sdo"/>
+    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/><d:hasobjects
+    	instantiateUsing="configuration" class="Rpdo">
+</d:hasobjects>
+  	<d:hasobjects instantiateUsing="configuration" class="Sdo"/>
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic/>
@@ -151,6 +158,8 @@
     </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:hasobjects instantiateUsing="configuration" class="GenerateIdenticalChannels"/>
+  </d:class>
+  <d:class name="Rpdo">
   </d:class>
   <d:class name="MultiplexedChannel">
     <d:devicelogic/>
@@ -217,12 +226,17 @@
     		</d:restrictionByEnumeration>
     	</d:configRestriction>
     </d:configentry>
-    <d:configentry dataType="UaString" name="access"/>
+    <d:configentry dataType="UaString" name="access" storedInDeviceObject="true">
+    	<d:configRestriction>
+    		<d:restrictionByPattern pattern="R|RW|W" />
+    	</d:configRestriction>
+    </d:configentry>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">
 </d:sourcevariable>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"></d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="Warnings"></d:hasobjects>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>
 </d:design>

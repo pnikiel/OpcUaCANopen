@@ -13,6 +13,7 @@
 			</ComponentLogLevels>
 		</Log>
 	</StandardMetaData>
+	<GlobalSettings name="GlobalSettings" spyMode="enforceTrue" />
 	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1">
 			&ELMB;

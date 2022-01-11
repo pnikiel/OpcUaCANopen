@@ -27,6 +27,9 @@
 #include <DNode.h>
 
 #include <ValueMapper.h>
+#include <Logging.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -79,6 +82,11 @@ UaStatus DSdoItem::readValue (
 )
 {
     // TODO: check if "R" is included in the arguments
+    if (access().find("R") == std::string::npos)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because of configuration.";
+        return OpcUa_BadUserAccessDenied;
+    }
     std::vector<unsigned char> readData;
     bool status = getParent()->getParent()->sdoEngine().readExpedited(getParent()->index(), m_subIndex, readData); // TODO 0
     if (!status)

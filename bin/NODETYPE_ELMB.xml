@@ -4,7 +4,7 @@ object dictionary -->
 <!-- NodeError is gone as being useless for ELMB -->
 
 <Sdo index="1009" name="hwVersion">
-  <SdoItem subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
+  <SdoItem subIndex="0" access="W" dataType="UInt32"  name="hwVersion" />
 </Sdo>
 
 <Sdo index="100A" name="elmbSw" >
