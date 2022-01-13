@@ -18,45 +18,47 @@
  */
 
 
-#ifndef __DBus__H__
-#define __DBus__H__
+#ifndef __DRpdoCachedVariable__H__
+#define __DRpdoCachedVariable__H__
 
-#include <chrono>
-
-#include <GhostPointer.h>
-#include <CCanAccess.h>
-
-#include <NodeGuarding.hpp>
-
-#include <Base_DBus.h>
+#include <Base_DRpdoCachedVariable.h>
 
 namespace Device
 {
 
 class
-    DBus
-    : public Base_DBus
+    DRpdoCachedVariable
+    : public Base_DRpdoCachedVariable
 {
 
 public:
     /* sample constructor */
-    explicit DBus (
-        const Configuration::Bus& config,
-        Parent_DBus* parent
+    explicit DRpdoCachedVariable (
+        const Configuration::RpdoCachedVariable& config,
+        Parent_DRpdoCachedVariable* parent
     ) ;
     /* sample dtr */
-    ~DBus ();
+    ~DRpdoCachedVariable ();
 
     /* delegators for
     cachevariables and sourcevariables */
 
+    /* ASYNCHRONOUS !! */
+    UaStatus readValue (
+        UaVariant& value,
+        UaDateTime& sourceTime
+    );
+    /* ASYNCHRONOUS !! */
+    UaStatus writeValue (
+        UaVariant& value
+    );
 
     /* delegators for methods */
 
 private:
     /* Delete copy constructor and assignment operator */
-    DBus( const DBus& other );
-    DBus& operator=(const DBus& other);
+    DRpdoCachedVariable( const DRpdoCachedVariable& other );
+    DRpdoCachedVariable& operator=(const DRpdoCachedVariable& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -64,39 +66,13 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    //! Call it 1/sec or so to run internal state machines and other timed actions.
-    void tick();
-
-    //! This is to be used by device logic of this as well as child classes for sending msgs to the CAN interface.
-    void sendMessage(const CanMessage& msg);
-
-    // to be called when server is shutting down; will stop processing traffic, etc.
-    void shutDown();
-
-    bool isInSpyMode () const;
 
 private:
-    GhostPointer<CanModule::CCanAccess> m_canAccess;
 
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
-    std::chrono::steady_clock::time_point m_lastSyncTimePoint;
-    std::chrono::steady_clock::time_point m_lastStatsCalc;
-
-    void invokeNodeGuarding();
-    void tickSync();
-    void tickPublishingStatistics ();
-
-    //! Every message received (by CanModule) goes via this function.
-    void onMessageReceived (const CanMessage& msg);
-
-    void onError (const int errorCode, const char* errorDescription, timeval&);
-
-    
-    
 
 
 };
 
 }
 
-#endif // __DBus__H__
+#endif // __DRpdoCachedVariable__H__

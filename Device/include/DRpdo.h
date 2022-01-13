@@ -18,34 +18,27 @@
  */
 
 
-#ifndef __DBus__H__
-#define __DBus__H__
+#ifndef __DRpdo__H__
+#define __DRpdo__H__
 
-#include <chrono>
-
-#include <GhostPointer.h>
-#include <CCanAccess.h>
-
-#include <NodeGuarding.hpp>
-
-#include <Base_DBus.h>
+#include <Base_DRpdo.h>
 
 namespace Device
 {
 
 class
-    DBus
-    : public Base_DBus
+    DRpdo
+    : public Base_DRpdo
 {
 
 public:
     /* sample constructor */
-    explicit DBus (
-        const Configuration::Bus& config,
-        Parent_DBus* parent
+    explicit DRpdo (
+        const Configuration::Rpdo& config,
+        Parent_DRpdo* parent
     ) ;
     /* sample dtr */
-    ~DBus ();
+    ~DRpdo ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -55,8 +48,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DBus( const DBus& other );
-    DBus& operator=(const DBus& other);
+    DRpdo( const DRpdo& other );
+    DRpdo& operator=(const DRpdo& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -64,39 +57,14 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    //! Call it 1/sec or so to run internal state machines and other timed actions.
-    void tick();
-
-    //! This is to be used by device logic of this as well as child classes for sending msgs to the CAN interface.
-    void sendMessage(const CanMessage& msg);
-
-    // to be called when server is shutting down; will stop processing traffic, etc.
-    void shutDown();
-
-    bool isInSpyMode () const;
 
 private:
-    GhostPointer<CanModule::CCanAccess> m_canAccess;
+    std::vector<uint8_t> m_cache;
 
-    std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint; // probably remove - went to the DNode
-    std::chrono::steady_clock::time_point m_lastSyncTimePoint;
-    std::chrono::steady_clock::time_point m_lastStatsCalc;
-
-    void invokeNodeGuarding();
-    void tickSync();
-    void tickPublishingStatistics ();
-
-    //! Every message received (by CanModule) goes via this function.
-    void onMessageReceived (const CanMessage& msg);
-
-    void onError (const int errorCode, const char* errorDescription, timeval&);
-
-    
-    
 
 
 };
 
 }
 
-#endif // __DBus__H__
+#endif // __DRpdo__H__

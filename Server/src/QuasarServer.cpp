@@ -85,6 +85,7 @@ void QuasarServer::initializeLogIt()
 	Log::registerLoggingComponent("CanModule");
 	Log::registerLoggingComponent("Spooky");
     Log::registerLoggingComponent("NodeMgmt");
+    Log::registerLoggingComponent("Sdo");
     LOG(Log::INF) << "Logging initialized.";
 }
 

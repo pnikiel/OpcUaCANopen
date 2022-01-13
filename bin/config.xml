@@ -8,12 +8,14 @@
 	<StandardMetaData>
 		<Log>
 			<ComponentLogLevels>
-				<ComponentLogLevel logLevel="ERR" componentName="CanModule" /><ComponentLogLevel
-					logLevel="TRC" componentName="CalcVars" />
+				<ComponentLogLevel logLevel="ERR" componentName="CanModule" />
+				<ComponentLogLevel
+					logLevel="INF" componentName="CalcVars" />
+				<ComponentLogLevel logLevel="TRC" componentName="Sdo" />
 			</ComponentLogLevels>
 		</Log>
 	</StandardMetaData>
-	<GlobalSettings name="GlobalSettings" spyMode="enforceTrue" />
+	<GlobalSettings name="GlobalSettings"  />
 	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1">
 			&ELMB;

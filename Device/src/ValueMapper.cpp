@@ -54,3 +54,45 @@ UaVariant ValueMapper::extractFromFrameIntoVariant (const CanMessage& msg, const
 {
     return extractFromBytesIntoVariant(msg.c_data, msg.c_dlc, dataType, offset, booleanFromBit);
 }
+
+std::vector<uint8_t> ValueMapper::packVariantToBytes ( // offset and all the rest probably not relevant in this direction
+    const UaVariant& data,
+    const std::string& dataType
+)
+{
+    std::vector<uint8_t> bytes;
+    if (dataType == "Int32")
+    {
+        int32_t out;
+        if (data.toInt32(out) != OpcUa_Good)
+            throw std::runtime_error("Failed transforming variant to bytes");
+        bytes.assign(sizeof out, 0);
+        std::copy(
+            (uint8_t*)&out,
+            (uint8_t*)&out + sizeof out,
+            bytes.begin());
+    }
+    else if (dataType == "UInt32")
+    {
+        uint32_t out;
+        if (data.toUInt32(out) != OpcUa_Good)
+            throw std::runtime_error("Failed transforming variant to bytes");
+        bytes.assign(sizeof out, 0);
+        std::copy(
+            (uint8_t*)&out,
+            (uint8_t*)&out + sizeof out,
+            bytes.begin());
+    }
+    else if (dataType == "Boolean")
+    {
+        uint8_t out; // OPC-UA boolean is uint8_t
+        if (data.toBoolean(out) != OpcUa_Good)
+            throw std::runtime_error("Failed transforming variant to bytes");
+        bytes.assign(1, (uint8_t)out);
+        // TODO: encoding to bits?
+
+    }
+    else
+        throw std::runtime_error("Datatype is not recognized");
+    return bytes;
+}

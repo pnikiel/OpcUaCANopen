@@ -20,10 +20,8 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DTpdo.h>
-#include <ASTpdo.h>
-
-#include <DExtractedValue.h>
+#include <DRpdo.h>
+#include <ASRpdo.h>
 
 namespace Device
 {
@@ -49,11 +47,11 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DTpdo::DTpdo (
-    const Configuration::Tpdo& config,
-    Parent_DTpdo* parent
+DRpdo::DRpdo (
+    const Configuration::Rpdo& config,
+    Parent_DRpdo* parent
 ):
-    Base_DTpdo( config, parent)
+    Base_DRpdo( config, parent)
 
     /* fill up constructor initialization list here */
 {
@@ -61,7 +59,7 @@ DTpdo::DTpdo (
 }
 
 /* sample dtr */
-DTpdo::~DTpdo ()
+DRpdo::~DRpdo ()
 {
 }
 
@@ -76,14 +74,5 @@ DTpdo::~DTpdo ()
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
-
-void DTpdo::onReplyReceived(const CanMessage& msg)
-{
-    LOG(Log::TRC) << "received TPDO reply: " << msg.toString();
-    for (DExtractedValue* extractedValue : extractedvalues())
-    {
-        extractedValue->onReplyReceived(msg);
-    }
-}
 
 }

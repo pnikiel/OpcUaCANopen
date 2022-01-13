@@ -17,4 +17,9 @@ public:
         unsigned int offset, 
         const std::string& booleanFromBit);
 
+    static std::vector<uint8_t> packVariantToBytes ( // offset and all the rest probably not relevant in this direction
+        const UaVariant& data,
+        const std::string& dataType
+    );
+
 };

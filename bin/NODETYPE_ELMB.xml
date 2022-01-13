@@ -4,7 +4,7 @@ object dictionary -->
 <!-- NodeError is gone as being useless for ELMB -->
 
 <Sdo index="1009" name="hwVersion">
-  <SdoItem subIndex="0" access="W" dataType="UInt32"  name="hwVersion" />
+  <SdoItem subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
 </Sdo>
 
 <Sdo index="100A" name="elmbSw" >
@@ -65,6 +65,7 @@ object dictionary -->
    <SdoItem subIndex="7" access="R" dataType="Int32" name="aisdo_6"/>
    <SdoItem subIndex="8" access="R" dataType="Int32" name="aisdo_7"/>
    <SdoItem subIndex="9" access="R" dataType="Int32" name="aisdo_8"/>
+   <!--
    <SdoItem subIndex="A" access="R" dataType="Int32" name="aisdo_9"/>
    <SdoItem subIndex="B" access="R" dataType="Int32" name="aisdo_10"/>
    <SdoItem subIndex="C" access="R" dataType="Int32" name="aisdo_11"/>
@@ -120,6 +121,7 @@ object dictionary -->
    <SdoItem subIndex="3E" access="R" dataType="Int32" name="aisdo_61"/>
    <SdoItem subIndex="3F" access="R" dataType="Int32" name="aisdo_62"/>
    <SdoItem subIndex="40" access="R" dataType="Int32" name="aisdo_63"/>
+-->
 </Sdo>
 
 <!--SPI interface-->
@@ -229,3 +231,6 @@ object dictionary -->
     </MultiplexedChannel>
   </GenerateIdenticalChannels>
 </TpdoMultiplex>
+<Rpdo name="RPDO1" selector="1">
+  <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
+</Rpdo>

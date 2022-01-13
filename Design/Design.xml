@@ -1,18 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <d:design xmlns:d="http://cern.ch/quasar/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" projectShortName="OpcUaNewCANopenServer" xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd " author="Piotr Nikiel (ATLAS Central DCS)">
   <d:class name="GlobalSettings">
-  	<d:devicelogic></d:devicelogic>
-  	<d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse"
-  		storedInDeviceObject="true">
-  		<d:configRestriction>
-  			<d:restrictionByEnumeration>
-  				<d:enumerationValue value="enforceTrue" />
-  				<d:enumerationValue value="suggestFalse" />
-  			</d:restrictionByEnumeration>
-  		</d:configRestriction>
-  		<d:documentation>enforceTrue enables spy mode on all buses declared in the configuration. See FC4.1 for exact documentation of the spy mode feature.</d:documentation>
-  	</d:configentry>
-  	<d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
+    <d:devicelogic/>
+    <d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="enforceTrue"/>
+          <d:enumerationValue value="suggestFalse"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+      <d:documentation>enforceTrue enables spy mode on all buses declared in the configuration. See FC4.1 for exact documentation of the spy mode feature.</d:documentation>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Double" name="expeditedSdoTimeoutSeconds" defaultValue="1" storedInDeviceObject="true">
+      <d:documentation>
+  			Max time between SDO request (from server) and SDO reply (from a CANopen node) that is
+  			permissible; otherwise a timeout condition is considered.
+  		</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="0.001"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
   <d:class name="Warnings">
   </d:class>
@@ -47,14 +55,14 @@
       </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="spyMode" defaultValue="inheritFromGlobalSettings">
-    	<d:configRestriction>
-    		<d:restrictionByEnumeration>
-    			<d:enumerationValue value="true" />
-    			<d:enumerationValue value="false" />
-    			<d:enumerationValue value="inheritFromGlobalSettings"></d:enumerationValue>
-    		</d:restrictionByEnumeration>
-    	</d:configRestriction>
-    	<d:documentation>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="true"/>
+          <d:enumerationValue value="false"/>
+          <d:enumerationValue value="inheritFromGlobalSettings"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+      <d:documentation>
     		When activated (i.e. true, or inheriting true from global settings) the server will never
     		transmit anything on that particular bus and will listen only. This mode is useful
 
@@ -80,7 +88,9 @@
     </d:cachevariable>
   </d:class>
   <d:class name="Node">
-    <d:devicelogic/>
+    <d:devicelogic>
+      <d:mutex/>
+    </d:devicelogic>
     <d:configentry dataType="OpcUa_Byte" name="id" isKey="true" storedInDeviceObject="true">
       <d:configRestriction>
         <d:restrictionByBounds minInclusive="1"/>
@@ -116,15 +126,18 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:cachevariable>
-    <d:method name="reset" executionSynchronicity="asynchronous">
+    <d:method name="reset" executionSynchronicity="asynchronous" addressSpaceCallUseMutex="of_containing_object">
       <d:returnvalue dataType="OpcUa_Boolean" name="bootupReceived"/>
-      <d:documentation>Attempts node reset by sending NMT request. Will return success if the node replied within bootup message. Otherwise will fail.</d:documentation>
+      <d:documentation>
+    		Attempts node reset by sending NMT request. Will return success if the node replied within
+    		bootup message. Otherwise will fail.
+    	</d:documentation>
     </d:method>
     <d:hasobjects instantiateUsing="configuration" class="Tpdo"/>
-    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/><d:hasobjects
-    	instantiateUsing="configuration" class="Rpdo">
+    <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
+    <d:hasobjects instantiateUsing="configuration" class="Rpdo">
 </d:hasobjects>
-  	<d:hasobjects instantiateUsing="configuration" class="Sdo"/>
+    <d:hasobjects instantiateUsing="configuration" class="Sdo"/>
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic/>
@@ -160,6 +173,52 @@
     <d:hasobjects instantiateUsing="configuration" class="GenerateIdenticalChannels"/>
   </d:class>
   <d:class name="Rpdo">
+    <d:devicelogic>
+      <d:mutex/>
+    </d:devicelogic>
+        <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
+      <d:documentation>
+            The selector code of the RPDO, for RPDO1 it should be 1,
+            etc.
+        </d:documentation>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="1"/>
+          <d:enumerationValue value="2"/>
+          <d:enumerationValue value="3"/>
+          <d:enumerationValue value="4"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:hasobjects instantiateUsing="configuration" class="RpdoCachedVariable"/>
+  </d:class>
+  <d:class name="RpdoCachedVariable">
+    <d:devicelogic/>
+    <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="of_parent_of_containing_object" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_parent_of_containing_object">
+  	</d:sourcevariable>
+    <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="Boolean"/>
+          <d:enumerationValue value="Byte"/>
+          <d:enumerationValue value="UInt16"/>
+          <d:enumerationValue value="Int16"/>         
+          <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Int32"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Byte" name="offset" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByBounds maxInclusive="7"/>
+      </d:configRestriction>
+      <d:documentation>
+            Position in the RPDO payload to be sent at which this variable is mapped.
+        </d:documentation>
+    </d:configentry>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaByteString" name="cache"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good">
+    </d:cachevariable>
   </d:class>
   <d:class name="MultiplexedChannel">
     <d:devicelogic/>
@@ -210,33 +269,39 @@
   </d:class>
   <d:class name="SdoItem" singleVariableNode="true">
     <d:devicelogic/>
-    <d:configentry dataType="UaString" name="subIndex">
-    	<d:configRestriction>
-    		<d:restrictionByPattern pattern="[0-9A-F]{1,4}" />
-    	</d:configRestriction>
+    <d:configentry dataType="OpcUa_Byte" name="subIndex">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
+      </d:configRestriction>
+      <d:documentation>subIndex is decimal!</d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
-    	<d:configRestriction>
-    		<d:restrictionByEnumeration>
-    			<d:enumerationValue value="Boolean" />
-    			<d:enumerationValue value="Byte" />
-    			<d:enumerationValue value="UInt16" />
-    			<d:enumerationValue value="UInt32" />
-    			<d:enumerationValue value="Int32" />
-    		</d:restrictionByEnumeration>
-    	</d:configRestriction>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="Boolean"/>
+          <d:enumerationValue value="Byte"/>
+          <d:enumerationValue value="UInt16"/>
+          <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Int32"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="access" storedInDeviceObject="true">
-    	<d:configRestriction>
-    		<d:restrictionByPattern pattern="R|RW|W" />
-    	</d:configRestriction>
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="R|RW|W"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="UaString" name="booleanFromBit" defaultValue="-" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="0|1|2|3|4|5|6|7|-"/>
+      </d:configRestriction>
     </d:configentry>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">
 </d:sourcevariable>
   </d:class>
   <d:root>
-    <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"></d:hasobjects>
-    <d:hasobjects instantiateUsing="configuration" class="Warnings"></d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>
+    <d:hasobjects instantiateUsing="configuration" class="Warnings"/>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>
 </d:design>

@@ -15,8 +15,8 @@ class SdoEngine
     public:
         SdoEngine (MessageSendFunction messageSendFunction, unsigned char nodeId);
 
-        bool readExpedited (uint16_t index, uint16_t subIndex, std::vector<unsigned char>& output);
-        void writeExpedited (uint16_t index, uint16_t subIndex);
+        bool readExpedited (const std::string& where, uint16_t index, uint16_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMs=1000);
+        bool writeExpedited (const std::string& where, uint16_t index, uint16_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
 
         void replyCame (const CanMessage& msg);
 

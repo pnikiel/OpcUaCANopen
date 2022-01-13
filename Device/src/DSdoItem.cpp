@@ -25,9 +25,14 @@
 
 #include <DSdo.h>
 #include <DNode.h>
+#include <DRoot.h>
+#include <DGlobalSettings.h>
+#include <DBus.h>
 
 #include <ValueMapper.h>
 #include <Logging.hpp>
+
+
 
 using namespace Logging;
 
@@ -64,7 +69,7 @@ DSdoItem::DSdoItem (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
-    m_subIndex = std::stoi(config.subIndex(), nullptr, /*base*/ 16);
+    m_subIndex = config.subIndex(); // perhaps we should optimize it ;-)
 }
 
 /* sample dtr */
@@ -81,24 +86,37 @@ UaStatus DSdoItem::readValue (
     UaDateTime& sourceTime
 )
 {
-    // TODO: check if "R" is included in the arguments
+    /* Is it actually allowed to read this SDO? */
     if (access().find("R") == std::string::npos)
     {
-        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because of configuration.";
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because it is denied in the configuration.";
         return OpcUa_BadUserAccessDenied;
     }
+    /* Not in spy mode? */
+    if (getParent()->getParent()->getParent()->isInSpyMode())
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
+        return OpcUa_BadOutOfService;
+    }
+
     std::vector<unsigned char> readData;
-    bool status = getParent()->getParent()->sdoEngine().readExpedited(getParent()->index(), m_subIndex, readData); // TODO 0
+    bool status = getParent()->getParent()->sdoEngine().readExpedited(
+        getFullName(),
+        getParent()->index(), 
+        m_subIndex, 
+        readData, 
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());
     if (!status)
         return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
+    LOG(Log::TRC) << wrapId(getFullName()) << "SDO transaction finished, performing value mapping now";
     try
     {
-        value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, "");
+        value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, booleanFromBit());
     }
     catch(const std::exception& e)
     {
-        LOG(Log::ERR) << e.what();
+        LOG(Log::ERR) << e.what() << "(note: dataType was " << dataType() << ")";
         return OpcUa_Bad;
     }
     return OpcUa_Good;
@@ -108,7 +126,31 @@ UaStatus DSdoItem::writeValue (
     UaVariant& value
 )
 {
-    return OpcUa_BadNotImplemented;
+    /* Is it actually allowed to write this SDO? */
+    if (access().find("W") == std::string::npos)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO write was denied because it is denied in the configuration.";
+        return OpcUa_BadUserAccessDenied;
+    }
+
+    /* Not in spy mode? */
+    if (getParent()->getParent()->getParent()->isInSpyMode())
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
+        return OpcUa_BadOutOfService;
+    }
+
+    // Synchronization: use quasar's made mutex:
+    std::lock_guard<boost::mutex> lock (getParent()->getParent()->getLock());
+
+    std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+    bool status = getParent()->getParent()->sdoEngine().writeExpedited(
+        getFullName(),
+        getParent()->index(), 
+        m_subIndex, 
+        bytes, 
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());    
+    return status ? OpcUa_Good : OpcUa_Bad;
 }
 
 /* delegators for methods */
