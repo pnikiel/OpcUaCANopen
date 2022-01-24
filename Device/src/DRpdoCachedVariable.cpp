@@ -22,6 +22,14 @@
 
 #include <DRpdoCachedVariable.h>
 #include <ASRpdoCachedVariable.h>
+#include <DRpdo.h>
+#include <DNode.h>
+#include <DBus.h>
+
+#include <ValueMapper.h>
+#include <Logging.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -72,15 +80,60 @@ UaStatus DRpdoCachedVariable::readValue (
     UaDateTime& sourceTime
 )
 {
-    sourceTime = UaDateTime::now();
-    return OpcUa_BadNotImplemented;
+    try
+    {
+        value = ValueMapper::extractFromBytesIntoVariant(&getParent()->getCache()[0], getParent()->getCache().size(), dataType(), offset(), std::to_string(booleanToBit()));
+        sourceTime = UaDateTime::now();
+        return OpcUa_Good;
+    }
+    catch(const std::exception& e)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << " readValue exception: " << e.what();
+        return OpcUa_Bad;
+    }
 }
+
 /* ASYNCHRONOUS !! */
 UaStatus DRpdoCachedVariable::writeValue (
     UaVariant& value
 )
 {
-    return OpcUa_BadNotImplemented;
+    // modify the cache
+    // if boolean ... we can't use the value packer because we're (or might be) on cross-byte boundary
+    if (dataType() == "Boolean")
+    {
+        OpcUa_Boolean b;
+        if (value.toBool(b) != OpcUa_Good)
+        {
+            LOG(Log::ERR, "Sdo") << wrapId (getFullName()) << " Received value can't be casted to boolean.";
+            throw std::runtime_error("Received value can't be casted to boolean.");
+        }
+        getParent()->getCache()[offset()] |= (b ? 0x01 : 0x00) << 3;
+    }
+    else
+    {
+        throw std::runtime_error("dataType not yet supported"); 
+    }
+       
+
+    // and send out cache to the device
+
+    CanMessage rpdoMessage;
+
+    if (getParent()->getCache().size() > sizeof(rpdoMessage.c_data))
+    {
+        throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
+    }
+
+    std::copy(
+        getParent()->getCache().begin(),
+        getParent()->getCache().end(),
+        rpdoMessage.c_data    
+    );
+
+    getParent()->propagateCache();
+    //getParent()->getParent()->getParent()->sendMessage(rpdoMessage);
+    return OpcUa_Good;
 }
 
 /* delegators for methods */

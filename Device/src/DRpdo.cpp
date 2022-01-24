@@ -22,6 +22,7 @@
 
 #include <DRpdo.h>
 #include <ASRpdo.h>
+#include <ArrayTools.h>
 
 namespace Device
 {
@@ -56,6 +57,7 @@ DRpdo::DRpdo (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    m_cache.assign(8, 0);
 }
 
 /* sample dtr */
@@ -74,5 +76,16 @@ DRpdo::~DRpdo ()
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+//! sends and publishes to the address-space
+void DRpdo::propagateCache()
+{
+    // this can certainly be done better!!
+    UaVariant out;
+    AddressSpace::ArrayTools::convertByteVectorToUaVariant(m_cache, out);
+    UaByteString bs;
+    out.toByteString(bs);
+    getAddressSpaceLink()->setCache(bs, OpcUa_Good);
+}
 
 }

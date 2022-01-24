@@ -117,7 +117,7 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
         {
             for (TpdoMultiplex& multiplex : node.TpdoMultiplex())
             {
-                for (GenerateIdenticalChannels& generator : multiplex.GenerateIdenticalChannels())
+                for (MultiplexedChannelConfigurationGenerator& generator : multiplex.MultiplexedChannelConfigurationGenerator())
                 {
                     if (generator.MultiplexedChannel().size() != 1)
                         throw std::runtime_error ("Bad configuration: GenerateIdenticalChannels must contain precisely one MultiplexedChannel to server as a specimen.");
@@ -144,7 +144,7 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
                 }
 
                 //! Generators has been run, throw them away.
-                DecorationUtils::clear(multiplex, multiplex.GenerateIdenticalChannels(), TpdoMultiplex::GenerateIdenticalChannels_id);
+                DecorationUtils::clear(multiplex, multiplex.MultiplexedChannelConfigurationGenerator(), TpdoMultiplex::MultiplexedChannelConfigurationGenerator_id);
 
             }
         }

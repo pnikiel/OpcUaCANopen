@@ -1,0 +1,20 @@
+<Sdo index="1802" name="aiTransmit" >
+ <SdoItem subIndex="2" access="RW" dataType="Byte" name="aiTransmissionType" />
+ <SdoItem subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
+</Sdo>
+
+<Sdo index="2100" name="aiConfig" >
+ <SdoItem subIndex="1" access="RW" dataType="Byte" name="channelMax" />
+ <SdoItem subIndex="2" access="RW" dataType="Byte" name="rate" />
+ <SdoItem subIndex="3" access="RW" dataType="Byte" name="range" />
+ <SdoItem subIndex="4" access="RW" dataType="Byte" name="mode" />
+</Sdo>
+
+<TpdoMultiplex name="TPDO3" selector="3" transportMechanism="sync">
+  <MultiplexedChannelConfigurationGenerator numberOfChannels="64" name="gic">
+    <MultiplexedChannel name="specimen" id="1">
+      <ExtractedValue name="adcFlag" dataType="Byte" offset="1" />
+      <ExtractedValue name="value" dataType="Int32" offset="2" />
+    </MultiplexedChannel>
+  </MultiplexedChannelConfigurationGenerator>
+</TpdoMultiplex>
