@@ -16,14 +16,21 @@
 
 
  */
-
+\
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
 #include <DTpdo.h>
 #include <ASTpdo.h>
+#include <DNode.h>
+#include <DBus.h>
 
 #include <DExtractedValue.h>
+
+#include <Logging.hpp>
+#include <FrameFactory.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -58,6 +65,27 @@ DTpdo::DTpdo (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    // for the mode of on-sync supports rtr, we should send an RTR each time there is a state change towards preop
+    if (config.transportMechanism() == "asyncSupportsRtr")
+    {
+        getParent()->addNodeStateChangeCallBack(
+            [this](CANopen::NodeState previous, CANopen::NodeState current)
+            {
+                if (current == CANopen::NodeState::OPERATIONAL)
+                {
+                    if (getParent()->getParent()->isInSpyMode())
+                    {
+                        LOG(Log::TRC) << wrapId(getFullName()) << " would send RTR for state change into OPERATIONAL, but we're in the spy mode.";
+                    }
+                    else
+                    {
+                        // Note: Feature clause FP6.2
+                        LOG(Log::TRC) << wrapId(getFullName()) << " sending RTR for state change into OPERATIONAL";
+                        this->sendRtr();
+                    }
+                }
+            });
+    }
 }
 
 /* sample dtr */
@@ -84,6 +112,14 @@ void DTpdo::onReplyReceived(const CanMessage& msg)
     {
         extractedValue->onReplyReceived(msg);
     }
+}
+
+void DTpdo::sendRtr()
+{
+    // only when in non spy mode!!!! --> also complete the documentation
+    // TODO: send this fucking RTR.
+    getParent()->getParent()->sendMessage(
+        CANopen::makeTpdoRtr(getParent()->id(), 0x180/*TODO*/));
 }
 
 }

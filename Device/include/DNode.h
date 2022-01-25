@@ -77,6 +77,8 @@ public:
 
     CANopen::SdoEngine& sdoEngine() { return m_sdoEngine; }
 
+    void addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack);
+
 private:
     void onNodeManagementReplyReceived (const CanMessage& msg);
     void onBootupReceived (const CanMessage& msg);
@@ -87,6 +89,7 @@ private:
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
     CANopen::SdoEngine m_sdoEngine;
     
+    std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
 
 };
 

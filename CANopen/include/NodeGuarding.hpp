@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <functional>
 
 #include <Definitions.hpp>
 
@@ -22,5 +23,7 @@ std::string stateEnumToText (NodeState state);
 NodeState textToStateEnum (const std::string& text);
 
 NodeState noToggleNgReplyToStateEnum (uint8_t noToggleReply);
+
+typedef std::function<void(NodeState previous, NodeState current)> NodeStateChangeCallBack;
 
 }

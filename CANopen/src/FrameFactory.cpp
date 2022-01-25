@@ -29,4 +29,13 @@ CanMessage makeSyncRequest ()
     return syncRequest;
 }
 
+CanMessage makeTpdoRtr (uint8_t targetId, uint16_t cobid)
+{
+    CanMessage tpdoRtr;
+    tpdoRtr.c_id = cobid + targetId;
+    tpdoRtr.c_rtr = true;
+    tpdoRtr.c_dlc = 0;
+    return tpdoRtr;    
+}
+
 }

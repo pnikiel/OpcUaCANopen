@@ -214,6 +214,9 @@ void DNode::onNodeManagementReplyReceived (const CanMessage& msg)
             {
                 LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " state change was seen, last known state was "
                     << wrapValue(CANopen::stateEnumToText(m_previousState)) << " current is " << wrapValue(CANopen::stateEnumToText(currentState)); // TODO what state into what state?
+                // TODO here we should have a list of state changes receivers.
+                for (CANopen::NodeStateChangeCallBack callBack : m_nodeStateChangeCallBacks)
+                    callBack(m_previousState, currentState);
             }
             // TODO what shall we do?
             // For going to operational, we should send RTRs
@@ -293,6 +296,11 @@ void DNode::tick()
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
         m_lastNodeGuardingTimePoint = now;
     }
+}
+
+void DNode::addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack)
+{
+    m_nodeStateChangeCallBacks.push_back(callBack);
 }
 
 }

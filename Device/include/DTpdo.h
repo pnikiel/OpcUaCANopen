@@ -63,7 +63,8 @@ public:
 
 
 private:
-
+    // sends RTR corresponding to this TPDO
+    void sendRtr();
 
 
 };
