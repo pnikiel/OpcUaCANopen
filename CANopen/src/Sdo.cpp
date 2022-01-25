@@ -48,7 +48,7 @@ bool SdoEngine::readExpedited (
     initiateDomainUpload.c_data[1] = index;
     initiateDomainUpload.c_data[2] = index >> 8;
     initiateDomainUpload.c_data[3] = subIndex;
-    initiateDomainUpload.c_dlc = 4; // TODO this is to be checked!!
+    initiateDomainUpload.c_dlc = 8; // TODO this is to be checked!!  Was checked and 4 did not work. Trying ;-)
     m_sendFunction(initiateDomainUpload);
 
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));

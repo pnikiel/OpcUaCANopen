@@ -197,7 +197,7 @@ object dictionary -->
  <SdoItem subIndex="24" access="RW" dataType="Boolean" name="do_F_7"/>
 </Sdo>
 
-<Tpdo name="TPDO1" selector="1">
+<Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">
   <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />
   <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_F_1" offset="0" />
   <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_F_2" offset="0" />
@@ -223,13 +223,13 @@ object dictionary -->
   <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_C_6" offset="2" />
   <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_C_7" offset="2" />
 </Tpdo>
-<TpdoMultiplex name="TPDO3" selector="3">
-  <GenerateIdenticalChannels numberOfChannels="64" name="gic">
+<TpdoMultiplex name="TPDO3" selector="3" transportMechanism="sync">
+  <MultiplexedChannelConfigurationGenerator numberOfChannels="64" name="gic">
     <MultiplexedChannel name="specimen" id="1">
       <ExtractedValue name="adcFlag" dataType="Byte" offset="1" />
       <ExtractedValue name="value" dataType="Int32" offset="2" />
     </MultiplexedChannel>
-  </GenerateIdenticalChannels>
+  </MultiplexedChannelConfigurationGenerator>
 </TpdoMultiplex>
 <Rpdo name="RPDO1" selector="1">
   <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
