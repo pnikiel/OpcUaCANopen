@@ -23,6 +23,10 @@
 #include <DRpdo.h>
 #include <ASRpdo.h>
 #include <ArrayTools.h>
+#include <DNode.h>
+#include <DBus.h>
+
+#include <CanMessage.h>
 
 namespace Device
 {
@@ -86,6 +90,23 @@ void DRpdo::propagateCache()
     UaByteString bs;
     out.toByteString(bs);
     getAddressSpaceLink()->setCache(bs, OpcUa_Good);
+
+    CanMessage rpdoMessage;
+
+    if (getCache().size() > sizeof(rpdoMessage.c_data))
+    {
+        throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
+    }
+
+    std::copy(
+        getCache().begin(),
+        getCache().end(),
+        rpdoMessage.c_data    
+    );
+
+    rpdoMessage.c_id = 0x200 + getParent()->id();
+    rpdoMessage.c_dlc = sizeof m_cache;
+    getParent()->getParent()->sendMessage(rpdoMessage);
 }
 
 }

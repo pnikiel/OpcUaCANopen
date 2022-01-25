@@ -112,24 +112,17 @@ UaStatus DRpdoCachedVariable::writeValue (
     }
     else
     {
-        throw std::runtime_error("dataType not yet supported"); 
+        std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+        std::copy(
+            bytes.begin(),
+            bytes.end(),
+            getParent()->getCache().begin()); // TODO: we're missiing cache there!
     }
        
 
     // and send out cache to the device
 
-    CanMessage rpdoMessage;
 
-    if (getParent()->getCache().size() > sizeof(rpdoMessage.c_data))
-    {
-        throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
-    }
-
-    std::copy(
-        getParent()->getCache().begin(),
-        getParent()->getCache().end(),
-        rpdoMessage.c_data    
-    );
 
     getParent()->propagateCache();
     //getParent()->getParent()->getParent()->sendMessage(rpdoMessage);

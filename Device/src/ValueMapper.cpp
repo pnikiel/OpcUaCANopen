@@ -9,6 +9,18 @@ static T bytesAsTypePrimitiveCast(const uint8_t* bytes, size_t size, size_t offs
     return *(T*)&bytes[offset];
 }
 
+template<typename T>
+std::vector<uint8_t> typeAsBytesPrimitiveCast(T input)
+{
+    std::vector<uint8_t> bytes;
+    bytes.assign(sizeof input, 0);
+    std::copy(
+        (uint8_t*)&input,
+        (uint8_t*)&input + sizeof input,
+        bytes.begin());
+    return bytes;
+}
+
 UaVariant ValueMapper::extractFromBytesIntoVariant (
     const uint8_t* bytes, 
     size_t size,
@@ -66,23 +78,22 @@ std::vector<uint8_t> ValueMapper::packVariantToBytes ( // offset and all the res
         int32_t out;
         if (data.toInt32(out) != OpcUa_Good)
             throw std::runtime_error("Failed transforming variant to bytes");
-        bytes.assign(sizeof out, 0);
-        std::copy(
-            (uint8_t*)&out,
-            (uint8_t*)&out + sizeof out,
-            bytes.begin());
+        return typeAsBytesPrimitiveCast(out);
     }
     else if (dataType == "UInt32")
     {
         uint32_t out;
         if (data.toUInt32(out) != OpcUa_Good)
             throw std::runtime_error("Failed transforming variant to bytes");
-        bytes.assign(sizeof out, 0);
-        std::copy(
-            (uint8_t*)&out,
-            (uint8_t*)&out + sizeof out,
-            bytes.begin());
+        return typeAsBytesPrimitiveCast(out);
     }
+    if (dataType == "UInt16")
+    {
+        uint16_t out;
+        if (data.toUInt16(out) != OpcUa_Good)
+            throw std::runtime_error("Failed transforming variant to bytes");
+        return typeAsBytesPrimitiveCast(out);
+    } 
     else if (dataType == "Boolean")
     {
         uint8_t out; // OPC-UA boolean is uint8_t
