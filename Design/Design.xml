@@ -152,10 +152,13 @@
   </d:class>
   <d:class name="EmergencyParser">
     <d:devicelogic/>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt16" name="errorCode" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-  	</d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="errorRegister" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-  	</d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt16" name="lastErrorCode" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorRegister" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte3" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte4" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte5" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte6" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte7" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic/>

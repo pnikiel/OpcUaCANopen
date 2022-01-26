@@ -78,7 +78,13 @@ DEmergencyParser::~DEmergencyParser ()
 void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
 {
     uint16_t errorCode = msg.c_data[0] | (msg.c_data[1] << 8);
-    getAddressSpaceLink()->setErrorCode(errorCode, OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorCode(errorCode, OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorRegister(msg.c_data[2], OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorByte3(msg.c_data[3], OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorByte4(msg.c_data[4], OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorByte5(msg.c_data[5], OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorByte6(msg.c_data[6], OpcUa_Good);
+    getAddressSpaceLink()->setLastErrorByte7(msg.c_data[7], OpcUa_Good);
 }
 
 }
