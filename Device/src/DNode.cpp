@@ -30,6 +30,7 @@
 
 #include <DTpdoMultiplex.h>
 #include <DTpdo.h>
+#include <DEmergencyParser.h>
 
 #include <FrameFactory.hpp>
 
@@ -145,6 +146,9 @@ void DNode::onMessageReceived (const CanMessage& msg)
     unsigned int functionCode = msg.c_id >> 7;
     switch (functionCode)
     {
+        case 0x1:
+            onEmergencyReceived(msg); break;
+
         // TPDOs
         case 0x3: // TPDO1
         case 0x5: // TPDO2
@@ -171,6 +175,11 @@ void DNode::onBootupReceived (const CanMessage& msg)
     getAddressSpaceLink()->setBootupCounter( getAddressSpaceLink()->getBootupCounter()+1, OpcUa_Good );
 
     // TODO FSM notification that reception of bootup is equivalent of the PREOP state
+}
+
+void DNode::onEmergencyReceived (const CanMessage& msg)
+{
+    emergencyparsers()[0]->onEmergencyReceived(msg);
 }
 
 void DNode::onNodeManagementReplyReceived (const CanMessage& msg)

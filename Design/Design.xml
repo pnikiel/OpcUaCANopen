@@ -138,6 +138,9 @@
     <d:hasobjects instantiateUsing="configuration" class="Rpdo">
 </d:hasobjects>
     <d:hasobjects instantiateUsing="configuration" class="Sdo"/>
+    <d:hasobjects instantiateUsing="design" class="EmergencyParser">
+      <d:object name="Emergency"/>
+    </d:hasobjects>
     <d:configentry dataType="UaString" name="stateInfoSource">
       <d:configRestriction>
         <d:restrictionByEnumeration>
@@ -146,6 +149,13 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
+  </d:class>
+  <d:class name="EmergencyParser">
+    <d:devicelogic/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt16" name="errorCode" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+  	</d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="errorRegister" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+  	</d:cachevariable>
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic/>
@@ -194,7 +204,7 @@
           <d:enumerationValue value="publieCommeRecu"/>
         </d:restrictionByEnumeration>
       </d:configRestriction>
-    </d:configentry>  
+    </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannelConfigurationGenerator"/>
   </d:class>
