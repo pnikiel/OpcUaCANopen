@@ -85,6 +85,9 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
     getAddressSpaceLink()->setLastErrorByte5(msg.c_data[5], OpcUa_Good);
     getAddressSpaceLink()->setLastErrorByte6(msg.c_data[6], OpcUa_Good);
     getAddressSpaceLink()->setLastErrorByte7(msg.c_data[7], OpcUa_Good);
+
+    // FE2.1: Count emergencies
+    getAddressSpaceLink()->setEmergencyErrorCounter(getAddressSpaceLink()->getEmergencyErrorCounter()+1, OpcUa_Good);
 }
 
 }
