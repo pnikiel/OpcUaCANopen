@@ -23,6 +23,10 @@
 #include <DEmergencyParser.h>
 #include <ASEmergencyParser.h>
 
+#include <Logging.hpp>
+
+using namespace Logging;
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -88,6 +92,11 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
 
     // FE2.1: Count emergencies
     getAddressSpaceLink()->setEmergencyErrorCounter(getAddressSpaceLink()->getEmergencyErrorCounter()+1, OpcUa_Good);
+
+    //TODO: we should print that we received emergency messages with error severity ERR
+    // do it!
+    LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << "Received emergency, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
+        ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter()));
 }
 
 }
