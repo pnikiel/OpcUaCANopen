@@ -95,7 +95,7 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
 
     //TODO: we should print that we received emergency messages with error severity ERR
     // do it!
-    LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << "Received emergency, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
+    LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << ": received emergency, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
         ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter()));
 }
 
