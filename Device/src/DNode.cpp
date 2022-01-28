@@ -61,6 +61,8 @@ namespace Device
 // 2     on list)                                                          2
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
+
+
 /* sample ctr */
 DNode::DNode (
     const Configuration::Node& config,
@@ -70,7 +72,8 @@ DNode::DNode (
         m_requestedStateEnum(CANopen::textToStateEnum(config.requestedState())),
         m_previousState(CANopen::NodeState::UNKNOWN),
         m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
-        m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id())
+        m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id()),
+        m_nodeStateEngine(CANopen::stateInfoModelFromText(config.stateInfoSource()), 10, getFullName() ) // TODO: fix 10  
 
     /* fill up constructor initialization list here */
 {
@@ -283,6 +286,8 @@ void DNode::onTpdoReceived (const CanMessage& msg)
 
 void DNode::tick()
 {
+    m_nodeStateEngine.tick();
+
     // Feature FN1.1
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
 

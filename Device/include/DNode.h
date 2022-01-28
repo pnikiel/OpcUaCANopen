@@ -31,6 +31,8 @@
 
 #include <CanMessage.h>
 
+#include <NodeStateEngine.hpp>
+
 namespace Device
 {
 
@@ -91,6 +93,8 @@ private:
     CANopen::SdoEngine m_sdoEngine;
     
     std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
+
+    CANopen::NodeStateEngine m_nodeStateEngine;
 
 };
 
