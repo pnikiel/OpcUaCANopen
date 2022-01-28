@@ -1,5 +1,6 @@
 #include <condition_variable>
 #include <chrono>
+#include <iomanip>
 
 #include <LogIt.h>
 
@@ -16,7 +17,7 @@ static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
 {
     std::stringstream dataAsStr;
     for ( uint8_t byte : bytes)
-        dataAsStr << std::hex << (unsigned int)byte << ",";
+        dataAsStr << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)byte << ",";
     return dataAsStr.str(); 
 } 
 
@@ -97,8 +98,8 @@ bool SdoEngine::readExpedited (
         output.begin());
 
     LOG(Log::TRC, "Sdo") << 
-        wrapId(where) << " <-- SDO read index=" << wrapValue(Utils::toHexString(index)) << 
-        " subIndex=" << wrapValue(std::to_string(subIndex)) << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
+        wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
 
     return true;
 
