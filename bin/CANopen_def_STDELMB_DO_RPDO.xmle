@@ -1,0 +1,3 @@
+<Rpdo name="RPDO1" selector="1">
+  <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
+</Rpdo>
