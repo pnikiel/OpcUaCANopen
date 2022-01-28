@@ -33,7 +33,8 @@ bool SdoEngine::readExpedited (
     uint16_t subIndex, 
     std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
 {
-    LOG(Log::TRC, "Sdo") << "+ SDO read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
+    LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        " subIndex=" << wrapValue(std::to_string(subIndex));
     // TODO: we need to synchronize access to SDOs, preferably at the level of the node. (quasar synchronization)??
 
     std::unique_lock<std::mutex> lock (m_condVarChangeLock);
@@ -54,7 +55,10 @@ bool SdoEngine::readExpedited (
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR) << "SDO reply hasn't come";
+        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+            Quasar::TermColors::ForeRed << "SDO reply has not come in expected time (" << timeoutMs << "ms)" << 
+            Quasar::TermColors::StyleReset;
         return false;
     }
 
@@ -67,7 +71,10 @@ bool SdoEngine::readExpedited (
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (!deviceWantsExpeditedTransfer)
     {
-        LOG(Log::ERR) << "Device wants expedited transfer only!";
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+            Quasar::TermColors::ForeRed << "CANopen device wanted non-expedited transfer (" << timeoutMs << "ms)" << 
+            Quasar::TermColors::StyleReset;
         return false;
     }
 
@@ -77,7 +84,7 @@ bool SdoEngine::readExpedited (
     bool dataSetSizeIndicated = m_lastSdoReply.c_data[0] & 0x01;
     if (!dataSetSizeIndicated)
     {
-        LOG(Log::ERR) << "Data size set was not indicated!";
+        LOG(Log::ERR, "Sdo") << "Data size set was not indicated!";
         return false;
     }
     unsigned char sizeOfDataSet = 4 - ((m_lastSdoReply.c_data[0] & 0x0c) >> 2);
@@ -90,7 +97,8 @@ bool SdoEngine::readExpedited (
         output.begin());
 
     LOG(Log::TRC, "Sdo") << 
-        wrapId(where) << " + SDO read index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
+        wrapId(where) << " <-- SDO read index=" << wrapValue(Utils::toHexString(index)) << 
+        " subIndex=" << wrapValue(std::to_string(subIndex)) << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
 
     return true;
 
