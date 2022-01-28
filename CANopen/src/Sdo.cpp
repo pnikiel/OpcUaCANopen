@@ -58,8 +58,8 @@ bool SdoEngine::readExpedited (
     {
         LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            Quasar::TermColors::ForeRed << "SDO reply has not come in expected time (" << timeoutMs << "ms)" << 
-            Quasar::TermColors::StyleReset;
+            Quasar::TermColors::ForeRed() << " SDO reply has not come in expected time (" << timeoutMs << "ms)" << 
+            Quasar::TermColors::StyleReset();
         return false;
     }
 
