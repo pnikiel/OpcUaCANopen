@@ -301,7 +301,8 @@ void DNode::tick()
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
         // TODO move the current state to unknown
         
-        SPOOKY(getFullName()) << "Timeout for NodeGuarding reply." << SPOOKY_; 
+        LOG(Log::TRC, "NodeMgmt") << wrapId(getFullName()) << " Timeout for NodeGuarding reply. " << 
+            wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
     }
 
     if (millisecondsSinceLastNgRequest >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
