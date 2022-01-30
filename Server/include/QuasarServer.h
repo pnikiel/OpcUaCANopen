@@ -49,6 +49,10 @@ public:
 
     bool overridableConfigure(const std::string& fileName, AddressSpace::ASNodeManager *nm);
 
+    virtual void appendCustomCommandLineOptions(
+        boost::program_options::options_description& commandLineOptions, 
+        boost::program_options::positional_options_description& positionalOptionsDescription) override;
+
     bool processConfiguration(Configuration::Configuration& configuration);
 
 

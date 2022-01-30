@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration [
-        <!ENTITY STDELMB_DI_ON_CHANGE SYSTEM "NODETYPE_STDELMB_DI_ON_CHANGE.xml">
         <!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
         ]>
 <configuration xmlns="http://cern.ch/quasar/Configuration"
@@ -20,7 +19,6 @@
 	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
       &STDELMB_AI_TPDO3;
-			&STDELMB_DI_ON_CHANGE;
 		</Node>
 	</Bus>
 

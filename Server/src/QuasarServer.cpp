@@ -36,6 +36,25 @@
 
 using namespace Configuration;
 
+namespace po = boost::program_options;
+
+struct LogComponent
+{
+    std::string name;
+    std::string logLevelFromArgs;
+    Log::LogComponentHandle handle;
+    LogComponent(std::string _name): name(_name) {}
+};
+
+std::vector<LogComponent> LogComponents = 
+{
+    {"CanModule"},
+    {"NodeMgmt"},
+    {"Sdo"},
+    {"Spooky"},
+    {"Emergency"}
+};
+
 QuasarServer::QuasarServer() : BaseQuasarServer()
 {
 
@@ -66,7 +85,21 @@ void QuasarServer::mainLoop()
 void QuasarServer::initialize()
 {
     LOG(Log::INF) << "Initializing Quasar server.";
-
+    for (auto& logComponent : LogComponents)
+    {
+        if (logComponent.logLevelFromArgs != "")
+        {
+            Log::LOG_LEVEL level;
+            if (!Log::logLevelFromString(logComponent.logLevelFromArgs, level))
+            {
+                throw std::runtime_error("Failed parsing log level [" + logComponent.logLevelFromArgs + "] received from the command line");
+            }
+            if(Log::setComponentLogLevel(logComponent.handle, level))
+            {
+                LOG(Log::INF) << "Note: overriden log component [" << logComponent.name << "] to [" << logComponent.logLevelFromArgs << "]";
+            }
+        }
+    }
 }
 
 void QuasarServer::shutdown()
@@ -82,11 +115,8 @@ void QuasarServer::shutdown()
 void QuasarServer::initializeLogIt()
 {
 	BaseQuasarServer::initializeLogIt();
-	Log::registerLoggingComponent("CanModule");
-	Log::registerLoggingComponent("Spooky");
-    Log::registerLoggingComponent("NodeMgmt");
-    Log::registerLoggingComponent("Sdo");
-    Log::registerLoggingComponent("Emergency");
+    for (auto& logComponent : LogComponents)
+        logComponent.handle = Log::registerLoggingComponent(logComponent.name);     
     LOG(Log::INF) << "Logging initialized.";
 }
 
@@ -152,4 +182,14 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
     }
     
     return true;
+}
+
+
+
+void QuasarServer::appendCustomCommandLineOptions(
+    boost::program_options::options_description& commandLineOptions, 
+    boost::program_options::positional_options_description& positionalOptionsDescription)
+{
+    for (auto& logComponent : LogComponents)
+        commandLineOptions.add_options()(("l" + logComponent.name).c_str(), po::value<std::string>(&logComponent.logLevelFromArgs), (logComponent.name + " log level [ERR,WRN,INF,DBG,TRC]").c_str());
 }
