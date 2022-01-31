@@ -89,9 +89,9 @@
 <!-- Note: the order here is by Sdo index, and it follows Henk's ELMBio documentation chapter about
 object dictionary -->
 
-<SdoVariable index="2500" subIndex="1" name="aoChannelMax" dataType="byte" access="R" />
-<SdoVariable index="2500" subIndex="2" name="dacType" dataType="byte" access="RW" />
-<SdoVariable index="2500" subIndex="3" name="aoSpiSclkHigh" dataType="byte" access="RW" />
+<SdoVariable index="2500" subIndex="1" name="aoChannelMax" dataType="Byte" access="R" />
+<SdoVariable index="2500" subIndex="2" name="dacType" dataType="Byte" access="RW" />
+<SdoVariable index="2500" subIndex="3" name="aoSpiSclkHigh" dataType="Byte" access="RW" />
 
 <SdoVariable index="6411" subIndex="01" name="ao_0" dataType="UInt16" access="RW" />
 <SdoVariable index="6411" subIndex="02" name="ao_1" dataType="UInt16" access="RW" />
