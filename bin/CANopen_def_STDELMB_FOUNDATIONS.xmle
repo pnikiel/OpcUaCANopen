@@ -1,30 +1,30 @@
 <!-- NodeError is gone as being useless for ELMB -->
 
 <SdoSameIndexGroup index="1009" name="hwVersion">
-  <SdoItem subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
+  <SdoVariable subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="100A" name="elmbSw" >
-  <SdoItem subIndex="0" access="R" dataType="UInt32" name="swVersion" />
-  <SdoItem subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
+  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="swVersion" />
+  <SdoVariable subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="100C" name="guardTime">
-  <SdoItem subIndex="0" access="R" dataType="UInt16" name="guardTime" />
+  <SdoVariable subIndex="0" access="R" dataType="UInt16" name="guardTime" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="100D" name="lifeTime">
-  <SdoItem subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
+  <SdoVariable subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="1010" name="storeParams">
-  <SdoItem subIndex="1" access="RW" dataType="UInt32" name="save"/>
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="save"/>
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="1011" name="restoreParams">
-  <SdoItem subIndex="1" access="RW" dataType="UInt32" name="load"/>
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="load"/>
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="3100" name="serialNumber">
-  <SdoItem subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
+  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
 </SdoSameIndexGroup>

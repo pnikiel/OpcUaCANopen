@@ -18,27 +18,27 @@
  */
 
 
-#ifndef __DSdoItem__H__
-#define __DSdoItem__H__
+#ifndef __DSdoVariable__H__
+#define __DSdoVariable__H__
 
-#include <Base_DSdoItem.h>
+#include <Base_DSdoVariable.h>
 
 namespace Device
 {
 
 class
-    DSdoItem
-    : public Base_DSdoItem
+    DSdoVariable
+    : public Base_DSdoVariable
 {
 
 public:
     /* sample constructor */
-    explicit DSdoItem (
-        const Configuration::SdoItem& config,
-        Parent_DSdoItem* parent
+    explicit DSdoVariable (
+        const Configuration::SdoVariable& config,
+        Parent_DSdoVariable* parent
     ) ;
     /* sample dtr */
-    ~DSdoItem ();
+    ~DSdoVariable ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -57,8 +57,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DSdoItem( const DSdoItem& other );
-    DSdoItem& operator=(const DSdoItem& other);
+    DSdoVariable( const DSdoVariable& other );
+    DSdoVariable& operator=(const DSdoVariable& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -78,4 +78,4 @@ private:
 
 }
 
-#endif // __DSdoItem__H__
+#endif // __DSdoVariable__H__

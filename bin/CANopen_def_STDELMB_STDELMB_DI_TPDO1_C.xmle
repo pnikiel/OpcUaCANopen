@@ -1,19 +1,19 @@
 <SdoSameIndexGroup index="6006" name="diInterrupt" >
-  <SdoItem subIndex="1" access="RW" dataType="Byte" name="diInterruptMaskF" />
-  <SdoItem subIndex="2" access="RW" dataType="Byte" name="diInterruptMaskA" />
-  <SdoItem subIndex="3" access="RW" dataType="Byte" name="diInterruptMaskC" />
+  <SdoVariable subIndex="1" access="RW" dataType="Byte" name="diInterruptMaskF" />
+  <SdoVariable subIndex="2" access="RW" dataType="Byte" name="diInterruptMaskA" />
+  <SdoVariable subIndex="3" access="RW" dataType="Byte" name="diInterruptMaskC" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="6208" name="dioPortA" >
-  <SdoItem subIndex="2" access="RW" dataType="Byte" name="dioOutputMaskA" />
+  <SdoVariable subIndex="2" access="RW" dataType="Byte" name="dioOutputMaskA" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="6208" name="dioPortC" >
-  <SdoItem subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
+  <SdoVariable subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
 </SdoSameIndexGroup>
 
 <SdoSameIndexGroup index="6005" name="diGlobalInterruptEnable">
-  <SdoItem subIndex="0" access="RW" dataType="Boolean" name="diGlobalInterruptEnable" />
+  <SdoVariable subIndex="0" access="RW" dataType="Boolean" name="diGlobalInterruptEnable" />
 </SdoSameIndexGroup>
 
 <Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">

@@ -306,14 +306,14 @@
   </d:class>
   <d:class name="SdoSameIndexGroup">
     <d:devicelogic/>
-    <d:hasobjects instantiateUsing="configuration" class="SdoItem"/>
+    <d:hasobjects instantiateUsing="configuration" class="SdoVariable"/>
     <d:configentry dataType="UaString" name="index">
       <d:configRestriction>
         <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
       </d:configRestriction>
     </d:configentry>
   </d:class>
-  <d:class name="SdoItem" singleVariableNode="true">
+  <d:class name="SdoVariable" singleVariableNode="true">
     <d:devicelogic/>
     <d:configentry dataType="OpcUa_Byte" name="subIndex">
       <d:configRestriction>

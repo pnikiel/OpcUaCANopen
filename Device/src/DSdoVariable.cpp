@@ -20,8 +20,8 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DSdoItem.h>
-#include <ASSdoItem.h>
+#include <DSdoVariable.h>
+#include <ASSdoVariable.h>
 
 #include <DSdoSameIndexGroup.h>
 #include <DNode.h>
@@ -60,11 +60,11 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DSdoItem::DSdoItem (
-    const Configuration::SdoItem& config,
-    Parent_DSdoItem* parent
+DSdoVariable::DSdoVariable (
+    const Configuration::SdoVariable& config,
+    Parent_DSdoVariable* parent
 ):
-    Base_DSdoItem( config, parent)
+    Base_DSdoVariable( config, parent)
 
     /* fill up constructor initialization list here */
 {
@@ -73,7 +73,7 @@ DSdoItem::DSdoItem (
 }
 
 /* sample dtr */
-DSdoItem::~DSdoItem ()
+DSdoVariable::~DSdoVariable ()
 {
 }
 
@@ -81,7 +81,7 @@ DSdoItem::~DSdoItem ()
 
 
 /* ASYNCHRONOUS !! */
-UaStatus DSdoItem::readValue (
+UaStatus DSdoVariable::readValue (
     UaVariant& value,
     UaDateTime& sourceTime
 )
@@ -122,7 +122,7 @@ UaStatus DSdoItem::readValue (
     return OpcUa_Good;
 }
 /* ASYNCHRONOUS !! */
-UaStatus DSdoItem::writeValue (
+UaStatus DSdoVariable::writeValue (
     UaVariant& value
 )
 {
