@@ -137,8 +137,10 @@
     <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
     <d:hasobjects instantiateUsing="configuration" class="Rpdo">
 </d:hasobjects>
-    <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/>
-    <d:hasobjects instantiateUsing="design" class="EmergencyParser">
+    <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/><d:hasobjects
+    	instantiateUsing="configuration" class="SdoVariable">
+</d:hasobjects>
+  	<d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
     <d:configentry dataType="UaString" name="stateInfoSource">
@@ -314,8 +316,13 @@
     </d:configentry>
   </d:class>
   <d:class name="SdoVariable" singleVariableNode="true">
-    <d:devicelogic/>
-    <d:configentry dataType="OpcUa_Byte" name="subIndex">
+    <d:devicelogic/><d:configentry dataType="UaString" name="index" defaultValue="fromGroup"
+    	storedInDeviceObject="true">
+    	<d:configRestriction>
+    		<d:restrictionByPattern pattern="fromGroup|[0-9A-F]{1,4}" />
+    	</d:configRestriction>
+</d:configentry>
+  	<d:configentry dataType="OpcUa_Byte" name="subIndex">
       <d:configRestriction>
         <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
       </d:configRestriction>

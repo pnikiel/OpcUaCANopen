@@ -26,6 +26,9 @@
 namespace Device
 {
 
+    class DBus;
+    class DNode;
+
 class
     DSdoVariable
     : public Base_DSdoVariable
@@ -66,11 +69,18 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize (DBus* bus, DNode* node);
+
     void setIndex (uint16_t index);
+
 
 private:
     uint16_t m_index;
     uint16_t m_subIndex;
+
+    //! We need this references for different stuff like locks etc and can't get it via getParent
+    DBus* m_bus;
+    DNode* m_node;
 
 
 

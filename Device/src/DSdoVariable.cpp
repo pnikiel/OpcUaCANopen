@@ -70,6 +70,10 @@ DSdoVariable::DSdoVariable (
 {
     /* fill up constructor body here */
     m_subIndex = config.subIndex(); // perhaps we should optimize it ;-)
+    if (config.index() != "fromGroup")
+    {
+        m_index = std::stoi(config.index(), nullptr, /*base*/ 16);
+    }
 }
 
 /* sample dtr */
@@ -92,17 +96,18 @@ UaStatus DSdoVariable::readValue (
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because it is denied in the configuration.";
         return OpcUa_BadUserAccessDenied;
     }
+
     /* Not in spy mode? */
-    if (getParent()->getParent()->getParent()->isInSpyMode())
+    if (m_bus->isInSpyMode())
     {
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
         return OpcUa_BadOutOfService;
     }
 
     std::vector<unsigned char> readData;
-    bool status = getParent()->getParent()->sdoEngine().readExpedited(
+    bool status = m_node->sdoEngine().readExpedited(
         getFullName(),
-        getParent()->index(), 
+        m_index, 
         m_subIndex, 
         readData, 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());
@@ -134,19 +139,19 @@ UaStatus DSdoVariable::writeValue (
     }
 
     /* Not in spy mode? */
-    if (getParent()->getParent()->getParent()->isInSpyMode())
+    if (m_bus->isInSpyMode())
     {
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
         return OpcUa_BadOutOfService;
     }
 
     // Synchronization: use quasar's made mutex:
-    std::lock_guard<boost::mutex> lock (getParent()->getParent()->getLock());
+    std::lock_guard<boost::mutex> lock (m_node->getLock());
 
     std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
-    bool status = getParent()->getParent()->sdoEngine().writeExpedited(
+    bool status = m_node->sdoEngine().writeExpedited(
         getFullName(),
-        getParent()->index(), 
+        m_index, 
         m_subIndex, 
         bytes, 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());    
@@ -160,5 +165,18 @@ UaStatus DSdoVariable::writeValue (
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DSdoVariable::initialize (DBus* bus, DNode* node)
+{
+    m_bus = bus;
+    m_node = node;
+}
+
+void DSdoVariable::setIndex (uint16_t _index)
+{
+    if (index() != "fromGroup")
+        throw std::runtime_error("SdoVariable " + getFullName() + " index is not fromGroup, thus you have configuration issue.");
+    m_index = _index;
+}
 
 }

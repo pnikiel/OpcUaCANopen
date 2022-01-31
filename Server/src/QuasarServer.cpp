@@ -85,6 +85,8 @@ void QuasarServer::mainLoop()
 void QuasarServer::initialize()
 {
     LOG(Log::INF) << "Initializing Quasar server.";
+
+    // TODO make it a separate method
     for (auto& logComponent : LogComponents)
     {
         if (logComponent.logLevelFromArgs != "")
@@ -100,6 +102,10 @@ void QuasarServer::initialize()
             }
         }
     }
+
+    for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
+        bus->initialize();
+    
 }
 
 void QuasarServer::shutdown()

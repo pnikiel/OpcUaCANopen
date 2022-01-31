@@ -31,6 +31,8 @@
 #include <DTpdoMultiplex.h>
 #include <DTpdo.h>
 #include <DEmergencyParser.h>
+#include <DSdoSameIndexGroup.h>
+#include <DSdoVariable.h>
 
 #include <FrameFactory.hpp>
 
@@ -141,6 +143,20 @@ UaStatus DNode::callReset (
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DNode::initialize()
+{
+    for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
+    {
+        sdogroup->propagateIndex();
+        for (Device::DSdoVariable* variable : sdogroup->sdovariables())
+            variable->initialize(getParent(), this);
+    }
+
+    for (Device::DSdoVariable* variable : sdovariables())
+            variable->initialize(getParent(), this);
+    
+}
 
 void DNode::onMessageReceived (const CanMessage& msg)
 {

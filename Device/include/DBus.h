@@ -64,6 +64,9 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    //! Call it once before server enters the actual mainloop.
+    void initialize();
+
     //! Call it 1/sec or so to run internal state machines and other timed actions.
     void tick();
 

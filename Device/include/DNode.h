@@ -72,6 +72,8 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize();
+    
     // the generic reception handler for this Node
     void onMessageReceived (const CanMessage& msg);
     void onTpdoReceived (const CanMessage& msg);

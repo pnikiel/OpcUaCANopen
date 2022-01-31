@@ -23,6 +23,8 @@
 #include <DSdoSameIndexGroup.h>
 #include <ASSdoSameIndexGroup.h>
 
+#include <DSdoVariable.h>
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -75,5 +77,11 @@ DSdoSameIndexGroup::~DSdoSameIndexGroup ()
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DSdoSameIndexGroup::propagateIndex()
+{
+    for (Device::DSdoVariable* variable : sdovariables())
+        variable->setIndex(m_index);
+}
 
 }

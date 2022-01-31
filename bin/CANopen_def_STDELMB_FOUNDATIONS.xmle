@@ -1,8 +1,6 @@
 <!-- NodeError is gone as being useless for ELMB -->
 
-<SdoSameIndexGroup index="1009" name="hwVersion">
-  <SdoVariable subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
-</SdoSameIndexGroup>
+<SdoVariable index="1009" subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
 
 <SdoSameIndexGroup index="100A" name="elmbSw" >
   <SdoVariable subIndex="0" access="R" dataType="UInt32" name="swVersion" />
@@ -25,6 +23,4 @@
   <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="load"/>
 </SdoSameIndexGroup>
 
-<SdoSameIndexGroup index="3100" name="serialNumber">
-  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
-</SdoSameIndexGroup>
+<SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />

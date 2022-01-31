@@ -58,6 +58,7 @@ private:
 
 public:
     uint16_t index() const { return m_index; }
+    void propagateIndex();
 
 private:
     const uint16_t m_index;
