@@ -157,35 +157,6 @@ object dictionary -->
 <SdoVariable index="6411" subIndex="62" name="ao_61" dataType="UInt16" access="RW" />
 <SdoVariable index="6411" subIndex="63" name="ao_62" dataType="UInt16" access="RW" />
 <SdoVariable index="6411" subIndex="64" name="ao_63" dataType="UInt16" access="RW" />
-<Rpdo name="RPDO1" selector="1">
-  <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
-</Rpdo>
-<!-- NodeError is gone as being useless for ELMB -->
-
-<SdoVariable index="1009" subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
-
-<SdoSameIndexGroup index="100A" name="elmbSw" >
-  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="swVersion" />
-  <SdoVariable subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
-</SdoSameIndexGroup>
-
-<SdoSameIndexGroup index="100C" name="guardTime">
-  <SdoVariable subIndex="0" access="R" dataType="UInt16" name="guardTime" />
-</SdoSameIndexGroup>
-
-<SdoSameIndexGroup index="100D" name="lifeTime">
-  <SdoVariable subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
-</SdoSameIndexGroup>
-
-<SdoSameIndexGroup index="1010" name="storeParams">
-  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="save"/>
-</SdoSameIndexGroup>
-
-<SdoSameIndexGroup index="1011" name="restoreParams">
-  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="load"/>
-</SdoSameIndexGroup>
-
-<SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
 <SdoSameIndexGroup index="1800" name="diTransmit">
   <SdoVariable subIndex="2" access="RW" dataType="Byte" name="diTransmissionType" />
   <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="diEventTimer" />
@@ -234,3 +205,37 @@ object dictionary -->
   <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_C_6" offset="2" />
   <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_C_7" offset="2" />
 </Tpdo>
+<Sdo index="6200" name="do_read" >
+ <SdoVariable subIndex="1" access="R" dataType="Byte" name="do_C_read" />
+ <SdoVariable subIndex="2" access="R" dataType="Byte" name="do_A_read" />
+</Sdo>
+
+<Rpdo name="RPDO1" selector="1">
+  <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
+</Rpdo>
+<!-- NodeError is gone as being useless for ELMB -->
+
+<SdoVariable index="1009" subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
+
+<SdoSameIndexGroup index="100A" name="elmbSw" >
+  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="swVersion" />
+  <SdoVariable subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="100C" name="guardTime">
+  <SdoVariable subIndex="0" access="R" dataType="UInt16" name="guardTime" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="100D" name="lifeTime">
+  <SdoVariable subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="1010" name="storeParams">
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="save"/>
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="1011" name="restoreParams">
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="load"/>
+</SdoSameIndexGroup>
+
+<SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
