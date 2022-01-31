@@ -1,3 +1,8 @@
+<Sdo index="6200" name="do_read" >
+ <SdoVariable subIndex="1" access="R" dataType="Byte" name="do_C_read" />
+ <SdoVariable subIndex="2" access="R" dataType="Byte" name="do_A_read" />
+</Sdo>
+
 <Rpdo name="RPDO1" selector="1">
   <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
 </Rpdo>
