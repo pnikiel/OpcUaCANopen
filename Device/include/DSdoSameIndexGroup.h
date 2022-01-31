@@ -18,27 +18,27 @@
  */
 
 
-#ifndef __DSdo__H__
-#define __DSdo__H__
+#ifndef __DSdoSameIndexGroup__H__
+#define __DSdoSameIndexGroup__H__
 
-#include <Base_DSdo.h>
+#include <Base_DSdoSameIndexGroup.h>
 
 namespace Device
 {
 
 class
-    DSdo
-    : public Base_DSdo
+    DSdoSameIndexGroup
+    : public Base_DSdoSameIndexGroup
 {
 
 public:
     /* sample constructor */
-    explicit DSdo (
-        const Configuration::Sdo& config,
-        Parent_DSdo* parent
+    explicit DSdoSameIndexGroup (
+        const Configuration::SdoSameIndexGroup& config,
+        Parent_DSdoSameIndexGroup* parent
     ) ;
     /* sample dtr */
-    ~DSdo ();
+    ~DSdoSameIndexGroup ();
 
     /* delegators for
     cachevariables and sourcevariables */
@@ -48,8 +48,8 @@ public:
 
 private:
     /* Delete copy constructor and assignment operator */
-    DSdo( const DSdo& other );
-    DSdo& operator=(const DSdo& other);
+    DSdoSameIndexGroup( const DSdoSameIndexGroup& other );
+    DSdoSameIndexGroup& operator=(const DSdoSameIndexGroup& other);
 
     // ----------------------------------------------------------------------- *
     // -     CUSTOM CODE STARTS BELOW THIS COMMENT.                            *
@@ -68,4 +68,4 @@ private:
 
 }
 
-#endif // __DSdo__H__
+#endif // __DSdoSameIndexGroup__H__

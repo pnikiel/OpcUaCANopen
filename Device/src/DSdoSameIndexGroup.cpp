@@ -20,8 +20,8 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DSdo.h>
-#include <ASSdo.h>
+#include <DSdoSameIndexGroup.h>
+#include <ASSdoSameIndexGroup.h>
 
 namespace Device
 {
@@ -47,11 +47,11 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DSdo::DSdo (
-    const Configuration::Sdo& config,
-    Parent_DSdo* parent
+DSdoSameIndexGroup::DSdoSameIndexGroup (
+    const Configuration::SdoSameIndexGroup& config,
+    Parent_DSdoSameIndexGroup* parent
 ):
-    Base_DSdo( config, parent),
+    Base_DSdoSameIndexGroup( config, parent),
     m_index(std::stoi(config.index(), nullptr, /*base*/ 16))
 
     /* fill up constructor initialization list here */
@@ -60,7 +60,7 @@ DSdo::DSdo (
 }
 
 /* sample dtr */
-DSdo::~DSdo ()
+DSdoSameIndexGroup::~DSdoSameIndexGroup ()
 {
 }
 

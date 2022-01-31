@@ -1,30 +1,30 @@
 <!-- NodeError is gone as being useless for ELMB -->
 
-<Sdo index="1009" name="hwVersion">
+<SdoSameIndexGroup index="1009" name="hwVersion">
   <SdoItem subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="100A" name="elmbSw" >
+<SdoSameIndexGroup index="100A" name="elmbSw" >
   <SdoItem subIndex="0" access="R" dataType="UInt32" name="swVersion" />
   <SdoItem subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="100C" name="guardTime">
+<SdoSameIndexGroup index="100C" name="guardTime">
   <SdoItem subIndex="0" access="R" dataType="UInt16" name="guardTime" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="100D" name="lifeTime">
+<SdoSameIndexGroup index="100D" name="lifeTime">
   <SdoItem subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="1010" name="storeParams">
+<SdoSameIndexGroup index="1010" name="storeParams">
   <SdoItem subIndex="1" access="RW" dataType="UInt32" name="save"/>
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="1011" name="restoreParams">
+<SdoSameIndexGroup index="1011" name="restoreParams">
   <SdoItem subIndex="1" access="RW" dataType="UInt32" name="load"/>
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="3100" name="serialNumber">
+<SdoSameIndexGroup index="3100" name="serialNumber">
   <SdoItem subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
-</Sdo>
+</SdoSameIndexGroup>

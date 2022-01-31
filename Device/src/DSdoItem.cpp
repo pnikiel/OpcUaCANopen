@@ -23,7 +23,7 @@
 #include <DSdoItem.h>
 #include <ASSdoItem.h>
 
-#include <DSdo.h>
+#include <DSdoSameIndexGroup.h>
 #include <DNode.h>
 #include <DRoot.h>
 #include <DGlobalSettings.h>

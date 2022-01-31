@@ -1,4 +1,4 @@
-<Sdo index="2404" name="aisdo">
+<SdoSameIndexGroup index="2404" name="aisdo">
    <SdoItem subIndex="1" access="R" dataType="Int32" name="aisdo_0"/>
    <SdoItem subIndex="2" access="R" dataType="Int32" name="aisdo_1"/>
    <SdoItem subIndex="3" access="R" dataType="Int32" name="aisdo_2"/>
@@ -65,4 +65,4 @@
    <SdoItem subIndex="3F" access="R" dataType="Int32" name="aisdo_62"/>
    <SdoItem subIndex="40" access="R" dataType="Int32" name="aisdo_63"/>
 -->
-</Sdo>
+</SdoSameIndexGroup>

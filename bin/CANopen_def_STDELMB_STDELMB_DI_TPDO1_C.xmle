@@ -1,20 +1,20 @@
-<Sdo index="6006" name="diInterrupt" >
+<SdoSameIndexGroup index="6006" name="diInterrupt" >
   <SdoItem subIndex="1" access="RW" dataType="Byte" name="diInterruptMaskF" />
   <SdoItem subIndex="2" access="RW" dataType="Byte" name="diInterruptMaskA" />
   <SdoItem subIndex="3" access="RW" dataType="Byte" name="diInterruptMaskC" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="6208" name="dioPortA" >
+<SdoSameIndexGroup index="6208" name="dioPortA" >
   <SdoItem subIndex="2" access="RW" dataType="Byte" name="dioOutputMaskA" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="6208" name="dioPortC" >
+<SdoSameIndexGroup index="6208" name="dioPortC" >
   <SdoItem subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
-</Sdo>
+</SdoSameIndexGroup>
 
-<Sdo index="6005" name="diGlobalInterruptEnable">
+<SdoSameIndexGroup index="6005" name="diGlobalInterruptEnable">
   <SdoItem subIndex="0" access="RW" dataType="Boolean" name="diGlobalInterruptEnable" />
-</Sdo>
+</SdoSameIndexGroup>
 
 <Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">
   <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />

@@ -137,7 +137,7 @@
     <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
     <d:hasobjects instantiateUsing="configuration" class="Rpdo">
 </d:hasobjects>
-    <d:hasobjects instantiateUsing="configuration" class="Sdo"/>
+    <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/>
     <d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
@@ -304,7 +304,7 @@
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:configentry dataType="OpcUa_Byte" name="numberOfChannels"/>
   </d:class>
-  <d:class name="Sdo">
+  <d:class name="SdoSameIndexGroup">
     <d:devicelogic/>
     <d:hasobjects instantiateUsing="configuration" class="SdoItem"/>
     <d:configentry dataType="UaString" name="index">
