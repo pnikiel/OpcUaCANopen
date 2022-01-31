@@ -186,10 +186,10 @@ object dictionary -->
 </SdoSameIndexGroup>
 
 <SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
-<Sdo index="1800" name="diTransmit">
+<SdoSameIndexGroup index="1800" name="diTransmit">
   <SdoVariable subIndex="2" access="RW" dataType="Byte" name="diTransmissionType" />
   <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="diEventTimer" />
-</Sdo>
+</SdoSameIndexGroup>
 
 <SdoVariable subIndex="0" access="RW" dataType="Boolean" index="6005" name="diGlobalInterruptEnable" />
 <SdoVariable subIndex="0" access="RW" dataType="Byte" index="2200" name="diDebounceTimer" />
