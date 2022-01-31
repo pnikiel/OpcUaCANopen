@@ -208,10 +208,6 @@ object dictionary -->
   <SdoVariable subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
 </SdoSameIndexGroup>
 
-<SdoSameIndexGroup index="6005" name="diGlobalInterruptEnable">
-  <SdoVariable subIndex="0" access="RW" dataType="Boolean" name="diGlobalInterruptEnable" />
-</SdoSameIndexGroup>
-
 <Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">
   <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />
   <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_F_1" offset="0" />
