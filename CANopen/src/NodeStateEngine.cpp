@@ -185,4 +185,9 @@ void NodeStateEngine::evaluateStateChange (NodeState newState)
     }
 }
 
+void NodeStateEngine::setRequestedState(NodeState requestedState)
+{
+    m_requestedStateEnum = requestedState;
+}
+
 }

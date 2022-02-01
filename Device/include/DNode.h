@@ -81,17 +81,15 @@ public:
 
     CANopen::SdoEngine& sdoEngine() { return m_sdoEngine; }
 
-    void addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack);
+    void addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack) { m_nodeStateEngine.addNodeStateChangeNotification(callBack); }
 
     void publishState (uint8_t rawState, CANopen::NodeState state);
 
 private:
-    void onNodeManagementReplyReceived (const CanMessage& msg);
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
 
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
-    CANopen::NodeState m_requestedStateEnum;
     CANopen::NodeState m_previousState;
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
     CANopen::SdoEngine m_sdoEngine;

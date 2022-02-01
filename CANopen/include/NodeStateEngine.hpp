@@ -48,6 +48,7 @@ namespace CANopen
         void setStateInfoPeriod (float seconds);
 
         void addNodeStateNotification (NodeStateNotification notification) { m_nodeStateNotifications.push_back(notification); }
+        void addNodeStateChangeNotification (NodeStateChangeCallBack notification) { m_nodeStateChangeCallBacks.push_back(notification); }
 
         void onNodeManagementReplyReceived (const CanMessage& msg);
         void onBootupReceived (const CanMessage& msg);

@@ -33,6 +33,8 @@
 #include <DEmergencyParser.h>
 #include <DSdoSameIndexGroup.h>
 #include <DSdoVariable.h>
+#include <DRoot.h>
+#include <DGlobalSettings.h>
 
 #include <FrameFactory.hpp>
 
@@ -71,7 +73,6 @@ DNode::DNode (
     Parent_DNode* parent
 ):
     Base_DNode( config, parent),
-        m_requestedStateEnum(),
         m_previousState(CANopen::NodeState::UNKNOWN),
         m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
         m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id()),
@@ -79,9 +80,9 @@ DNode::DNode (
             config.id(),
             CANopen::stateInfoModelFromText(config.stateInfoSource()),
             10, // TODO fix it --> state info period
-            CANopen::textToStateEnum(config.requestedState()),
-            getFullName(),
-            1, // TODO this take from global factory, not sure though how well it's implemented!
+            CANopen::textToStateEnum(config.requestedState()), /* initial requested state */
+            getFullName(), /* ID for logging */
+            DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout(),
             std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1))
 
     /* fill up constructor initialization list here */
@@ -104,12 +105,13 @@ UaStatus DNode::writeRequestedState ( const UaString& v)
 {
     try
     {
-        m_requestedStateEnum = CANopen::textToStateEnum(v.toUtf8());
+        CANopen::NodeState requestedStateEnum = CANopen::textToStateEnum(v.toUtf8());
+        m_nodeStateEngine.setRequestedState(requestedStateEnum);
         return OpcUa_Good;
     }
     catch(const std::exception& e)
     {
-        LOG(Log::ERR) << "For node " << wrapId(getFullName()) << " written state is out of range, it was: " << wrapValue(v.toUtf8());
+        LOG(Log::ERR, "NodeMgmt") << "For node " << wrapId(getFullName()) << " requestedState written by client was out of range " << wrapValue(v.toUtf8());
         return OpcUa_BadOutOfRange;
     }
 }
@@ -211,84 +213,7 @@ void DNode::onEmergencyReceived (const CanMessage& msg)
     emergencyparsers()[0]->onEmergencyReceived(msg);
 }
 
-void DNode::onNodeManagementReplyReceived (const CanMessage& msg)
-{
-    if (msg.c_dlc != 1)
-    {
-        LOG(Log::WRN, "Spooky") << "CANopen protocol violation, received NMT reply and the data size is " << msg.c_dlc << " (should be 1)"; // TODO which bus which elmb message content 
-        return;
-    }
-    if (msg.c_data[0] == 0)
-        this->onBootupReceived();
-    else
-    {
-        if (m_nodeGuardingOperationsState != CANopen::NodeGuardingOperationsState::AWAITING_REPLY)
-        {
-            SPOOKY(getFullName()) << "unsolicited(!!) NG reply is coming. Discarding." << SPOOKY_;
-            return;
-        }
-        else
-            m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE; // we're awaiting reply, so now we got it.
-        // TODO are we actually expecting to get the NG?
 
-        // Feature FN1.1.2
-        // TODO implement actual NG reply logic
-
-        // TODO toggle bit checking
-        getAddressSpaceLink()->setState(msg.c_data[0], OpcUa_Good);
-        uint8_t stateNoToggle = msg.c_data[0] & 0x7f;
-        CANopen::NodeState currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
-
-        // TODO stateNoToggle -> currentState must be improved!!
-
-        getAddressSpaceLink()->setStateNoToggle(stateNoToggle, OpcUa_Good);
-        getAddressSpaceLink()->setStateAsText(CANopen::stateEnumToText(currentState).c_str(), OpcUa_Good);
-
-        // identify node change by comparing to the previous state
-        // TODO: the NMT state machine would be running from here ;-)
-        if (currentState != m_previousState)
-        {
-            if (m_previousState != CANopen::NodeState::UNKNOWN)
-            {
-                LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " state change was seen, last known state was "
-                    << wrapValue(CANopen::stateEnumToText(m_previousState)) << " current is " << wrapValue(CANopen::stateEnumToText(currentState)); // TODO what state into what state?
-                // TODO here we should have a list of state changes receivers.
-                for (CANopen::NodeStateChangeCallBack callBack : m_nodeStateChangeCallBacks)
-                    callBack(m_previousState, currentState);
-            }
-            // TODO what shall we do?
-            // For going to operational, we should send RTRs
-            m_previousState = currentState;
-        }
-
-        // TODO: disconnected support
-
-        // shall we do something with state management here?
-        if (stateNoToggle != m_requestedStateEnum)
-        {
-            LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " state mismatch is seen; current state is " 
-                << wrapValue(CANopen::stateEnumToText(currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
-            // send therefore a message for correcting
-
-            uint8_t nmtCommand;
-
-            switch(m_requestedStateEnum)
-            {
-                case 5: // to be started
-                    nmtCommand = 1; break; // start
-                case 4: // to be stopped
-                    nmtCommand = 2; break; // stop remote node
-                case 127: // go to preoperational
-                    nmtCommand = 128; break;
-                default: throw std::logic_error("requested state as int is unsupported");
-            }
-
-            getParent()->sendMessage(CANopen::makeNodeManagementServiceRequest(id(), nmtCommand));
-            LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " sent NMT service request to change state, CS was " << wrapValue(std::to_string((int)nmtCommand));
-
-        }
-    }
-}
 
 void DNode::onTpdoReceived (const CanMessage& msg)
 {
@@ -339,10 +264,6 @@ void DNode::tick()
     // }
 }
 
-void DNode::addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack)
-{
-    m_nodeStateChangeCallBacks.push_back(callBack);
-}
 
 void DNode::publishState (uint8_t rawState, CANopen::NodeState state)
 {
