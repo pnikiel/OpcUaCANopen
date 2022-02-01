@@ -2,13 +2,10 @@
 #include <mutex>
 #include <condition_variable>
 
-#include <CanMessage.h>
-
+#include <Definitions.hpp>
 
 namespace CANopen
 {
-
-typedef std::function<void (const CanMessage& msg)> MessageSendFunction;
 
 class SdoEngine
 {

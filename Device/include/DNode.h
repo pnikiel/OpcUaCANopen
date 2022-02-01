@@ -83,6 +83,8 @@ public:
 
     void addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack);
 
+    void publishState (uint8_t rawState, CANopen::NodeState state);
+
 private:
     void onNodeManagementReplyReceived (const CanMessage& msg);
     void onBootupReceived (const CanMessage& msg);

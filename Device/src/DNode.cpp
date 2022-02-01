@@ -71,15 +71,23 @@ DNode::DNode (
     Parent_DNode* parent
 ):
     Base_DNode( config, parent),
-        m_requestedStateEnum(CANopen::textToStateEnum(config.requestedState())),
+        m_requestedStateEnum(),
         m_previousState(CANopen::NodeState::UNKNOWN),
         m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
         m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id()),
-        m_nodeStateEngine(CANopen::stateInfoModelFromText(config.stateInfoSource()), 10, getFullName() ) // TODO: fix 10  
+        m_nodeStateEngine(
+            config.id(),
+            CANopen::stateInfoModelFromText(config.stateInfoSource()),
+            10, // TODO fix it --> state info period
+            CANopen::textToStateEnum(config.requestedState()),
+            getFullName(),
+            1, // TODO this take from global factory, not sure though how well it's implemented!
+            std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1))
 
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    m_nodeStateEngine.addNodeStateNotification([this](uint8_t rawState, CANopen::NodeState state){this->publishState(rawState, state);});
 }
 
 /* sample dtr */
@@ -146,6 +154,7 @@ UaStatus DNode::callReset (
 
 void DNode::initialize()
 {
+    m_nodeStateEngine.setLoggingName(getFullName());
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {
         sdogroup->propagateIndex();
@@ -177,7 +186,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
 
         case 0xb: m_sdoEngine.replyCame(msg); break;
         // various NMts
-        case 0xe: onNodeManagementReplyReceived(msg); break;
+        case 0xe: m_nodeStateEngine.onNodeManagementReplyReceived(msg); break;
         
         default:
             SPOOKY(getFullName()) << "Received unintelligible message, fnc code " << wrapValue(std::to_string(functionCode)) << " " << msg.toString() << SPOOKY_;
@@ -310,28 +319,35 @@ void DNode::tick()
     unsigned int millisecondsSinceLastNgRequest = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastNodeGuardingTimePoint).count();
     // Nodes non-replying to NG requests, notice the timeout.
 
-    // TODO: natural condition that the node guarding interval should be bigger than 1000
-    if (m_nodeGuardingOperationsState == CANopen::NodeGuardingOperationsState::AWAITING_REPLY && millisecondsSinceLastNgRequest >= 1000)
-    {
-        // this is an official report that we did not get the reply to the NG
-        m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
-        // TODO move the current state to unknown
+    // // TODO: natural condition that the node guarding interval should be bigger than 1000
+    // if (m_nodeGuardingOperationsState == CANopen::NodeGuardingOperationsState::AWAITING_REPLY && millisecondsSinceLastNgRequest >= 1000)
+    // {
+    //     // this is an official report that we did not get the reply to the NG
+    //     m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
+    //     // TODO move the current state to unknown
         
-        LOG(Log::TRC, "NodeMgmt") << wrapId(getFullName()) << " Timeout for NodeGuarding reply. " << 
-            wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
-    }
+    //     LOG(Log::TRC, "NodeMgmt") << wrapId(getFullName()) << " Timeout for NodeGuarding reply. " << 
+    //         wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
+    // }
 
-    if (millisecondsSinceLastNgRequest >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
-    {
-        getParent()->sendMessage(CANopen::makeNodeGuardingRequest(id()));
-        m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
-        m_lastNodeGuardingTimePoint = now;
-    }
+    // if (millisecondsSinceLastNgRequest >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
+    // {
+    //     getParent()->sendMessage(CANopen::makeNodeGuardingRequest(id()));
+    //     m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
+    //     m_lastNodeGuardingTimePoint = now;
+    // }
 }
 
 void DNode::addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack)
 {
     m_nodeStateChangeCallBacks.push_back(callBack);
+}
+
+void DNode::publishState (uint8_t rawState, CANopen::NodeState state)
+{
+    getAddressSpaceLink()->setState(rawState, OpcUa_Good);
+    getAddressSpaceLink()->setStateNoToggle(rawState & 0x7f, OpcUa_Good);
+    getAddressSpaceLink()->setStateAsText(CANopen::stateEnumToText(state).c_str(), OpcUa_Good);
 }
 
 }

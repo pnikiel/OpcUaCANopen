@@ -1,7 +1,13 @@
 #pragma once
 
+#include <functional>
+
+#include <CanMessage.h>
+
 namespace CANopen
 {
+
+typedef std::function<void (const CanMessage& msg)> MessageSendFunction;
 
 enum NodeState
 {

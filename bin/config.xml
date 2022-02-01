@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE configuration [
 
-        <!ENTITY STDELMB_FOUNDATIONS SYSTEM "NODETYPE_ELMB.xml">
+        <!ENTITY STDELMB_FOUNDATIONS SYSTEM "CANopen_def_STDELMB_FOUNDATIONS.xmle">
         <!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
         ]>
 <configuration xmlns="http://cern.ch/quasar/Configuration"

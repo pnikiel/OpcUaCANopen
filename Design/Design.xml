@@ -20,6 +20,13 @@
         <d:restrictionByBounds minInclusive="0.001"/>
       </d:configRestriction>
     </d:configentry>
+    <d:configentry dataType="OpcUa_Float" name="nodeGuardingReplyTimeout" defaultValue="1"
+    	storedInDeviceObject="true">
+    	<d:documentation>
+    		Max wait time (in seconds) for NodeGuarding reply after NodeGuarding request, when passed
+    		NodeGuarding timeout is declared.
+    	</d:documentation>
+    </d:configentry>
     <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
   <d:class name="Warnings">
