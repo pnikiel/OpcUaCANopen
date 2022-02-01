@@ -88,6 +88,7 @@ DNode::DNode (
 {
     /* fill up constructor body here */
     m_nodeStateEngine.addNodeStateNotification([this](uint8_t rawState, CANopen::NodeState state){this->publishState(rawState, state);});
+    m_nodeStateEngine.setOnBootupNotification([this](){this->onBootupReceived();});
 }
 
 /* sample dtr */
@@ -193,7 +194,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
     }
 }
 
-void DNode::onBootupReceived (const CanMessage& msg)
+void DNode::onBootupReceived ()
 {
     // TODO missing impl
 
@@ -218,7 +219,7 @@ void DNode::onNodeManagementReplyReceived (const CanMessage& msg)
         return;
     }
     if (msg.c_data[0] == 0)
-        this->onBootupReceived(msg);
+        this->onBootupReceived();
     else
     {
         if (m_nodeGuardingOperationsState != CANopen::NodeGuardingOperationsState::AWAITING_REPLY)

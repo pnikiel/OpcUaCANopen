@@ -22,6 +22,7 @@ namespace CANopen
     StateInfoModel stateInfoModelFromText(const std::string &text);
 
     typedef std::function<void (uint8_t rawState, NodeState state)> NodeStateNotification;
+    typedef std::function<void ()> BootUpNotification;
 
     class NodeStateEngine
     {
@@ -52,6 +53,8 @@ namespace CANopen
         void onBootupReceived (const CanMessage& msg);
         void evaluateStateChange (NodeState newState);
 
+        void setOnBootupNotification (BootUpNotification bootUpNotification) { m_bootUpNotification = bootUpNotification; }
+
     private:
         const uint8_t m_nodeId;
         const StateInfoModel m_stateInfoModel;
@@ -79,6 +82,7 @@ namespace CANopen
 
         std::vector<NodeStateNotification> m_nodeStateNotifications;
         std::vector<NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
+        BootUpNotification m_bootUpNotification;
 
     };
 

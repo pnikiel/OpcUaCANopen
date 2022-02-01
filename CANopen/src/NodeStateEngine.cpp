@@ -166,7 +166,8 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
 
 void NodeStateEngine::onBootupReceived (const CanMessage& msg)
 {
-    throw std::runtime_error("not-implemented");
+    if (m_bootUpNotification)
+        m_bootUpNotification();
 }
 
 void NodeStateEngine::evaluateStateChange (NodeState newState)

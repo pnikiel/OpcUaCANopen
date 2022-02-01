@@ -87,7 +87,7 @@ public:
 
 private:
     void onNodeManagementReplyReceived (const CanMessage& msg);
-    void onBootupReceived (const CanMessage& msg);
+    void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
 
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
