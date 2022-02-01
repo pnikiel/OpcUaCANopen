@@ -34,7 +34,6 @@ namespace CANopen
             float stateInfoPeriodSeconds,
             NodeState initialRequestedState,
             const std::string& nodeAddressForDebug,
-            unsigned int nodeGuardingReplyTimeout,
             MessageSendFunction messageSendFunction);
 
         //! Expected to be called by the stack somehow regularly (every second).
@@ -44,6 +43,7 @@ namespace CANopen
         void setRequestedState(NodeState requestedState);
 
         void setLoggingName(const std::string& name) { m_nodeAddressForDebug = name; }
+        void setNodeGuardingReplyTimeout(float seconds) { m_nodeGuardingReplyTimeoutMs = 1000.0 * seconds; }
 
         void setStateInfoPeriod (float seconds);
 

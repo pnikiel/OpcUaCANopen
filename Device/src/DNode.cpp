@@ -82,7 +82,6 @@ DNode::DNode (
             10, // TODO fix it --> state info period
             CANopen::textToStateEnum(config.requestedState()), /* initial requested state */
             getFullName(), /* ID for logging */
-            DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout(),
             std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1))
 
     /* fill up constructor initialization list here */
@@ -158,6 +157,8 @@ UaStatus DNode::callReset (
 void DNode::initialize()
 {
     m_nodeStateEngine.setLoggingName(getFullName());
+    m_nodeStateEngine.setNodeGuardingReplyTimeout(DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout());
+
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {
         sdogroup->propagateIndex();

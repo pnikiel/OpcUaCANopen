@@ -27,7 +27,6 @@ NodeStateEngine::NodeStateEngine(
         float stateInfoPeriodSeconds, 
         NodeState initialRequestedState,
         const std::string& nodeAddressForDebug,
-        unsigned int nodeGuardingReplyTimeout,
         MessageSendFunction messageSendFunction):
     m_nodeId(nodeId),
     m_requestedStateEnum(initialRequestedState),
@@ -36,11 +35,11 @@ NodeStateEngine::NodeStateEngine(
     m_currentStateInfoPeriod(stateInfoPeriodSeconds),
     m_nodeGuardingOperationsState(IDLE),
     m_previousState(CANopen::NodeState::UNKNOWN),
-    m_nodeGuardingReplyTimeoutMs(nodeGuardingReplyTimeout),
+    m_nodeGuardingReplyTimeoutMs(1000),
     m_messageSendFunction(messageSendFunction)
 {
-    if (nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
-        throw std::runtime_error("NodeGuarding Reply Timeout *must be* smaller that NodeGuarding interval");
+    // if (m_nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
+    //     throw std::runtime_error("NodeGuarding Reply Timeout *must be* smaller that NodeGuarding interval");
     this->addNodeStateNotification([this](uint8_t rawState, NodeState state){this->evaluateStateChange(state);});
 }
 
