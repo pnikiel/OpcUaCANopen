@@ -71,6 +71,7 @@ void NodeStateEngine::tickNodeGuarding()
 
     if (millisecondsSinceLastNgRequest >= m_currentStateInfoPeriod * 1000)
     {
+        LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Sending NG request";
         m_messageSendFunction(CANopen::makeNodeGuardingRequest(m_nodeId));
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
         m_lastNodeGuardingTimePoint = now;
