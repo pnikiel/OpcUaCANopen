@@ -14,3 +14,5 @@ std::string wrapId (const std::string& id);
 #define SPOOKY(ID) LOG(Log::WRN, "Spooky") << Logging::wrapId((ID)) << " \033[43;30m"
 #define SPOOKY_ Quasar::TermColors::StyleReset()
 
+#define ERROR " \033[41;37m"
+#define ERROR_ Quasar::TermColors::StyleReset()

@@ -22,6 +22,7 @@
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;
       			&STDELMB_AI_TPDO3;
+			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R" />
 		</Node>
 	</Bus>
 
