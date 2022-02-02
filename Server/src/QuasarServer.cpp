@@ -34,6 +34,8 @@
 #include <Configurator.h>
 #include <ConfigurationDecorationUtils.h>
 
+#include <Warnings.hxx>
+
 using namespace Configuration;
 
 namespace po = boost::program_options;
@@ -209,6 +211,7 @@ void QuasarServer::processWarnings (Configuration::Configuration& configuration)
         Configuration::Warnings("Warnings"), 
         Configuration::Configuration::Warnings_id,
         "Warnings");
+    Warnings::validateWarnings();
 }
 
 bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
@@ -216,6 +219,7 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
     processGlobalSettings(configuration);
     processWarnings(configuration);
     processMultiplexedChannelConfigurationGenerator(configuration);
+    configuration.Warnings()[0].unexpectedTpdo() = true;
     return true;
 }
 
@@ -227,4 +231,15 @@ void QuasarServer::appendCustomCommandLineOptions(
 {
     for (auto& logComponent : LogComponents)
         commandLineOptions.add_options()(("l" + logComponent.name).c_str(), po::value<std::string>(&logComponent.logLevelFromArgs), "log level from [ERR,WRN,INF,DBG,TRC]");
+
+    for (auto& warningDefinition : Warnings::WarningsDefinitions)
+    {
+        commandLineOptions.add_options()(("W" + warningDefinition.name).c_str(), po::bool_switch(&warningDefinition.turnOn));
+    }
+
+    for (auto& warningDefinition : Warnings::WarningsDefinitions)
+    {
+        commandLineOptions.add_options()(("Wno_" + warningDefinition.name).c_str(), po::bool_switch(&warningDefinition.turnOff));
+    }
+
 }
