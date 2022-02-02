@@ -18,7 +18,8 @@
 		</Log>
 	</StandardMetaData>
 	<GlobalSettings name="GlobalSettings"  />
-	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardIntervalMs="10000" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
+	<Warnings name="Warnings" unexpectedTpdo="false"></Warnings>
+	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardInterval="10" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;
       			&STDELMB_AI_TPDO3;

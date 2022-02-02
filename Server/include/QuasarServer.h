@@ -54,7 +54,9 @@ public:
         boost::program_options::positional_options_description& positionalOptionsDescription) override;
 
     bool processConfiguration(Configuration::Configuration& configuration);
-
+    void processMultiplexedChannelConfigurationGenerator (Configuration::Configuration& configuration);
+    void processGlobalSettings (Configuration::Configuration& configuration);
+    void processWarnings (Configuration::Configuration& configuration);
 
 private:
     //Disable copy-constructor and assignment-operator

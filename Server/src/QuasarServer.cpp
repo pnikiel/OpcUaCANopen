@@ -131,23 +131,8 @@ bool QuasarServer::overridableConfigure(const std::string& fileName, AddressSpac
     return configure(fileName, nm, std::bind(&QuasarServer::processConfiguration, this, std::placeholders::_1));
 }
 
-bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
+void QuasarServer::processMultiplexedChannelConfigurationGenerator (Configuration::Configuration& configuration)
 {
-    if (configuration.GlobalSettings().size() < 1)
-    {
-        DecorationUtils::push_back(
-            configuration,
-            configuration.GlobalSettings(),
-            Configuration::GlobalSettings("GlobalSettings"),
-            Configuration::Configuration::GlobalSettings_id
-        );
-    }
-    else
-    {
-    	// for a user-supplied GlobalSettings make sure it is called "GlobalSettings" as we can't force it via quasar
-        if (configuration.GlobalSettings()[0].name() != "GlobalSettings")
-            throw std::runtime_error("Error: user supplied GlobalSettings name must be GlobalSettings. Fix your configuration file.");
-    }
     for (Bus& bus : configuration.Bus())
     {
         for (Node& node : bus.Node())
@@ -179,14 +164,58 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
 
                     }
                 }
-
                 //! Generators has been run, throw them away.
                 DecorationUtils::clear(multiplex, multiplex.MultiplexedChannelConfigurationGenerator(), TpdoMultiplex::MultiplexedChannelConfigurationGenerator_id);
-
             }
         }
     }
-    
+}
+
+template<typename Tcoll, typename Tparent, typename Tchild>
+static void ensureObjectPresent(Tcoll& collection, Tparent& parent, Tchild object, size_t id, const std::string& expectedName)
+{
+    if (collection.size() < 1)
+    {
+        DecorationUtils::push_back(
+            parent,
+            collection,
+            object,
+            id
+        );
+    }
+    else
+    {
+     	// for a user-supplied object make sure it is called properly as we can't force it via quasar
+        if (collection[0].name() != expectedName)
+            throw std::runtime_error("Error: user supplied "+expectedName+" has wrong name attribute [" + collection[0].name() + "]. Fix your configuration file.");       
+    }
+}
+
+void QuasarServer::processGlobalSettings (Configuration::Configuration& configuration)
+{
+    ensureObjectPresent(
+        configuration.GlobalSettings(), 
+        configuration, 
+        Configuration::GlobalSettings("GlobalSettings"), 
+        Configuration::Configuration::GlobalSettings_id,
+        "GlobalSettings");
+
+}
+void QuasarServer::processWarnings (Configuration::Configuration& configuration)
+{
+    ensureObjectPresent(
+        configuration.Warnings(), 
+        configuration, 
+        Configuration::Warnings("Warnings"), 
+        Configuration::Configuration::Warnings_id,
+        "Warnings");
+}
+
+bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
+{
+    processGlobalSettings(configuration);
+    processWarnings(configuration);
+    processMultiplexedChannelConfigurationGenerator(configuration);
     return true;
 }
 
@@ -197,5 +226,5 @@ void QuasarServer::appendCustomCommandLineOptions(
     boost::program_options::positional_options_description& positionalOptionsDescription)
 {
     for (auto& logComponent : LogComponents)
-        commandLineOptions.add_options()(("l" + logComponent.name).c_str(), po::value<std::string>(&logComponent.logLevelFromArgs), (logComponent.name + " log level [ERR,WRN,INF,DBG,TRC]").c_str());
+        commandLineOptions.add_options()(("l" + logComponent.name).c_str(), po::value<std::string>(&logComponent.logLevelFromArgs), "log level from [ERR,WRN,INF,DBG,TRC]");
 }

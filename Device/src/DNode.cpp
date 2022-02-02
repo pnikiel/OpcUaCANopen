@@ -35,6 +35,7 @@
 #include <DSdoVariable.h>
 #include <DRoot.h>
 #include <DGlobalSettings.h>
+#include <DWarnings.h>
 
 #include <FrameFactory.hpp>
 
@@ -228,7 +229,10 @@ void DNode::onTpdoReceived (const CanMessage& msg)
     DTpdoMultiplex* multiplex = getTpdoMultiplexBySelector(pdoSelector);
     if (!multiplex && !tpdo)
     {
-        SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. This is a *GRAVE* configuration problem." << SPOOKY_;
+        if (DRoot::getInstance()->warningss()[0]->unexpectedTpdo())
+        {
+            SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. This is a *GRAVE* configuration problem." << SPOOKY_;
+        }
         return;
     }
     if (tpdo)
