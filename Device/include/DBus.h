@@ -49,6 +49,8 @@ public:
 
     /* delegators for
     cachevariables and sourcevariables */
+    /* Note: never directly call this function. */
+    UaStatus writeNodeGuardInterval ( const OpcUa_Double& v);
 
 
     /* delegators for methods */
@@ -95,7 +97,7 @@ private:
     void onError (const int errorCode, const char* errorDescription, timeval&);
 
     
-    
+
 
 
 };

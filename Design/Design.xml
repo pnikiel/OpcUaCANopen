@@ -82,8 +82,8 @@
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="regular">
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
     </d:cachevariable>
-    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="forbidden">
-      <d:documentation>The NG interval in miliseconds for all nodes on the bus. 10000 to 60000 are the typical values for average DCS systems. 0 means that NG is disabled.</d:documentation>
+    <d:cachevariable initializeWith="configuration" dataType="OpcUa_Double" name="nodeGuardInterval" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
+      <d:documentation>The NG interval in seconds for all nodes configured for NodeGuarding. 10 is a typical value.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>

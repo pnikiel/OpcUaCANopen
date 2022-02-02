@@ -94,6 +94,12 @@ DBus::~DBus ()
 
 /* delegates for cachevariables */
 
+/* Note: never directly call this function. */
+
+UaStatus DBus::writeNodeGuardInterval ( const OpcUa_Double& v)
+{
+    return OpcUa_BadNotImplemented;
+}
 
 
 /* delegators for methods */

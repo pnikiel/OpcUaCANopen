@@ -157,7 +157,7 @@ void DNode::initialize()
     m_nodeStateEngine.setLoggingName(getFullName());
     m_nodeStateEngine.setNodeGuardingReplyTimeout(DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout());
     if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
-        m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs() / 1000.0); // node guarding interval to be in seconds
+        m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardInterval()); // node guarding interval to be in seconds
     else
         throw std::runtime_error("not-implemented HB");
 
@@ -203,10 +203,11 @@ void DNode::onBootupReceived ()
 {
     // TODO missing impl
 
-    // TODO logging
 
     // Feature FN2.1: counting bootups
     getAddressSpaceLink()->setBootupCounter( getAddressSpaceLink()->getBootupCounter()+1, OpcUa_Good );
+    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " bootup msg received. Current bootup counter is " 
+        << wrapValue(std::to_string(getAddressSpaceLink()->getBootupCounter()));
 
     // TODO FSM notification that reception of bootup is equivalent of the PREOP state
 }
@@ -241,30 +242,6 @@ void DNode::onTpdoReceived (const CanMessage& msg)
 void DNode::tick()
 {
     m_nodeStateEngine.tick();
-
-    // Feature FN1.1
-    std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
-
-    unsigned int millisecondsSinceLastNgRequest = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastNodeGuardingTimePoint).count();
-    // Nodes non-replying to NG requests, notice the timeout.
-
-    // // TODO: natural condition that the node guarding interval should be bigger than 1000
-    // if (m_nodeGuardingOperationsState == CANopen::NodeGuardingOperationsState::AWAITING_REPLY && millisecondsSinceLastNgRequest >= 1000)
-    // {
-    //     // this is an official report that we did not get the reply to the NG
-    //     m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
-    //     // TODO move the current state to unknown
-        
-    //     LOG(Log::TRC, "NodeMgmt") << wrapId(getFullName()) << " Timeout for NodeGuarding reply. " << 
-    //         wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
-    // }
-
-    // if (millisecondsSinceLastNgRequest >= getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs())
-    // {
-    //     getParent()->sendMessage(CANopen::makeNodeGuardingRequest(id()));
-    //     m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
-    //     m_lastNodeGuardingTimePoint = now;
-    // }
 }
 
 
