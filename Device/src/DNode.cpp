@@ -65,8 +65,6 @@ namespace Device
 // 2     on list)                                                          2
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
-
-
 /* sample ctr */
 DNode::DNode (
     const Configuration::Node& config,
@@ -75,11 +73,11 @@ DNode::DNode (
     Base_DNode( config, parent),
         m_previousState(CANopen::NodeState::UNKNOWN),
         m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
+        m_stateInfoModel(CANopen::stateInfoModelFromText(config.stateInfoSource())),
         m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id()),
         m_nodeStateEngine(
             config.id(),
-            CANopen::stateInfoModelFromText(config.stateInfoSource()),
-            10, // TODO fix it --> state info period
+            m_stateInfoModel,
             CANopen::textToStateEnum(config.requestedState()), /* initial requested state */
             getFullName(), /* ID for logging */
             std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1))
@@ -158,6 +156,10 @@ void DNode::initialize()
 {
     m_nodeStateEngine.setLoggingName(getFullName());
     m_nodeStateEngine.setNodeGuardingReplyTimeout(DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout());
+    if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
+        m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs() / 1000.0); // node guarding interval to be in seconds
+    else
+        throw std::runtime_error("not-implemented HB");
 
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {

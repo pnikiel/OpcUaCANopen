@@ -92,6 +92,7 @@ private:
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
     CANopen::NodeState m_previousState;
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
+    CANopen::StateInfoModel m_stateInfoModel;
     CANopen::SdoEngine m_sdoEngine;
     
     std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;

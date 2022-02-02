@@ -31,7 +31,6 @@ namespace CANopen
         NodeStateEngine(
             uint8_t nodeId,
             StateInfoModel stateInfoModel,
-            float stateInfoPeriodSeconds,
             NodeState initialRequestedState,
             const std::string& nodeAddressForDebug,
             MessageSendFunction messageSendFunction);
@@ -59,7 +58,7 @@ namespace CANopen
     private:
         const uint8_t m_nodeId;
         const StateInfoModel m_stateInfoModel;
-        float m_currentStateInfoPeriod;
+        float m_currentStateInfoPeriod; // TODO: move this to milliseconds
 
         std::string m_nodeAddressForDebug;
 

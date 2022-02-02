@@ -23,8 +23,7 @@ StateInfoModel stateInfoModelFromText(const std::string &text)
 
 NodeStateEngine::NodeStateEngine(
         uint8_t nodeId,
-        StateInfoModel stateInfoModel, 
-        float stateInfoPeriodSeconds, 
+        StateInfoModel stateInfoModel,  
         NodeState initialRequestedState,
         const std::string& nodeAddressForDebug,
         MessageSendFunction messageSendFunction):
@@ -32,7 +31,7 @@ NodeStateEngine::NodeStateEngine(
     m_requestedStateEnum(initialRequestedState),
     m_nodeAddressForDebug(nodeAddressForDebug),
     m_stateInfoModel(stateInfoModel),
-    m_currentStateInfoPeriod(stateInfoPeriodSeconds),
+    m_currentStateInfoPeriod(10), // Expected to be overwritten 
     m_nodeGuardingOperationsState(IDLE),
     m_previousState(CANopen::NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
@@ -187,6 +186,11 @@ void NodeStateEngine::evaluateStateChange (NodeState newState)
 void NodeStateEngine::setRequestedState(NodeState requestedState)
 {
     m_requestedStateEnum = requestedState;
+}
+
+void NodeStateEngine::setStateInfoPeriod (float seconds)
+{
+    m_currentStateInfoPeriod = seconds;
 }
 
 }
