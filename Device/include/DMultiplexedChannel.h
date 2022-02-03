@@ -23,6 +23,8 @@
 
 #include <Base_DMultiplexedChannel.h>
 
+#include <DTpdoMultiplex.h>
+
 #include <CanMessage.h>
 
 namespace Device
@@ -59,10 +61,20 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize();
+
     void onReplyReceived(const CanMessage& msg);
 
-private:
+    //! To be called just before the server emits sync
+    void notifySync ();
 
+    void setParentMultiplex(DTpdoMultiplex* parent) { m_parentMultiplex = parent; }
+
+private:
+    bool m_onSync;
+    DTpdoMultiplex* m_parentMultiplex;
+    bool m_firstIteration;
+    unsigned int m_receivedCtrSinceLastSync;
 
 
 };

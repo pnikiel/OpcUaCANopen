@@ -81,8 +81,21 @@ DTpdoMultiplex::~DTpdoMultiplex ()
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
 
+void DTpdoMultiplex::initialize()
+{
+    for (DMultiplexedChannel* channel : multiplexedchannels())
+    {
+        channel->setParentMultiplex(this);
+        channel->initialize();
+    }
+}
+
 void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
 {
+    // Feature clause FP3.1: MPDO: multiplexing of TPDOs
+
+    // FP2.1.1 is missing here.
+
     LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
     // getting the channel number ...
     // Note: this is the standard channel demultiplexer
@@ -99,6 +112,12 @@ void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
     
     channel->onReplyReceived(msg);
 
+}
+
+void DTpdoMultiplex::notifySync ()
+{
+    for (DMultiplexedChannel* channel : multiplexedchannels())
+        channel->notifySync();
 }
 
 }

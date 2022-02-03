@@ -162,6 +162,9 @@ void DNode::initialize()
     else
         throw std::runtime_error("not-implemented HB");
 
+    for (DTpdoMultiplex* tpdoMultiplex : tpdomultiplexs())
+        tpdoMultiplex->initialize();
+        
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {
         sdogroup->propagateIndex();
@@ -259,6 +262,8 @@ void DNode::notifySync ()
 {
     for (DTpdo* tpdo : tpdos())
         tpdo->notifySync();
+    for (DTpdoMultiplex* multiplex : tpdomultiplexs())
+        multiplex->notifySync();
 }
 
 }

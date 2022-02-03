@@ -225,14 +225,14 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
-    <d:configentry dataType="UaString" name="transportMechanism">
-      <d:configRestriction>
-        <d:restrictionByEnumeration>
-          <d:enumerationValue value="sync"/>
-          <d:enumerationValue value="asyncWithRtr"/>
-          <d:enumerationValue value="publieCommeRecu"/>
-        </d:restrictionByEnumeration>
-      </d:configRestriction>
+    <d:configentry dataType="UaString" name="transportMechanism" storedInDeviceObject="true">
+    	<d:configRestriction>
+    		<d:restrictionByEnumeration>
+    			<d:enumerationValue value="sync" />
+    			<d:enumerationValue value="asyncWithRtr" />
+    			<d:enumerationValue value="publieCommeRecu" />
+    		</d:restrictionByEnumeration>
+    	</d:configRestriction>
     </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannelConfigurationGenerator"/>

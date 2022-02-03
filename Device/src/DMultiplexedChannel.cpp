@@ -24,6 +24,12 @@
 #include <ASMultiplexedChannel.h>
 
 #include <DExtractedValue.h>
+#include <DRoot.h>
+#include <DWarnings.h>
+
+#include <Logging.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -53,7 +59,11 @@ DMultiplexedChannel::DMultiplexedChannel (
     const Configuration::MultiplexedChannel& config,
     Parent_DMultiplexedChannel* parent
 ):
-    Base_DMultiplexedChannel( config, parent)
+    Base_DMultiplexedChannel( config, parent),
+    m_onSync(false), // to be initialized later
+    m_parentMultiplex(nullptr), // to be initialized later
+    m_firstIteration(true),
+    m_receivedCtrSinceLastSync(0)
 
     /* fill up constructor initialization list here */
 {
@@ -77,10 +87,36 @@ DMultiplexedChannel::~DMultiplexedChannel ()
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
 
+void DMultiplexedChannel::initialize()
+{
+    m_onSync = m_parentMultiplex->transportMechanism() == "sync";
+}
+
 void DMultiplexedChannel::onReplyReceived(const CanMessage& msg)
 {
+    m_receivedCtrSinceLastSync++;
+
     for (DExtractedValue* extractedValue : extractedvalues())
         extractedValue->onReplyReceived(msg);
+}
+
+void DMultiplexedChannel::notifySync ()
+{
+
+    if (m_onSync)
+    {
+        // Feature clause FP2.1.1: Warning of missing data between SYNCs
+        if (!m_firstIteration && m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
+        {
+            if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
+            {
+                SPOOKY(getFullName()) << "expected 1 M-TPDO in the previous SYNC cycle but got " << wrapValue(std::to_string(m_receivedCtrSinceLastSync)) << 
+                    ". Likely a grave configuration issue. " << SPOOKY_ << "[WtpdoSyncMismatch]";
+            }
+        }
+        m_receivedCtrSinceLastSync = 0;
+        m_firstIteration = false;
+    }
 }
 
 }
