@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include <Warnings.hxx>
+#include <LogIt.h>
 
 namespace Warnings
 {
@@ -24,11 +25,22 @@ void validateWarnings()
 void passToConfiguration(Configuration::Warnings& warningsConfig)
 {
 {% for ce in designInspector.objectify_config_entries('Warnings') %}
-  if (WarningsDefinitions["{{ce.get('name')}}"].turnOn)
+  if (WarningsDefinitions["{{ce.get('name')}}"].turnOn || allWarnings)
     warningsConfig.{{ce.get('name')}}() = true;
-  if (WarningsDefinitions["{{ce.get('name')}}"].turnOff)
+  if (WarningsDefinitions["{{ce.get('name')}}"].turnOff || noWarnings)
     warningsConfig.{{ce.get('name')}}() = false;
-{% endfor %}    
+{% endfor %}
 }
+
+void logWarningsConfiguration(Configuration::Warnings& warningsConfig)
+{
+    LOG(Log::INF) << "Warnings(spooky log) config: " 
+    {% for ce in designInspector.objectify_config_entries('Warnings') %}
+        << "{{ce.get('name')}}=" << warningsConfig.{{ce.get('name')}}() << " "
+    {% endfor %} ;
+}
+
+bool allWarnings (false);
+bool noWarnings (false);
 
 }

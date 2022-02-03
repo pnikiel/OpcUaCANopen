@@ -213,6 +213,7 @@ void QuasarServer::processWarnings (Configuration::Configuration& configuration)
         "Warnings");
     Warnings::validateWarnings();
     Warnings::passToConfiguration(configuration.Warnings()[0]);
+    Warnings::logWarningsConfiguration(configuration.Warnings()[0]);
 }
 
 bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
@@ -241,5 +242,7 @@ void QuasarServer::appendCustomCommandLineOptions(
     {
         commandLineOptions.add_options()(("Wno_" + warningDefinition.first).c_str(), po::bool_switch(&warningDefinition.second.turnOff));
     }
+    commandLineOptions.add_options()("Wall", po::bool_switch(&Warnings::allWarnings), "Turn on all warnings");
+    commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
 
 }

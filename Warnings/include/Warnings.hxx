@@ -19,7 +19,10 @@ struct Warning
 
 void validateWarnings();
 void passToConfiguration(Configuration::Warnings& warningsConfig);
+void logWarningsConfiguration(Configuration::Warnings& warningsConfig);
 
 extern std::map<std::string, Warning> WarningsDefinitions;
+extern bool allWarnings;
+extern bool noWarnings;
 
 }
