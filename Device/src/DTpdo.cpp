@@ -64,6 +64,7 @@ DTpdo::DTpdo (
 ):
     Base_DTpdo( config, parent),
     m_onSync( config.transportMechanism() == "sync" ),
+    m_firstIteration(true),
     m_receivedCtrSinceLastSync (0)
 
     /* fill up constructor initialization list here */
@@ -139,7 +140,8 @@ void DTpdo::notifySync ()
 
     if (m_onSync)
     {
-        if (m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
+        // Feature clause FP2.1.1: Warning of missing data between SYNCs
+        if (!m_firstIteration && m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
         {
             if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
             {

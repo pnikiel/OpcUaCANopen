@@ -70,6 +70,7 @@ private:
     // sends RTR corresponding to this TPDO
     void sendRtr();
     bool m_onSync;
+    bool m_firstIteration;
 
     unsigned int m_receivedCtrSinceLastSync;
 
