@@ -123,7 +123,7 @@ UaStatus DNode::callReset (
     /* Piotr: I know it'd be *fancier* to solve this problem using e.g. cond variables but I think it would
        complicate it much further with marginally better outcome, while what I propose here seems alright for the application*/ 
 
-    // Feature FN3.1
+    // Feature clause FN3.1: Node reset
 
     // store before-reset number of bootup messages
     unsigned int bootupsBeforeReset = getAddressSpaceLink()->getBootupCounter();
@@ -202,10 +202,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
 
 void DNode::onBootupReceived ()
 {
-    // TODO missing impl
-
-
-    // Feature FN2.1: counting bootups
+    // Feature clause: FN2.1: Count bootups
     getAddressSpaceLink()->setBootupCounter( getAddressSpaceLink()->getBootupCounter()+1, OpcUa_Good );
     LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " bootup msg received. Current bootup counter is " 
         << wrapValue(std::to_string(getAddressSpaceLink()->getBootupCounter()));
@@ -231,7 +228,8 @@ void DNode::onTpdoReceived (const CanMessage& msg)
     {
         if (DRoot::getInstance()->warningss()[0]->unexpectedTpdo())
         {
-            SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. This is a *GRAVE* configuration problem." << SPOOKY_;
+            SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << 
+                " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. " << SPOOKY_ << "[WunexpectedTpdo]";
         }
         return;
     }
@@ -251,9 +249,16 @@ void DNode::tick()
 
 void DNode::publishState (uint8_t rawState, CANopen::NodeState state)
 {
+    // Feature clause FN1.1.2: Presenting node state
     getAddressSpaceLink()->setState(rawState, OpcUa_Good);
     getAddressSpaceLink()->setStateNoToggle(rawState & 0x7f, OpcUa_Good);
     getAddressSpaceLink()->setStateAsText(CANopen::stateEnumToText(state).c_str(), OpcUa_Good);
+}
+
+void DNode::notifySync ()
+{
+    for (DTpdo* tpdo : tpdos())
+        tpdo->notifySync();
 }
 
 }

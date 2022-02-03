@@ -85,6 +85,9 @@ public:
 
     void publishState (uint8_t rawState, CANopen::NodeState state);
 
+    //! To be called just before the server emits sync
+    void notifySync ();
+
 private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);

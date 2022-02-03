@@ -21,6 +21,8 @@
 #ifndef __DTpdo__H__
 #define __DTpdo__H__
 
+#include <mutex>
+
 #include <CanMessage.h>
 
 #include <Base_DTpdo.h>
@@ -61,11 +63,19 @@ private:
 public:
     void onReplyReceived(const CanMessage& msg);
 
+    //! To be called just before the server emits sync
+    void notifySync ();
 
 private:
     // sends RTR corresponding to this TPDO
     void sendRtr();
+    bool m_onSync;
 
+    unsigned int m_receivedCtrSinceLastSync;
+
+    std::mutex m_accessLock;
+
+    // TODO consider a semaphore/mutex between notify and on reply rcvd (cornercases)
 
 };
 

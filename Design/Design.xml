@@ -31,6 +31,14 @@
   </d:class>
   <d:class name="Warnings">
   	<d:devicelogic></d:devicelogic>
+  	<d:configentry dataType="OpcUa_Boolean" name="rxFromUnknownNode" defaultValue="true"
+  		storedInDeviceObject="true">
+  		<d:documentation>Warn when receiving messages from undeclared node.</d:documentation>
+  	</d:configentry>
+  	<d:configentry dataType="OpcUa_Boolean" name="tpdoSyncMismatch" defaultValue="true"
+        storedInDeviceObject="true">
+        <d:documentation>Warn when not receiving data after sync, or receiving too much data after sync, for TPDOs configured onSync.</d:documentation>
+    </d:configentry>
   	<d:configentry dataType="OpcUa_Boolean" name="unexpectedTpdo" defaultValue="true"
   		storedInDeviceObject="true">
   		<d:documentation>

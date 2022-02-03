@@ -9,7 +9,7 @@ namespace Warnings
 std::map<std::string, Warning> WarningsDefinitions = 
 {
 {% for ce in designInspector.objectify_config_entries('Warnings') %}
-  {"{{ce.get('name')}}", {}}
+  {"{{ce.get('name')}}", {}}{% if not loop.last %},{% endif %}
 {% endfor %}
 };
 

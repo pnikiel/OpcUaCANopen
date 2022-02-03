@@ -20,6 +20,8 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
+#include <DRoot.h>
+#include <DWarnings.h>
 #include <DTpdo.h>
 #include <ASTpdo.h>
 #include <DNode.h>
@@ -60,12 +62,15 @@ DTpdo::DTpdo (
     const Configuration::Tpdo& config,
     Parent_DTpdo* parent
 ):
-    Base_DTpdo( config, parent)
+    Base_DTpdo( config, parent),
+    m_onSync( config.transportMechanism() == "sync" ),
+    m_receivedCtrSinceLastSync (0)
 
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
     // for the mode of on-sync supports rtr, we should send an RTR each time there is a state change towards preop
+    // TODO Mark the feature clause
     if (config.transportMechanism() == "asyncSupportsRtr")
     {
         getParent()->addNodeStateChangeCallBack(
@@ -107,7 +112,12 @@ DTpdo::~DTpdo ()
 
 void DTpdo::onReplyReceived(const CanMessage& msg)
 {
-    LOG(Log::TRC) << "received TPDO reply: " << msg.toString();
+    std::lock_guard<std::mutex> lock (m_accessLock); // operating on shared data, e.g. m_receivedCtrSinceLastSync
+
+    LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO: Wrong log component
+    m_receivedCtrSinceLastSync++;
+
+    // Feature clause FP2.1: TPDO (Transmit PDOs)
     for (DExtractedValue* extractedValue : extractedvalues())
     {
         extractedValue->onReplyReceived(msg);
@@ -120,6 +130,25 @@ void DTpdo::sendRtr()
     // TODO: send this fucking RTR.
     getParent()->getParent()->sendMessage(
         CANopen::makeTpdoRtr(getParent()->id(), 0x180/*TODO*/));
+}
+
+    
+void DTpdo::notifySync ()
+{
+    std::lock_guard<std::mutex> lock (m_accessLock);
+
+    if (m_onSync)
+    {
+        if (m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
+        {
+            if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
+            {
+                SPOOKY(getFullName()) << "expected 1 TPDO in the previous SYNC cycle but got " << wrapValue(std::to_string(m_receivedCtrSinceLastSync)) << 
+                    ". Likely a grave configuration issue. " << SPOOKY_ << "[WtpdoSyncMismatch]";
+            }
+        }
+        m_receivedCtrSinceLastSync = 0;
+    }
 }
 
 }

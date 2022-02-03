@@ -30,6 +30,7 @@
 #include <Utils.h>
 #include <SockCanScan.h>
 #include <DNode.h>
+#include <DWarnings.h>
 
 #include <Logging.hpp>
 #include <FrameFactory.hpp>
@@ -137,8 +138,13 @@ void DBus::onMessageReceived (const CanMessage& msg)
     if (node)
         node->onMessageReceived(msg);
     else
-        SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) << ", fix your hardware or your configuration." << SPOOKY_;
-
+    {
+        if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode())
+        {
+            SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
+                << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]";
+        }
+    }
 }
 
 void DBus::sendMessage(const CanMessage& msg)
@@ -160,8 +166,12 @@ void DBus::tickSync()
 {
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     unsigned int millisecondsSinceLastSync = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastSyncTimePoint).count();
+    // Feature clause FP1.2: Support of SYNC messages
     if (millisecondsSinceLastSync >= getAddressSpaceLink()->getSyncIntervalMs())
     {
+        // notify that new sync cycle starts -- this is relevant for book-keeping of TPDOs, MTPDOs and other stuff.
+        for (DNode* node : nodes())
+            node->notifySync();
         sendMessage(CANopen::makeSyncRequest());
         m_lastSyncTimePoint = now;
     }

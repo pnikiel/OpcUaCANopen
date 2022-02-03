@@ -2,6 +2,7 @@
 <!DOCTYPE configuration [
 
         <!ENTITY STDELMB_FOUNDATIONS SYSTEM "CANopen_def_STDELMB_FOUNDATIONS.xmle">
+        <!ENTITY STDELMB_DI_TPDO1_C SYSTEM "CANopen_def_STDELMB_DI_TPDO1_C.xmle">
         <!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
         ]>
 <configuration xmlns="http://cern.ch/quasar/Configuration"
@@ -18,10 +19,10 @@
 		</Log>
 	</StandardMetaData>
 	<GlobalSettings name="GlobalSettings"  />
-	<Warnings name="Warnings" unexpectedTpdo="false"></Warnings>
 	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardInterval="10" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;
+			&STDELMB_DI_TPDO1_C;
       			&STDELMB_AI_TPDO3;
 			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R" />
 		</Node>

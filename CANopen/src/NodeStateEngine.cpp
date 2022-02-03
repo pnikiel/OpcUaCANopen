@@ -69,6 +69,7 @@ void NodeStateEngine::tickNodeGuarding()
 
     if (millisecondsSinceLastNgRequest >= m_currentStateInfoPeriod * 1000)
     {
+        // Feature clause FN1.1: Node monitoring by node-guarding
         LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Sending NG request";
         m_messageSendFunction(CANopen::makeNodeGuardingRequest(m_nodeId));
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
