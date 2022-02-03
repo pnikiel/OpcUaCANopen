@@ -5,10 +5,10 @@
 namespace Warnings
 {
 
-std::vector<Warning> WarningsDefinitions = 
+std::map<std::string, Warning> WarningsDefinitions = 
 {
 {% for ce in designInspector.objectify_config_entries('Warnings') %}
-  {"{{ce.get('name')}}"}
+  {"{{ce.get('name')}}", {}}
 {% endfor %}
 };
 
@@ -16,9 +16,19 @@ void validateWarnings()
 {
     for (auto& warningDefinition : Warnings::WarningsDefinitions)
     {
-        if (warningDefinition.turnOn && warningDefinition.turnOff)
-            throw std::runtime_error("Conflicting command line arguments for warning [" + warningDefinition.name + "]");
+        if (warningDefinition.second.turnOn && warningDefinition.second.turnOff)
+            throw std::runtime_error("Conflicting command line arguments for warning [" + warningDefinition.first + "]");
     }
+}
+
+void passToConfiguration(Configuration::Warnings& warningsConfig)
+{
+{% for ce in designInspector.objectify_config_entries('Warnings') %}
+  if (WarningsDefinitions["{{ce.get('name')}}"].turnOn)
+    warningsConfig.{{ce.get('name')}}() = true;
+  if (WarningsDefinitions["{{ce.get('name')}}"].turnOff)
+    warningsConfig.{{ce.get('name')}}() = false;
+{% endfor %}    
 }
 
 }

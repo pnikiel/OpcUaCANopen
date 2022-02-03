@@ -212,6 +212,7 @@ void QuasarServer::processWarnings (Configuration::Configuration& configuration)
         Configuration::Configuration::Warnings_id,
         "Warnings");
     Warnings::validateWarnings();
+    Warnings::passToConfiguration(configuration.Warnings()[0]);
 }
 
 bool QuasarServer::processConfiguration(Configuration::Configuration& configuration)
@@ -219,7 +220,6 @@ bool QuasarServer::processConfiguration(Configuration::Configuration& configurat
     processGlobalSettings(configuration);
     processWarnings(configuration);
     processMultiplexedChannelConfigurationGenerator(configuration);
-    configuration.Warnings()[0].unexpectedTpdo() = true;
     return true;
 }
 
@@ -234,12 +234,12 @@ void QuasarServer::appendCustomCommandLineOptions(
 
     for (auto& warningDefinition : Warnings::WarningsDefinitions)
     {
-        commandLineOptions.add_options()(("W" + warningDefinition.name).c_str(), po::bool_switch(&warningDefinition.turnOn));
+        commandLineOptions.add_options()(("W" + warningDefinition.first).c_str(), po::bool_switch(&warningDefinition.second.turnOn));
     }
 
     for (auto& warningDefinition : Warnings::WarningsDefinitions)
     {
-        commandLineOptions.add_options()(("Wno_" + warningDefinition.name).c_str(), po::bool_switch(&warningDefinition.turnOff));
+        commandLineOptions.add_options()(("Wno_" + warningDefinition.first).c_str(), po::bool_switch(&warningDefinition.second.turnOff));
     }
 
 }

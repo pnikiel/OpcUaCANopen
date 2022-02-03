@@ -2,19 +2,24 @@
 
 #include <vector>
 #include <string>
+#include <map>
+
+#include <Configuration.hxx>
 
 namespace Warnings
 {
 
 struct Warning
 {
-    std::string name;
+    //std::string name;
     bool turnOn;
     bool turnOff;
-    Warning(const std::string& _name): name(_name), turnOn(false), turnOff(false) {}
+    Warning(/*const std::string& _name*/): /*name(_name), */turnOn(false), turnOff(false) {}
 };
 
 void validateWarnings();
-extern std::vector<Warning> WarningsDefinitions;
+void passToConfiguration(Configuration::Warnings& warningsConfig);
+
+extern std::map<std::string, Warning> WarningsDefinitions;
 
 }
