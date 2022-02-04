@@ -22,13 +22,17 @@
 
 
 #include <thread>
+#include <iomanip>
 
 #include "QuasarServer.h"
 #include <LogIt.h>
 #include <shutdown.h>
 
-#include <DBus.h>
 #include <DRoot.h>
+#include <DBus.h>
+#include <DNode.h>
+
+#include <ASBus.h>
 
 #include <Configuration.hxx>
 #include <Configurator.h>
@@ -107,6 +111,8 @@ void QuasarServer::initialize()
 
     for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
         bus->initialize();
+
+    printNiceSummary();
     
 }
 
@@ -245,4 +251,22 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("Wall", po::bool_switch(&Warnings::allWarnings), "Turn on all warnings");
     commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
 
+}
+
+void QuasarServer::printNiceSummary()
+{
+    std::cout << "+---------------------------------------+------------------------+" << std::endl;
+    std::cout << "| Node name                             | State info |            " << std::endl;
+    std::cout << "+---------------------------------------+------------------------+" << std::endl;
+    for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
+    {
+        //std::cout << bus->getFullName() << std::endl;
+        for (Device::DNode* node : bus->nodes())
+        {
+            std::cout << "|" << std::setw(30) << node->getFullName() << " (ID" << std::setw(3) << (unsigned int)node->id() << ") | ";
+            std::cout << node->stateInfoSource() << " " << bus->getAddressSpaceLink()->getNodeGuardInterval() << "s ";
+            std::cout << std::endl;
+        }       
+    }
+    std::cout << "+---------------------------------------+------------------------+" << std::endl;
 }

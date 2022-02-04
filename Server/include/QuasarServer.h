@@ -58,6 +58,8 @@ public:
     void processGlobalSettings (Configuration::Configuration& configuration);
     void processWarnings (Configuration::Configuration& configuration);
 
+    void printNiceSummary();
+
 private:
     //Disable copy-constructor and assignment-operator
     QuasarServer( const QuasarServer& server );

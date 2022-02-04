@@ -161,7 +161,7 @@
     <d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
-    <d:configentry dataType="UaString" name="stateInfoSource">
+    <d:configentry dataType="UaString" name="stateInfoSource" storedInDeviceObject="true">
       <d:configRestriction>
         <d:restrictionByEnumeration>
           <d:enumerationValue value="NodeGuard"/>
@@ -184,7 +184,8 @@
   </d:class>
   <d:class name="Tpdo">
     <d:devicelogic>
-    	<d:mutex /></d:devicelogic>
+      <d:mutex/>
+    </d:devicelogic>
     <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
     <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
       <d:configRestriction>
