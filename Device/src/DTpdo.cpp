@@ -141,7 +141,9 @@ void DTpdo::notifySync ()
     if (m_onSync)
     {
         // Feature clause FP2.1.1: Warning of missing data between SYNCs
-        if (!m_firstIteration && m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
+        if (!m_firstIteration &&
+            m_receivedCtrSinceLastSync != 1 && // 1 per sync is a valid number for non-MPDO traffic.
+            getParent()->nodeStateEngine().currentState() == CANopen::NodeState::OPERATIONAL)
         {
             if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
             {
@@ -150,6 +152,7 @@ void DTpdo::notifySync ()
             }
         }
         m_receivedCtrSinceLastSync = 0;
+        m_firstIteration = false;
     }
 }
 

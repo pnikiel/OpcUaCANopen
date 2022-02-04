@@ -88,6 +88,8 @@ public:
     //! To be called just before the server emits sync
     void notifySync ();
 
+    const CANopen::NodeStateEngine& nodeStateEngine () const { return m_nodeStateEngine; }
+
 private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);

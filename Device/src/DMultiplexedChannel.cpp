@@ -26,6 +26,7 @@
 #include <DExtractedValue.h>
 #include <DRoot.h>
 #include <DWarnings.h>
+#include <DNode.h>
 
 #include <Logging.hpp>
 
@@ -106,7 +107,9 @@ void DMultiplexedChannel::notifySync ()
     if (m_onSync)
     {
         // Feature clause FP2.1.1: Warning of missing data between SYNCs
-        if (!m_firstIteration && m_receivedCtrSinceLastSync != 1) // 1 per sync is a valid number for non-MPDO traffic.
+        if (!m_firstIteration && 
+            m_receivedCtrSinceLastSync != 1 && // 1 per sync is a valid number for non-MPDO traffic.
+            m_parentMultiplex->getParent()->nodeStateEngine().currentState() == CANopen::NodeState::OPERATIONAL) 
         {
             if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
             {

@@ -55,6 +55,8 @@ namespace CANopen
 
         void setOnBootupNotification (BootUpNotification bootUpNotification) { m_bootUpNotification = bootUpNotification; }
 
+        NodeState currentState() const { return m_currentState; }
+
     private:
         const uint8_t m_nodeId;
         const StateInfoModel m_stateInfoModel;
@@ -69,6 +71,7 @@ namespace CANopen
         CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
         CANopen::NodeState m_previousState;
         CANopen::NodeState m_requestedStateEnum;
+        CANopen::NodeState m_currentState;
 
         unsigned int m_nodeGuardingReplyTimeoutMs;
 

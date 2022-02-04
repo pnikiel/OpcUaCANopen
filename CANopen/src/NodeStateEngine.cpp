@@ -29,6 +29,7 @@ NodeStateEngine::NodeStateEngine(
         MessageSendFunction messageSendFunction):
     m_nodeId(nodeId),
     m_requestedStateEnum(initialRequestedState),
+    m_currentState(NodeState::UNKNOWN),
     m_nodeAddressForDebug(nodeAddressForDebug),
     m_stateInfoModel(stateInfoModel),
     m_currentStateInfoPeriod(10), // Expected to be overwritten 
@@ -131,13 +132,13 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         // TODO toggle bit checking
         
         uint8_t stateNoToggle = msg.c_data[0] & 0x7f;
-        CANopen::NodeState currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
-        notifyState(msg.c_data[0], currentState);
+        m_currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
+        notifyState(msg.c_data[0], m_currentState);
         
         if (stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {
             LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
-                << wrapValue(CANopen::stateEnumToText(currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
+                << wrapValue(CANopen::stateEnumToText(m_currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
             // send therefore a message for correcting
 
             uint8_t nmtCommand;
