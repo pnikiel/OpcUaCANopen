@@ -16,7 +16,7 @@
 
 
  */
-\
+
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
@@ -65,7 +65,8 @@ DTpdo::DTpdo (
     Base_DTpdo( config, parent),
     m_onSync( config.transportMechanism() == "sync" ),
     m_firstIteration(true),
-    m_receivedCtrSinceLastSync (0)
+    m_receivedCtrSinceLastSync (0),
+    m_numRtrsInvokedAddressSpace (0)
 
     /* fill up constructor initialization list here */
 {
@@ -102,6 +103,26 @@ DTpdo::~DTpdo ()
 /* delegates for cachevariables */
 
 
+/* ASYNCHRONOUS !! */
+UaStatus DTpdo::readInvokeRtr (
+    OpcUa_UInt32& value,
+    UaDateTime& sourceTime
+)
+{
+    sourceTime = UaDateTime::now();
+    value = m_numRtrsInvokedAddressSpace;
+    return OpcUa_Good;
+}
+/* ASYNCHRONOUS !! */
+UaStatus DTpdo::writeInvokeRtr (
+    OpcUa_UInt32& value
+)
+{
+    // Note: "value" is not relevant; we use this function to invoked action(s) from WinCC OA.
+    // Feature clause FP6.2: RTR and initialization of on-change data (invoking on request)
+    this->sendRtr(); // TODO If in spy mode, mention it, also catch potential exceptions.
+    return OpcUa_Good;
+}
 
 /* delegators for methods */
 
@@ -119,6 +140,7 @@ void DTpdo::onReplyReceived(const CanMessage& msg)
     m_receivedCtrSinceLastSync++;
 
     // Feature clause FP2.1: TPDO (Transmit PDOs)
+    // Feature clause FP6.1: Non-SYNC traffic
     for (DExtractedValue* extractedValue : extractedvalues())
     {
         extractedValue->onReplyReceived(msg);

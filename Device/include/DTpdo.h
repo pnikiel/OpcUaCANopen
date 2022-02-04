@@ -47,6 +47,15 @@ public:
     /* delegators for
     cachevariables and sourcevariables */
 
+    /* ASYNCHRONOUS !! */
+    UaStatus readInvokeRtr (
+        OpcUa_UInt32& value,
+        UaDateTime& sourceTime
+    );
+    /* ASYNCHRONOUS !! */
+    UaStatus writeInvokeRtr (
+        OpcUa_UInt32& value
+    );
 
     /* delegators for methods */
 
@@ -76,7 +85,7 @@ private:
 
     std::mutex m_accessLock;
 
-    // TODO consider a semaphore/mutex between notify and on reply rcvd (cornercases)
+    unsigned int m_numRtrsInvokedAddressSpace;
 
 };
 

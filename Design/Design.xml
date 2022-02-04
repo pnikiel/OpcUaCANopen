@@ -20,9 +20,8 @@
         <d:restrictionByBounds minInclusive="0.001"/>
       </d:configRestriction>
     </d:configentry>
-    <d:configentry dataType="OpcUa_Float" name="nodeGuardingReplyTimeout" defaultValue="1"
-    	storedInDeviceObject="true">
-    	<d:documentation>
+    <d:configentry dataType="OpcUa_Float" name="nodeGuardingReplyTimeout" defaultValue="1" storedInDeviceObject="true">
+      <d:documentation>
     		Max wait time (in seconds) for NodeGuarding reply after NodeGuarding request, when passed
     		NodeGuarding timeout is declared.
     	</d:documentation>
@@ -30,21 +29,18 @@
     <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
   <d:class name="Warnings">
-  	<d:devicelogic></d:devicelogic>
-  	<d:configentry dataType="OpcUa_Boolean" name="rxFromUnknownNode" defaultValue="true"
-  		storedInDeviceObject="true">
-  		<d:documentation>Warn when receiving messages from undeclared node.</d:documentation>
-  	</d:configentry>
-  	<d:configentry dataType="OpcUa_Boolean" name="tpdoSyncMismatch" defaultValue="true"
-        storedInDeviceObject="true">
-        <d:documentation>Warn when not receiving data after sync, or receiving too much data after sync, for TPDOs configured onSync.</d:documentation>
+    <d:devicelogic/>
+    <d:configentry dataType="OpcUa_Boolean" name="rxFromUnknownNode" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>Warn when receiving messages from undeclared node.</d:documentation>
     </d:configentry>
-  	<d:configentry dataType="OpcUa_Boolean" name="unexpectedTpdo" defaultValue="true"
-  		storedInDeviceObject="true">
-  		<d:documentation>
+    <d:configentry dataType="OpcUa_Boolean" name="tpdoSyncMismatch" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>Warn when not receiving data after sync, or receiving too much data after sync, for TPDOs configured onSync.</d:documentation>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Boolean" name="unexpectedTpdo" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>
   			Warn when receiving TPDOs which are not expected per configuration.
   		</d:documentation>
-  	</d:configentry>
+    </d:configentry>
   </d:class>
   <d:class name="Bus">
     <d:devicelogic/>
@@ -159,10 +155,10 @@
     <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
     <d:hasobjects instantiateUsing="configuration" class="Rpdo">
 </d:hasobjects>
-    <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/><d:hasobjects
-    	instantiateUsing="configuration" class="SdoVariable">
+    <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/>
+    <d:hasobjects instantiateUsing="configuration" class="SdoVariable">
 </d:hasobjects>
-  	<d:hasobjects instantiateUsing="design" class="EmergencyParser">
+    <d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
     <d:configentry dataType="UaString" name="stateInfoSource">
@@ -187,7 +183,8 @@
 </d:cachevariable>
   </d:class>
   <d:class name="Tpdo">
-    <d:devicelogic/>
+    <d:devicelogic>
+    	<d:mutex /></d:devicelogic>
     <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
     <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
       <d:configRestriction>
@@ -208,6 +205,9 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
+    <d:sourcevariable dataType="OpcUa_UInt32" name="invokeRtr" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="of_containing_object" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
+      <d:documentation>Writing to this variable invokes the RTR for this TPDO. It is a compatibility mode for WinCC OA which can not do method calls. Reading from this variable returns number of times the RTR was invoked in this way.</d:documentation>
+    </d:sourcevariable>
   </d:class>
   <d:class name="TpdoMultiplex">
     <d:devicelogic/>
@@ -226,13 +226,13 @@
       </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="transportMechanism" storedInDeviceObject="true">
-    	<d:configRestriction>
-    		<d:restrictionByEnumeration>
-    			<d:enumerationValue value="sync" />
-    			<d:enumerationValue value="asyncWithRtr" />
-    			<d:enumerationValue value="publieCommeRecu" />
-    		</d:restrictionByEnumeration>
-    	</d:configRestriction>
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="sync"/>
+          <d:enumerationValue value="asyncWithRtr"/>
+          <d:enumerationValue value="publieCommeRecu"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
     </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannelConfigurationGenerator"/>
@@ -338,13 +338,13 @@
     </d:configentry>
   </d:class>
   <d:class name="SdoVariable" singleVariableNode="true">
-    <d:devicelogic/><d:configentry dataType="UaString" name="index" defaultValue="fromGroup"
-    	storedInDeviceObject="true">
-    	<d:configRestriction>
-    		<d:restrictionByPattern pattern="fromGroup|[0-9A-F]{1,4}" />
-    	</d:configRestriction>
-</d:configentry>
-  	<d:configentry dataType="OpcUa_Byte" name="subIndex">
+    <d:devicelogic/>
+    <d:configentry dataType="UaString" name="index" defaultValue="fromGroup" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="fromGroup|[0-9A-F]{1,4}"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Byte" name="subIndex">
       <d:configRestriction>
         <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
       </d:configRestriction>
