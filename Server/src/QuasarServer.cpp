@@ -31,6 +31,7 @@
 #include <DRoot.h>
 #include <DBus.h>
 #include <DNode.h>
+#include <Sdo.h>
 
 #include <ASBus.h>
 
@@ -39,6 +40,7 @@
 #include <ConfigurationDecorationUtils.h>
 
 #include <Warnings.hxx>
+#include <Utils.h>
 
 using namespace Configuration;
 
@@ -73,6 +75,8 @@ QuasarServer::~QuasarServer()
 
 void QuasarServer::mainLoop()
 {
+    std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    printNiceSummary();
     printServerMsg("Press "+std::string(SHUTDOWN_SEQUENCE)+" to shutdown server");
 
     // Wait for user command to terminate the server thread.
@@ -112,7 +116,7 @@ void QuasarServer::initialize()
     for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
         bus->initialize();
 
-    printNiceSummary();
+    
     
 }
 
@@ -253,6 +257,22 @@ void QuasarServer::appendCustomCommandLineOptions(
 
 }
 
+std::string readSdoAsAscii (CANopen::SdoEngine& engine, uint16_t index, uint8_t subIndex)
+{
+    std::vector<uint8_t> output;
+    try
+    {
+        engine.readExpedited("-", index, subIndex, output);
+        std::string outString(output.size(), ' ');
+        std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x){return (char)x;});
+        return outString;
+    }
+    catch (const std::exception& e)
+    {
+        return Quasar::TermColors::ForeRed() + "ERR" + Quasar::TermColors::StyleReset();
+    }
+}
+
 void QuasarServer::printNiceSummary()
 {
     std::cout << "+---------------------------------------+------------------------+" << std::endl;
@@ -263,8 +283,12 @@ void QuasarServer::printNiceSummary()
         //std::cout << bus->getFullName() << std::endl;
         for (Device::DNode* node : bus->nodes())
         {
+            std::string swVersion = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x00);
+            std::string swVersionMinor = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x01);
+
             std::cout << "|" << std::setw(30) << node->getFullName() << " (ID" << std::setw(3) << (unsigned int)node->id() << ") | ";
             std::cout << node->stateInfoSource() << " " << bus->getAddressSpaceLink()->getNodeGuardInterval() << "s ";
+            std::cout << " | " << swVersion << "|" << swVersionMinor ;
             std::cout << std::endl;
         }       
     }
