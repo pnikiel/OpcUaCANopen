@@ -303,20 +303,22 @@ void QuasarServer::signalAction()
     std::cout << std::endl
               << Quasar::TermColors::ForeGreen() << "*** Ctrl-Z: list info ***" << Quasar::TermColors::StyleReset() 
               << std::endl;
-    std::cout << "╔════════════════════════════════╤════════════════╤═══════╤═══════╗" << std::endl;
-    std::cout << "║ Obj                            │ CAN state      │       │       ║  (for Bus)" << std::endl;
-    std::cout << "║ Obj                            │ CANopen state  │ #Emrg │ #Boot ║  (for Node)" << std::endl;
-    std::cout << "╠════════════════════════════════╪════════════════╪═══════╪═══════╢" << std::endl; 
+    std::cout << "╔═════════════════════════════════════╤════════════════╤═══════╤═══════╗" << std::endl;
+    std::cout << "║ Obj                                 │ CAN state      │       │       ║  (for Bus)" << std::endl;
+    std::cout << "║ Obj                                 │ CANopen state  │ #Emrg │ #Boot ║  (for Node)" << std::endl;
+    std::cout << "╠═════════════════════════════════════╪════════════════╪═══════╪═══════╢" << std::endl; 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        std::cout << "║ " << std::setw(30) << std::setfill(' ') << std::left << bus->getFullName() << " │ " << std::setw(14) << wrapId("X") << std::endl;
+        std::cout << "║ " << std::setw(35) << std::setfill(' ') << std::left << bus->getFullName() << " │ " << std::setw(22) << wrapValue("X") << " │ " << 
+            std::setw(5) << " " << " │ " << 
+            std::setw(5) << " " << " ║" << std::endl;
         for (Device::DNode *node : bus->nodes())
         {
-            std::cout << "║ " << std::setw(30) << node->getFullName() << " │ " << 
+            std::cout << "║ " << std::setw(35) << node->getFullName() << " │ " << 
                 std::setw(22) << wrapValue(CANopen::stateEnumToText(node->nodeStateEngine().currentState())) << " │ " << 
                 std::setw(5) << node->getAddressSpaceLink()->getBootupCounter() << " │ " <<
                 std::setw(5) << node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << " ║" << std::endl;
         }
     }
-    std::cout << "╚════════════════════════════════╧════════════════╧═══════╧═══════╝" << std::endl; 
+    std::cout << "╚═════════════════════════════════════╧════════════════╧═══════╧═══════╝" << std::endl; 
 }
