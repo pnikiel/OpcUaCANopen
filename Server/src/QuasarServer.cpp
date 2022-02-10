@@ -303,37 +303,31 @@ void QuasarServer::printNiceSummary()
 void QuasarServer::signalAction()
 {
 
-        fort::char_table table;
-    table.set_border_style(FT_FRAME_STYLE);
+    fort::char_table table;
+    table.set_border_style(FT_BOLD_STYLE);
 
     table << fort::header
-        << "N" << "Driver" << "Time" << "Avg Speed" << fort::endr
-        << "1" << "Ricciardo" << "1:25.945" << "47.362" << fort::endr
-        << "2" << "Hamilton" << "1:26.373" << "35.02" << fort::endr
-        << "3" << "Verstappen" << "1:26.469" << "29.78" << fort::endr;
+        << "Object" << "CAN/CANopen state" << "#Emrg" << "#Boot" << fort::endr;
 
-    std::cout << table.to_string() << std::endl;
+
+    
 
 
     std::cout << std::endl
               << Quasar::TermColors::ForeGreen() << "*** Ctrl-Z: list info ***" << Quasar::TermColors::StyleReset() 
               << std::endl;
-    std::cout << "╔═════════════════════════════════════╤════════════════╤═══════╤═══════╗" << std::endl;
-    std::cout << "║ Obj                                 │ CAN state      │       │       ║  (for Bus)" << std::endl;
-    std::cout << "║ Obj                                 │ CANopen state  │ #Emrg │ #Boot ║  (for Node)" << std::endl;
-    std::cout << "╠═════════════════════════════════════╪════════════════╪═══════╪═══════╢" << std::endl; 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        std::cout << "║ 🚌 " << std::setw(32) << std::setfill(' ') << std::left << bus->getFullName() << " │ " << std::setw(22) << wrapValue("X") << " │ " << 
-            std::setw(5) << " " << " │ " << 
-            std::setw(5) << " " << " ║" << std::endl;
+        table << "(B) " + bus->getFullName() << fort::endr;
         for (Device::DNode *node : bus->nodes())
         {
-            std::cout << "║ " << std::setw(35) << node->getFullName() << " │ " << 
-                std::setw(22) << wrapValue(CANopen::stateEnumToText(node->nodeStateEngine().currentState())) << " │ " << 
-                std::setw(5) << node->getAddressSpaceLink()->getBootupCounter() << " │ " <<
-                std::setw(5) << node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << " ║" << std::endl;
+            table << 
+                "---> " + node->getFullName() << 
+                CANopen::stateEnumToText(node->nodeStateEngine().currentState()) <<
+                node->getAddressSpaceLink()->getBootupCounter() << 
+                node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << fort::endr;
         }
+        table << fort::separator;
     }
-    std::cout << "╚═════════════════════════════════════╧════════════════╧═══════╧═══════╝" << std::endl; 
+    std::cout << table.to_string() << std::endl;
 }
