@@ -21,6 +21,8 @@
  */
 
 
+
+#include <signal.h>
 #include <thread>
 #include <iomanip>
 
@@ -34,6 +36,7 @@
 #include <Sdo.h>
 
 #include <ASBus.h>
+#include <ASNode.h>
 
 #include <Configuration.hxx>
 #include <Configurator.h>
@@ -41,8 +44,10 @@
 
 #include <Warnings.hxx>
 #include <Utils.h>
+#include <Logging.hpp>
 
 using namespace Configuration;
+using namespace Logging;
 
 namespace po = boost::program_options;
 
@@ -92,6 +97,12 @@ void QuasarServer::mainLoop()
     printServerMsg(" Shutting down server");
 }
 
+QuasarServer* quasarServer (nullptr);
+void sigAction (int)
+{
+    quasarServer->signalAction();
+}
+
 void QuasarServer::initialize()
 {
     LOG(Log::INF) << "Initializing Quasar server.";
@@ -116,7 +127,9 @@ void QuasarServer::initialize()
     for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
         bus->initialize();
 
-    
+
+    quasarServer = this;
+    signal(SIGTSTP, sigAction);
     
 }
 
@@ -293,4 +306,20 @@ void QuasarServer::printNiceSummary()
         }       
     }
     std::cout << "+---------------------------------------+------------------------+" << std::endl;
+}
+
+void QuasarServer::signalAction()
+{
+    std::cout << "*** Ctrl-Z: list info ***" << std::endl;
+    for (Device::DBus* bus : Device::DRoot::getInstance()->buss())
+    {
+        std::cout << "Bus " << wrapId(bus->getFullName()) << " CAN_state " << wrapId("X") << std::endl;
+        for (Device::DNode* node : bus->nodes())
+        {
+            std::cout << "Node " << wrapId(node->getFullName()) <<
+                " state " << CANopen::stateEnumToText(node->nodeStateEngine().currentState()) <<
+                " #bootups " << node->getAddressSpaceLink()->getBootupCounter() <<
+                std::endl;
+        }
+    }   
 }

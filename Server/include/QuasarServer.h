@@ -60,6 +60,8 @@ public:
 
     void printNiceSummary();
 
+    void signalAction();
+
 private:
     //Disable copy-constructor and assignment-operator
     QuasarServer( const QuasarServer& server );
