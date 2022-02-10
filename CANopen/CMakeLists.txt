@@ -3,4 +3,5 @@ add_library(CANopen OBJECT
     src/FrameFactory.cpp
     src/Sdo.cpp
     src/NodeStateEngine.cpp
+    src/EmergencyErrors.cpp
     )

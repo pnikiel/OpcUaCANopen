@@ -36,11 +36,18 @@ NodeStateEngine::NodeStateEngine(
     m_nodeGuardingOperationsState(IDLE),
     m_previousState(CANopen::NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
-    m_messageSendFunction(messageSendFunction)
+    m_messageSendFunction(messageSendFunction),
+    m_lastToggleBit(DUNNO)
 {
     // if (m_nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
     //     throw std::runtime_error("NodeGuarding Reply Timeout *must be* smaller that NodeGuarding interval");
     this->addNodeStateNotification([this](uint8_t rawState, NodeState state){this->evaluateStateChange(state);});
+
+    addNodeStateChangeNotification([this](NodeState previous, NodeState current)
+    {
+        if (previous == NodeState::DISCONNECTED) // we're quitting the DISCONNECTED
+            m_lastToggleBit = DUNNO;
+    });
 }
 
 void NodeStateEngine::tick()
@@ -129,9 +136,24 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         // Feature FN1.1.2
         // TODO implement actual NG reply logic
 
-        // TODO toggle bit checking
-        
-        uint8_t stateNoToggle = msg.c_data[0] & 0x7f;
+        // Feature clause FN1.1.1: Toggle bit support
+        uint8_t stateToggled = msg.c_data[0];
+        ToggleBit currentToggleBit = stateToggled & 0x80 ? ON : OFF;
+        if (m_currentState != NodeState::DISCONNECTED) // DISCONNECTED is the only state where there is no toggling, so we don't check.
+        {
+            if (m_lastToggleBit != DUNNO)
+            {
+                if (m_lastToggleBit == currentToggleBit) // no toggle detected!
+                {
+                    SPOOKY(m_nodeAddressForDebug) << "NoToggle detected!" << SPOOKY_;
+                    if (m_toggleViolationNotification)
+                        m_toggleViolationNotification();
+                }
+            }
+        }
+        m_lastToggleBit = currentToggleBit;
+
+        uint8_t stateNoToggle = stateToggled & 0x7f;
         m_currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
         notifyState(msg.c_data[0], m_currentState);
         

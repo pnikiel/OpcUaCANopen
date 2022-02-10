@@ -23,6 +23,7 @@ namespace CANopen
 
     typedef std::function<void (uint8_t rawState, NodeState state)> NodeStateNotification;
     typedef std::function<void ()> BootUpNotification;
+    typedef std::function<void ()> StateToggleViolationNotification;
 
     class NodeStateEngine
     {
@@ -57,6 +58,8 @@ namespace CANopen
 
         NodeState currentState() const { return m_currentState; }
 
+        void setStateToggleViolationNotification (StateToggleViolationNotification notification) { m_toggleViolationNotification = notification; }
+
     private:
         const uint8_t m_nodeId;
         const StateInfoModel m_stateInfoModel;
@@ -86,6 +89,10 @@ namespace CANopen
         std::vector<NodeStateNotification> m_nodeStateNotifications;
         std::vector<NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
         BootUpNotification m_bootUpNotification;
+
+        enum ToggleBit { ON, OFF, DUNNO };
+        ToggleBit m_lastToggleBit; 
+        StateToggleViolationNotification m_toggleViolationNotification;
 
     };
 
