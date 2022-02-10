@@ -267,7 +267,7 @@ std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t s
     std::vector<uint8_t> output;
     try
     {
-        engine.readExpedited("-", index, subIndex, output);
+        engine.readExpedited("-", index, subIndex, output, 50);
         std::string outString(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
                        { return (char)x; });
