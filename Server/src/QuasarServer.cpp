@@ -28,6 +28,9 @@
 #include <LogIt.h>
 #include <shutdown.h>
 
+
+#include <fort.hpp>
+
 #include <DRoot.h>
 #include <DBus.h>
 #include <DNode.h>
@@ -278,28 +281,40 @@ std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t s
 
 void QuasarServer::printNiceSummary()
 {
-    std::cout << "+---------------------------------------+------------------------+" << std::endl;
-    std::cout << "| Node name                             | State info |            " << std::endl;
-    std::cout << "+---------------------------------------+------------------------+" << std::endl;
+    fort::char_table table;
+    table.set_border_style(FT_FRAME_STYLE);
+
+    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << fort::endr;
+
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        // std::cout << bus->getFullName() << std::endl;
         for (Device::DNode *node : bus->nodes())
         {
             std::string swVersion = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x00);
             std::string swVersionMinor = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x01);
 
-            std::cout << "|" << std::setw(30) << node->getFullName() << " (ID" << std::setw(3) << (unsigned int)node->id() << ") | ";
-            std::cout << node->stateInfoSource() << " " << bus->getAddressSpaceLink()->getNodeGuardInterval() << "s ";
-            std::cout << " | " << swVersion << "|" << swVersionMinor;
-            std::cout << std::endl;
+            std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
+            table << node->getFullName() << (unsigned int)node->id() << stateInfo << swVersion+"."+swVersionMinor << fort::endr;
         }
     }
-    std::cout << "+---------------------------------------+------------------------+" << std::endl;
+    LOG(Log::INF) << "\n\n" << table.to_string() << std::endl;
 }
 
 void QuasarServer::signalAction()
 {
+
+        fort::char_table table;
+    table.set_border_style(FT_FRAME_STYLE);
+
+    table << fort::header
+        << "N" << "Driver" << "Time" << "Avg Speed" << fort::endr
+        << "1" << "Ricciardo" << "1:25.945" << "47.362" << fort::endr
+        << "2" << "Hamilton" << "1:26.373" << "35.02" << fort::endr
+        << "3" << "Verstappen" << "1:26.469" << "29.78" << fort::endr;
+
+    std::cout << table.to_string() << std::endl;
+
+
     std::cout << std::endl
               << Quasar::TermColors::ForeGreen() << "*** Ctrl-Z: list info ***" << Quasar::TermColors::StyleReset() 
               << std::endl;
