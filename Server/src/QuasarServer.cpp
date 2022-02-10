@@ -309,7 +309,7 @@ void QuasarServer::signalAction()
     std::cout << "╠═════════════════════════════════════╪════════════════╪═══════╪═══════╢" << std::endl; 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        std::cout << "║ " << std::setw(35) << std::setfill(' ') << std::left << bus->getFullName() << " │ " << std::setw(22) << wrapValue("X") << " │ " << 
+        std::cout << "║ 🚌 " << std::setw(32) << std::setfill(' ') << std::left << bus->getFullName() << " │ " << std::setw(22) << wrapValue("X") << " │ " << 
             std::setw(5) << " " << " │ " << 
             std::setw(5) << " " << " ║" << std::endl;
         for (Device::DNode *node : bus->nodes())
