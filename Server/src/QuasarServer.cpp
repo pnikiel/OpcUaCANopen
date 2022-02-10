@@ -282,7 +282,7 @@ std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t s
 void QuasarServer::printNiceSummary()
 {
     fort::char_table table;
-    table.set_border_style(FT_FRAME_STYLE);
+    table.set_border_style(FT_BOLD2_STYLE);
 
     table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << fort::endr;
 
