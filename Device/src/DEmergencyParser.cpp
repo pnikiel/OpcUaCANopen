@@ -82,6 +82,8 @@ DEmergencyParser::~DEmergencyParser ()
 void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
 {
     uint16_t errorCode = msg.c_data[0] | (msg.c_data[1] << 8);
+
+    // Feature clause FE1.1: Emergency errors in the address-space
     getAddressSpaceLink()->setLastErrorCode(errorCode, OpcUa_Good);
     getAddressSpaceLink()->setLastErrorRegister(msg.c_data[2], OpcUa_Good);
     getAddressSpaceLink()->setLastErrorByte3(msg.c_data[3], OpcUa_Good);
@@ -89,6 +91,16 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
     getAddressSpaceLink()->setLastErrorByte5(msg.c_data[5], OpcUa_Good);
     getAddressSpaceLink()->setLastErrorByte6(msg.c_data[6], OpcUa_Good);
     getAddressSpaceLink()->setLastErrorByte7(msg.c_data[7], OpcUa_Good);
+
+    // the bundle
+    std::string emergencyBundle = "0x" + Utils::toHexString(errorCode) + "|" +
+        Utils::toHexString(msg.c_data[2]) + "|" +
+        Utils::toHexString(msg.c_data[3]) + "|" +
+        Utils::toHexString(msg.c_data[4]) + "|" +
+        Utils::toHexString(msg.c_data[5]) + "|" +
+        Utils::toHexString(msg.c_data[6]) + "|" +
+        Utils::toHexString(msg.c_data[7]) + "|";
+    getAddressSpaceLink()->setEmergencyErrorBundle(emergencyBundle.c_str(), OpcUa_Good);
 
     // Feature clause FE2.1: Count emergencies
     getAddressSpaceLink()->setEmergencyErrorCounter(getAddressSpaceLink()->getEmergencyErrorCounter()+1, OpcUa_Good);

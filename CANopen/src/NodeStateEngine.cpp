@@ -159,6 +159,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         
         if (stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {
+            // Feature clause FN1.3: Maintaining state
             LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
                 << wrapValue(CANopen::stateEnumToText(m_currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
             // send therefore a message for correcting
