@@ -284,7 +284,7 @@ void QuasarServer::printNiceSummary()
     fort::char_table table;
     table.set_border_style(FT_BOLD2_STYLE);
 
-    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << fort::endr;
+    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << fort::endr;
 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
@@ -292,9 +292,10 @@ void QuasarServer::printNiceSummary()
         {
             std::string swVersion = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x00);
             std::string swVersionMinor = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x01);
+            std::string serialNumber = readSdoAsAscii(node->sdoEngine(), 0x3100, 0x00);
 
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
-            table << node->getFullName() << (unsigned int)node->id() << stateInfo << swVersion+"."+swVersionMinor << fort::endr;
+            table << node->getFullName() << (unsigned int)node->id() << stateInfo << swVersion+"."+swVersionMinor << serialNumber << fort::endr;
         }
     }
     LOG(Log::INF) << "\n\n" << table.to_string() << std::endl;
@@ -318,7 +319,7 @@ void QuasarServer::signalAction()
               << std::endl;
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        table << "(B) " + bus->getFullName() << fort::endr;
+        table << "(Bus) " + bus->getFullName() << fort::endr;
         for (Device::DNode *node : bus->nodes())
         {
             table << 
