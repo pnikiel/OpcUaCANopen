@@ -187,6 +187,14 @@ void DBus::onError (const int errorCode, const char* errorDescription, timeval&)
     // Feature clause FC2.1: CAN port statistics
     // TODO: we should count when there is the transition from Good to Bad, but that is to be revisited with the CAN module.
     getAddressSpaceLink()->setStatsTransitionsIntoErrorCounter(getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() + 1, OpcUa_Good);
+
+    if (errorCode != 0)
+    {
+        // Feature clause FC3.1: Propagation of CAN port state into affected variables
+        LOG(Log::TRC) << "Propagating bus error notification";
+        for (BusErrorNotification& notification : m_busErrorNotifications)
+            notification();
+    }
 }
 
 void DBus::tickPublishingStatistics ()

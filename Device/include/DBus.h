@@ -33,6 +33,8 @@
 namespace Device
 {
 
+typedef std::function<void()> BusErrorNotification;
+
 class
     DBus
     : public Base_DBus
@@ -80,6 +82,8 @@ public:
 
     bool isInSpyMode () const;
 
+    void addBusErrorNotification(BusErrorNotification notification) { m_busErrorNotifications.push_back(notification); }
+
 private:
     GhostPointer<CanModule::CCanAccess> m_canAccess;
 
@@ -96,7 +100,7 @@ private:
 
     void onError (const int errorCode, const char* errorDescription, timeval&);
 
-    
+    std::vector<BusErrorNotification> m_busErrorNotifications;
 
 
 

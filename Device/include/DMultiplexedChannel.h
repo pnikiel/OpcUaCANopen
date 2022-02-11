@@ -70,6 +70,9 @@ public:
 
     void setParentMultiplex(DTpdoMultiplex* parent) { m_parentMultiplex = parent; }
 
+    //! To be called when the bus goes down
+    void notifyBusError ();
+
 private:
     bool m_onSync;
     DTpdoMultiplex* m_parentMultiplex;

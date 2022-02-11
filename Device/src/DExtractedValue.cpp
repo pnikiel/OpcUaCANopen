@@ -93,10 +93,16 @@ void DExtractedValue::onReplyReceived(const CanMessage& msg)
     }
     catch (const std::exception& ex)
     {
+        // TODO Log component and log level wrong
         LOG(Log::INF) << "For node " << wrapId(getFullName()) << " value mapping failed: " << ex.what();
     }
     
 
+}
+
+void DExtractedValue::notifyBusError ()
+{
+    getAddressSpaceLink()->setValue(AddressSpace::QuasarNullDataType(), OpcUa_BadOutOfService);
 }
 
 }

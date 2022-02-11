@@ -94,6 +94,16 @@ DNode::DNode (
             getAddressSpaceLink()->getStateToggleViolationCounter() + 1, // FN1.1.1: Toggle bit support: Counting part.
             OpcUa_Good); 
     });
+
+    getParent()->addBusErrorNotification([this]()
+    {
+        // Feature clause: FC3.1: Propagation of CAN port state into affected variables
+        // TODO: missing normal DTpdo
+        for (DTpdoMultiplex* multiplex : tpdomultiplexs())
+        {
+            multiplex->notifyBusError();
+        }
+    });
 }
 
 /* sample dtr */
