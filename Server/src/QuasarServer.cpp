@@ -282,7 +282,7 @@ std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t s
 void QuasarServer::printNiceSummary()
 {
     fort::char_table table;
-    table.set_border_style(FT_BOLD2_STYLE);
+    table.set_border_style(FT_BOLD_STYLE);
 
     table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << fort::endr;
 
@@ -297,6 +297,7 @@ void QuasarServer::printNiceSummary()
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
             table << node->getFullName() << (unsigned int)node->id() << stateInfo << swVersion+"."+swVersionMinor << serialNumber << fort::endr;
         }
+        table << fort::separator;
     }
     LOG(Log::INF) << "\n\n" << table.to_string() << std::endl;
 }
@@ -318,7 +319,7 @@ void QuasarServer::signalAction()
               << std::endl;
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        table << "(Bus) " + bus->getFullName() << fort::endr;
+        table << "(Bus) " + bus->getFullName() << "TODO: impl me" << bus->getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() << fort::endr;
         for (Device::DNode *node : bus->nodes())
         {
             table << 
