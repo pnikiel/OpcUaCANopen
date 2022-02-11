@@ -23,7 +23,7 @@ namespace CANopen
 
     typedef std::function<void (uint8_t rawState, NodeState state)> NodeStateNotification;
     typedef std::function<void ()> BootUpNotification;
-    typedef std::function<void ()> StateToggleViolationNotification;
+    typedef std::function<void (uint8_t rawState)> StateToggleViolationNotification;
 
     class NodeStateEngine
     {

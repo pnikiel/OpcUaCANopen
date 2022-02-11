@@ -88,8 +88,13 @@ DNode::DNode (
     /* fill up constructor body here */
     m_nodeStateEngine.addNodeStateNotification([this](uint8_t rawState, CANopen::NodeState state){this->publishState(rawState, state);});
     m_nodeStateEngine.setOnBootupNotification([this](){this->onBootupReceived();});
-    m_nodeStateEngine.setStateToggleViolationNotification([this]()
+    m_nodeStateEngine.setStateToggleViolationNotification([this](uint8_t rawState)
     {
+        if (DRoot::getInstance()->warningss()[0]->stateToggleViolation())
+        {
+            SPOOKY(getFullName()) << "NoToggle detected!" << SPOOKY_ << " (state byte is 0x" << wrapValue(Utils::toHexString(rawState)) << ") [-WstateToggleViolation]";
+        }
+
         getAddressSpaceLink()->setStateToggleViolationCounter(
             getAddressSpaceLink()->getStateToggleViolationCounter() + 1, // FN1.1.1: Toggle bit support: Counting part.
             OpcUa_Good); 

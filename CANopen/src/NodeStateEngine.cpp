@@ -5,7 +5,6 @@
 
 #include <Logging.hpp>
 
-
 using namespace Logging;
 
 namespace CANopen
@@ -144,10 +143,9 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
             if (m_lastToggleBit != DUNNO)
             {
                 if (m_lastToggleBit == currentToggleBit) // no toggle detected!
-                {
-                    SPOOKY(m_nodeAddressForDebug) << "NoToggle detected!" << SPOOKY_ << " (state byte is " << wrapValue(Utils::toHexString(stateToggled)) << ")";
+                {          
                     if (m_toggleViolationNotification)
-                        m_toggleViolationNotification();
+                        m_toggleViolationNotification(stateToggled);
                 }
             }
         }
