@@ -3,7 +3,7 @@
 ## information how to use this file.
 ## ----------------------------------------------------
 
-set(CUSTOM_SERVER_MODULES CanModule CANopen Warnings libfort )
+set(CUSTOM_SERVER_MODULES CanModule CANopen Warnings libfort Enumerator)
 set(EXECUTABLE OpcUaServer)
 set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan )
 set(SERVER_LINK_LIBRARIES -lsocketcan )
@@ -22,6 +22,9 @@ set(BUILD_SERVER_SHARED_LIB OFF)
 set(ADDITIONAL_BOOST_LIBS filesystem )
 
 add_definitions(-fPIC)
+
+# Enumerator optional module settings.
+set(ENUMERATOR_SCOPE Node.emergencyMappingModel)
 
 #set(CANMODULE_BUILD_VENDORS ON)
 #set(CANMODULE_BUILD_ANAGATE OFF)

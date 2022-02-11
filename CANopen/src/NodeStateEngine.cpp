@@ -145,7 +145,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
             {
                 if (m_lastToggleBit == currentToggleBit) // no toggle detected!
                 {
-                    SPOOKY(m_nodeAddressForDebug) << "NoToggle detected!" << SPOOKY_;
+                    SPOOKY(m_nodeAddressForDebug) << "NoToggle detected!" << SPOOKY_ << " (state byte is " << wrapValue(Utils::toHexString(stateToggled)) << ")";
                     if (m_toggleViolationNotification)
                         m_toggleViolationNotification();
                 }

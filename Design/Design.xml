@@ -131,8 +131,6 @@
 			<ul><li>STOPPED - online but intentionally stopped. Not replying to SDOs and PDOs.</li><li>PREOPERATIONAL - preoperational. Replying to SDOs but not performing any PDO info exchange.</li><li>OPERATIONAL - in full operation</li><li>DISCONNECTED - node not responding while the server believes that the infrastructure (especially the CAN interface) is alright</li><li>UNKNOWN - the state is not known due to identified issues, e.g. CAN interface down or so.</li></ul>
 			</d:documentation>
     </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="emergencyPlaceHolder" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good">
-		</d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="UaString" name="requestedState" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
       <d:documentation>
 			Specifies the intended state of a node. Is applicable both for configuration (then it specifies the initial state that the node should be brought into)
@@ -173,6 +171,14 @@
     </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="stateToggleViolationCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
     </d:cachevariable>
+    <d:configentry dataType="UaString" name="emergencyMappingModel" defaultValue="ELMBio">
+      <d:configRestriction>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="ELMBio"/>
+          <d:enumerationValue value="CANopen"/>
+        </d:restrictionByEnumeration>
+      </d:configRestriction>
+    </d:configentry>
   </d:class>
   <d:class name="EmergencyParser">
     <d:devicelogic/>
