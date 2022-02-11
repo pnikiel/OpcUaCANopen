@@ -76,8 +76,8 @@ DBus::DBus (
     CSockCanScan* sockCanAccess = new CSockCanScan;
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
     sockCanAccess->createBus("sock:"+port(), "Unspecified");
-    sockCanAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
-    sockCanAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3));
+    sockCanAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1)); // TODO: move to initialize
+    sockCanAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3)); // TODO: move to initialize
 
     CanModule::CCanAccess* canAccess = sockCanAccess;
     
@@ -113,6 +113,7 @@ UaStatus DBus::writeNodeGuardInterval ( const OpcUa_Double& v)
 
 void DBus::initialize()
 {
+    
     for (Device::DNode* node : nodes())
         node->initialize();
 }
@@ -139,7 +140,7 @@ void DBus::onMessageReceived (const CanMessage& msg)
         node->onMessageReceived(msg);
     else
     {
-        if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode())
+        if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode()) // TODO: the model to study warnings must be invincible to the situation when the object structure is not entirely ready
         {
             SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
                 << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]";
@@ -179,8 +180,13 @@ void DBus::tickSync()
 
 void DBus::onError (const int errorCode, const char* errorDescription, timeval&)
 {
+    // Feature clause FC1.3: Monitor CAN port state
     getAddressSpaceLink()->setPortError(errorCode, OpcUa_Good);
     getAddressSpaceLink()->setPortErrorDescription(errorDescription, OpcUa_Good);
+
+    // Feature clause FC2.1: CAN port statistics
+    // TODO: we should count when there is the transition from Good to Bad, but that is to be revisited with the CAN module.
+    getAddressSpaceLink()->setStatsTransitionsIntoErrorCounter(getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() + 1, OpcUa_Good);
 }
 
 void DBus::tickPublishingStatistics ()

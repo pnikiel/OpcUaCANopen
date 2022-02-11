@@ -307,9 +307,8 @@ void QuasarServer::signalAction()
     fort::char_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
-    table << fort::header
-        << "Object" << "CAN/CANopen state" << "#Emrg" << "#Boot" << fort::endr;
-
+    table << fort::header << "(Bus) Object" << "CAN state" << "#toErr" << "-" << fort::endr;
+    table << fort::header << "(Node) Object" << "CANopen state" << "#Emrg" << "#Boot" << fort::endr;
 
     
 
@@ -327,6 +326,12 @@ void QuasarServer::signalAction()
                 CANopen::stateEnumToText(node->nodeStateEngine().currentState()) <<
                 node->getAddressSpaceLink()->getBootupCounter() << 
                 node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << fort::endr;
+            
+            table[table.cur_row()-1][1].set_cell_content_text_style(fort::text_style::bold);
+            if (node->nodeStateEngine().currentState() == CANopen::NodeState::DISCONNECTED)
+                table[table.cur_row()-1][1].set_cell_content_bg_color(fort::color::red);
+            else if (node->nodeStateEngine().currentState() == CANopen::NodeState::OPERATIONAL)
+                table[table.cur_row()-1][1].set_cell_content_fg_color(fort::color::green);
         }
         table << fort::separator;
     }

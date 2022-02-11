@@ -104,6 +104,8 @@
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsRxRate" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTransitionsIntoErrorCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
+    </d:cachevariable>
   </d:class>
   <d:class name="Node">
     <d:devicelogic>
@@ -169,9 +171,7 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32"
-    	name="stateToggleViolationCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden"
-    	initialStatus="OpcUa_Good" initialValue="0">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="stateToggleViolationCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
     </d:cachevariable>
   </d:class>
   <d:class name="EmergencyParser">
@@ -185,8 +185,7 @@
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte7" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="emergencyErrorCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
 </d:cachevariable>
-    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="emergencyErrorBundle"
-    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData" initialValue="">
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="emergencyErrorBundle" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData" initialValue="">
     </d:cachevariable>
   </d:class>
   <d:class name="Tpdo">
