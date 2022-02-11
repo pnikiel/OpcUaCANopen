@@ -70,8 +70,67 @@ std::vector<LogComponent> LogComponents =
         {"Spooky"},
         {"Emergency"}};
 
+void printLogo()
+{
+
+    // std::cout << " \
+
+    //                                  ▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄▄ \
+    //                            ▄▄▄▄▄▄▓▓███████████████████████▓▓▄▄▄▄▄▄  \
+    //                        ▄▄▄▄▓████████████▀▀▀▀▀▀▀       ▀▀▀▀▀▀▀████▓▄▄▄▄  \
+    //                      ▄▓▓███████████▀▀▀                        ▀▀▀█████▄▄    \
+    //                   ▄▓████████████▌                                  ▀█████▓▄   \
+    //                ▄▄▓███▌▀ ▀▓██████▓▓▄                                   ▐▀███▓▄▄   \
+    //              ▄▄▓███▌▀░▄▄▓▓▀▀    ▀▀░▓▄▄                                  ▀▀███▓▄▄   \
+    //            ▄▄▓█████▓▄▓▓▓▀          ▀▀░▄▄▄                                 ▀▀███▓▄▄  \
+    //          ▄▄▓████████▓▌▀              ▀▀▀▓▄▄                       ▄▄▄▄▄▄▄▄▄▓█████▓▄
+    //         ▄▓███▀▀▓████▀                   ▀▀░▄▄              ▄▄▄▄▄▄▄▓▓███████████████▌▄
+    //        ▄▓██▌  ▐▓███░                      ▀▀▀         ▄▄▄▄▓███████▀▀▀▀▀▀▀▀   ▀▀██████▄
+    //       ▄███▀   ▐▓███░                             ▄▄▄▓███████▀▀▀                ▐▓█████▄
+    //      ▄▓██▀   ▐▓████▌                        ▄▄▓▓▓█████▀                         ▐█████▓▌
+    //     ▄███▌   ▄▓░▀███▓▄                  ▄▄▄▄█████▀▀▀▀                            ▐███████▄
+    //    ▐▓██▀   ▐▓▌  ▐███▓              ▄▄▄▄▓███▀▀ ▀    ▄▄                         ▄▄▓███▓███▌
+    //    ▐██▌    ▐▓▌   ▐███▌         ▄▄▄▓▓███▀▀▀▀        ▀░▄▄                     ▄▄▓▓██▀▀░▓███▓
+    //   ▐▓██░   ▄░░     ▀██▌▄    ▄▄▄▓▓███▀▀                ▀▀▄▄                 ▄▄▓▀▀▀    ░▓███▓░
+    //  ▐▓███   ▐▓░       ▓██▓▄▄▄▄▓████▀▀                    ▐▓▓░              ▄▓█▀▀      ▐░▓▓▓██▌
+    //  ▐▓██▌  ▐▓█░       ▐█████████▀                         ▐█▓▄          ▄░▓▓▀         ▐░░░▓██▌
+    //  ▐███▌  ▐▓█        ▓██████▀                              ▐▓▌      ▄▓▓▓▀            ▐░░░▐██▌
+    //  ▐███▓  ▐▐▌     ▄▄████████▌                               ▐▓▓▄▄▄▄▓▓▀▀               ░  ▐██▌
+    //  ▐███▓░  ▐░▄ ▄▄▓███▀▀▀▀▀██▓▄                              ▐▓▓██▀▀▀               ▐░    ▐██▌
+    //  ▐███▓░ ▐▓▓▓▓▓███▀▀     ▀██▓▄                         ▄▄▄▄░▓██▌                  ▓▓    ▓██▌
+    //  ▐▓███▓ ▐▓████▀▀         ▀███▄                    ▄▄▄░░▀▀▀▀ ▀▀░▄▄               ▐▓▌   ▐▓██▌
+    //   ▐▓██▓▄▓███▀▀            ▐███▄▄              ▄▄▄░▀▀▀▀▀       ▐▓▌               ▐▓▌   ▐███░
+    //    ▐███████░               ▀███▓▄          ▄▓▓▓▀▀▀             ▀█░             ▄░▀▀  ▐▓██▀
+    //    ▐███████                  ▀██▓▄    ▄▓▓▓▓░▀                   ▀░▄           ▐▓░    ▐██▌
+    //     ▀██████▌                  ▀▓██▓▄                             ▐▓▌          ▐█░   ▄▓██░
+    //     ▐▓█████▓▄        ▄▄▄▄▄▄▄▄   ▀██▓▄                            ▐█▌        ▄▄░▀   ▐███▀
+    //      ▐██████▓▓▄▄▄▄▄▄ ░▀▀▀▀▀▀▀    ▀▓██▓▄                           ▀░       ▐▓▌    ▄▓██▀
+    //      ▐▓████████▀▀ ▀▀               ▀███▓▄                         ▐░░▄   ▄▄░▀▀  ▐▓███▀
+    //       ▐███████▌                      ▀█▀▀                          ▐▒▓▄▄▄▓█▀   ▄▓██▌▀
+    //        ▀▀██████▓▄                                                  ▐▓██▓▓▀   ▄▓███▀
+    //         ▐▀██████▓▄                    ▄▓████▓▄▄                    ▐███▌   ▐▓███▀
+    //           ▐███████▓▄                 ▐████████▓▄                 ▄▄▓██▌ ▐▄▓███▀▀
+    //             ▀████████▄▄▄▄▄           ▐█████████░▄▄▄▄▄         ▄▄▄▓█████▓▓███▀▀
+    //               ▀▀█████████▓▓▄▄▄▄▄▄    ▐███████▀▀▀ ▐███▓▄▄▄▄▄▄▄▄▓▓█████████▀▀
+    //                 ▀▀▀█████████████▓▄▄▄▄▓██████▀     ▀████████████▓▓██████▀
+    //                    ▀▀▀█████████████████████▄▄▄▄▄▄▄▄▄██████████████████▀
+    //                         ▀▀█████████████████████████████████████████▀▀
+    //                             ▀███████████████████████████████████▀▀
+    //                             ▐▓███████████████████████████████▀▀
+    //                              ▐██████████████████▀▀▀▀▀▀▀▀▀▀▀▀
+    //                              ▐█████████████████▀
+    //                              ▐████████████████▌
+    //                              ▐▓██████████████▌
+    //                               ▓██████████████
+    //                              ▐██████████████▌" << std::endl;
+
+
+}
+
+
 QuasarServer::QuasarServer() : BaseQuasarServer()
 {
+    printLogo();
 }
 
 QuasarServer::~QuasarServer()
@@ -279,6 +338,7 @@ std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t s
     }
 }
 
+
 void QuasarServer::printNiceSummary()
 {
     fort::char_table table;
@@ -290,6 +350,7 @@ void QuasarServer::printNiceSummary()
     {
         for (Device::DNode *node : bus->nodes())
         {
+            // TODO: spy mode need to be notified.   
             std::string swVersion = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x00);
             std::string swVersionMinor = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x01);
             std::string serialNumber = readSdoAsAscii(node->sdoEngine(), 0x3100, 0x00);
@@ -319,7 +380,15 @@ void QuasarServer::signalAction()
               << std::endl;
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        table << "(Bus) " + bus->getFullName() << "TODO: impl me" << bus->getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() << fort::endr;
+        OpcUa_Int16 portError (0);
+        std::string portErrorStr;
+        if (bus->getAddressSpaceLink()->getPortError(portError) == OpcUa_Good)
+        {
+            portErrorStr = std::to_string(portError);
+        }
+        else
+            portErrorStr = "?"; // from null
+        table << "(Bus) " + bus->getFullName() << portErrorStr << bus->getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() << fort::endr;
         for (Device::DNode *node : bus->nodes())
         {
             table << 
