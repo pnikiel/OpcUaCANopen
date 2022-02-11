@@ -102,6 +102,7 @@ void DExtractedValue::onReplyReceived(const CanMessage& msg)
 
 void DExtractedValue::notifyBusError ()
 {
+    // Feature clause FC3.1: Propagation of CAN port state into affected variables
     getAddressSpaceLink()->setValue(AddressSpace::QuasarNullDataType(), OpcUa_BadOutOfService);
 }
 

@@ -75,6 +75,9 @@ public:
     //! To be called just before the server emits sync
     void notifySync ();
 
+    //! To be called when the bus goes down
+    void notifyBusError ();
+
 private:
     // sends RTR corresponding to this TPDO
     void sendRtr();

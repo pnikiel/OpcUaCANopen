@@ -178,4 +178,11 @@ void DTpdo::notifySync ()
     }
 }
 
+    
+void DTpdo::notifyBusError ()
+{
+    for (DExtractedValue* extractedValue : extractedvalues())
+        extractedValue->notifyBusError();
+}
+
 }
