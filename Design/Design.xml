@@ -164,6 +164,8 @@
     <d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="OnlineConfigValidator" maxOccurs="1"/>
+    <d:hasobjects instantiateUsing="configuration" class="SdoValidator"/>
     <d:configentry dataType="UaString" name="stateInfoSource" storedInDeviceObject="true">
       <d:configRestriction>
         <d:restrictionByEnumeration>
@@ -306,6 +308,16 @@
       <d:documentation>If Boolean, specifies to which bit the boolean applies</d:documentation>
     </d:configentry>
   </d:class>
+  <d:class name="OnlineConfigValidator">
+    <d:devicelogic/>
+    <d:hasobjects instantiateUsing="configuration" class="SdoValidator"/>
+    <d:method name="validate" executionSynchronicity="asynchronous">
+      <d:returnvalue dataType="UaString" name="details">
+        <d:array/>
+      </d:returnvalue>
+      <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
+    </d:method>
+  </d:class>
   <d:class name="MultiplexedChannel">
     <d:devicelogic/>
     <d:configentry dataType="OpcUa_UInt16" name="id" isKey="true"/>
@@ -389,6 +401,17 @@
     </d:configentry>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">
 </d:sourcevariable>
+  </d:class>
+  <d:class name="SdoValidator">
+    <d:devicelogic/>
+    <d:configentry dataType="UaString" name="index">
+      <d:documentation>Uint16_t as hex.</d:documentation>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Byte" name="subIndex"/>
+    <d:configentry dataType="UaString" name="expectedValue">
+      <d:documentation>One to four bytes in hex with expected (i.e. passing) value of the SDO. Example: "A2,10"</d:documentation>
+    </d:configentry>
+    <d:method name="validate" executionSynchronicity="asynchronous"/>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>

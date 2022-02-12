@@ -20,17 +20,10 @@
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 
-#include <DMultiplexedChannel.h>
-#include <ASMultiplexedChannel.h>
+#include <DOnlineConfigValidator.h>
+#include <ASOnlineConfigValidator.h>
 
-#include <DExtractedValue.h>
-#include <DRoot.h>
-#include <DWarnings.h>
-#include <DNode.h>
-
-#include <Logging.hpp>
-
-using namespace Logging;
+#include <DSdoValidator.h>
 
 namespace Device
 {
@@ -56,15 +49,11 @@ namespace Device
 // 2222222222222222222222222222222222222222222222222222222222222222222222222
 
 /* sample ctr */
-DMultiplexedChannel::DMultiplexedChannel (
-    const Configuration::MultiplexedChannel& config,
-    Parent_DMultiplexedChannel* parent
+DOnlineConfigValidator::DOnlineConfigValidator (
+    const Configuration::OnlineConfigValidator& config,
+    Parent_DOnlineConfigValidator* parent
 ):
-    Base_DMultiplexedChannel( config, parent),
-    m_onSync(false), // to be initialized later
-    m_parentMultiplex(nullptr), // to be initialized later
-    m_firstIteration(true),
-    m_receivedCtrSinceLastSync(0)
+    Base_DOnlineConfigValidator( config, parent)
 
     /* fill up constructor initialization list here */
 {
@@ -72,7 +61,7 @@ DMultiplexedChannel::DMultiplexedChannel (
 }
 
 /* sample dtr */
-DMultiplexedChannel::~DMultiplexedChannel ()
+DOnlineConfigValidator::~DOnlineConfigValidator ()
 {
 }
 
@@ -81,51 +70,22 @@ DMultiplexedChannel::~DMultiplexedChannel ()
 
 
 /* delegators for methods */
+UaStatus DOnlineConfigValidator::callValidate (
+    std::vector<UaString>& details,
+    OpcUa_Boolean& passed
+)
+{
+    for (DSdoValidator* sdoValidator : sdovalidators())
+    {
+        details.push_back(sdoValidator->getFullName().c_str());
+    }
+    return OpcUa_Good;
+}
 
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
 // 3     FULLY CUSTOM CODE STARTS HERE                                     3
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
-
-void DMultiplexedChannel::initialize()
-{
-    m_onSync = m_parentMultiplex->transportMechanism() == "sync";
-}
-
-void DMultiplexedChannel::onReplyReceived(const CanMessage& msg)
-{
-    m_receivedCtrSinceLastSync++;
-
-    for (DExtractedValue* extractedValue : extractedvalues())
-        extractedValue->onReplyReceived(msg);
-}
-
-void DMultiplexedChannel::notifySync ()
-{
-
-    if (m_onSync)
-    {
-        // Feature clause FP2.1.1: Warning of missing data between SYNCs
-        if (!m_firstIteration && 
-            m_receivedCtrSinceLastSync != 1 && // 1 per sync is a valid number for non-MPDO traffic.
-            m_parentMultiplex->getParent()->nodeStateEngine().currentState() == CANopen::NodeState::OPERATIONAL) 
-        {
-            if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
-            {
-                SPOOKY(getFullName()) << "expected 1 M-TPDO in the previous SYNC cycle but got " << wrapValue(std::to_string(m_receivedCtrSinceLastSync)) << 
-                    ". Likely a grave configuration issue or the node shut down unexpectdly. " << SPOOKY_ << "[WtpdoSyncMismatch]";
-            }
-        }
-        m_receivedCtrSinceLastSync = 0;
-        m_firstIteration = false;
-    }
-}
-
-void DMultiplexedChannel::notifyBusError ()
-{
-    for (DExtractedValue* extractedValue : extractedvalues())
-        extractedValue->notifyBusError();
-}
 
 }

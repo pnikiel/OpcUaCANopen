@@ -298,6 +298,37 @@ bool QuasarServer::processConfiguration(Configuration::Configuration &configurat
     processGlobalSettings(configuration);
     processWarnings(configuration);
     processMultiplexedChannelConfigurationGenerator(configuration);
+
+    // now let's move all SdoValidators to the OnlineValidator group
+    for (Configuration::Bus& bus : configuration.Bus())
+    {
+        for (Configuration::Node& node : bus.Node())
+        {
+            if (node.SdoValidator().size() > 0)
+            {
+                ensureObjectPresent(
+                    node.OnlineConfigValidator(),
+                    node,
+                    Configuration::OnlineConfigValidator("onlineConfigValidator"),
+                    Configuration::Node::OnlineConfigValidator_id,
+                    "onlineConfigValidator");
+                for (Configuration::SdoValidator& sdoValidator : node.SdoValidator())
+                {
+                    DecorationUtils::push_back(
+                        node.OnlineConfigValidator().front(),
+                        node.OnlineConfigValidator().front().SdoValidator(),
+                        sdoValidator,
+                        Configuration::OnlineConfigValidator::SdoValidator_id);
+                }
+                DecorationUtils::clear(
+                    node,
+                    node.SdoValidator(),
+                    Configuration::Node::SdoValidator_id);
+            }
+
+        }
+    }
+
     return true;
 }
 
@@ -344,7 +375,7 @@ void QuasarServer::printNiceSummary()
     fort::char_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
-    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << fort::endr;
+    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << "OnlConfValidation" << fort::endr;
 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
