@@ -352,20 +352,21 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
 }
 
-std::string readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex)
+bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
 {
     std::vector<uint8_t> output;
     try
     {
-        engine.readExpedited("-", index, subIndex, output, 50);
-        std::string outString(output.size(), ' ');
+        if (!engine.readExpedited("-", index, subIndex, output, 50))
+            return false;
+        outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
                        { return (char)x; });
-        return outString;
+        return true;
     }
     catch (const std::exception &e)
     {
-        return Quasar::TermColors::ForeRed() + "ERR" + Quasar::TermColors::StyleReset();
+        return false;
     }
 }
 
@@ -381,13 +382,27 @@ void QuasarServer::printNiceSummary()
     {
         for (Device::DNode *node : bus->nodes())
         {
-            // TODO: spy mode need to be notified.   
-            std::string swVersion = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x00);
-            std::string swVersionMinor = readSdoAsAscii(node->sdoEngine(), 0x100A, 0x01);
-            std::string serialNumber = readSdoAsAscii(node->sdoEngine(), 0x3100, 0x00);
-
+            struct SdoBasedInfo
+            {
+                uint16_t index;
+                uint8_t subIndex;
+                std::string result;
+            };
+            std::vector<SdoBasedInfo> sdoBasedInfos = 
+            {
+                {0x100A, 0x00, "?"},  /* swVersion */
+                {0x100A, 0x01, "?"},  /* swVersionMinor */
+                {0x3100, 0x00, "?"}   /* serialNumber */
+            };
+            for (SdoBasedInfo& info : sdoBasedInfos)
+            {
+                if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
+                    break;
+            }
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
-            table << node->getFullName() << (unsigned int)node->id() << stateInfo << swVersion+"."+swVersionMinor << serialNumber << fort::endr;
+            table << node->getFullName() << (unsigned int)node->id() << stateInfo << 
+                sdoBasedInfos[0].result+"."+sdoBasedInfos[1].result << 
+                sdoBasedInfos[2].result << fort::endr;
         }
         table << fort::separator;
     }
