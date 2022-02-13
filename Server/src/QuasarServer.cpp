@@ -35,6 +35,7 @@
 #include <DBus.h>
 #include <DNode.h>
 #include <DEmergencyParser.h>
+#include <DOnlineConfigValidator.h>
 #include <Sdo.h>
 
 #include <ASBus.h>
@@ -371,9 +372,9 @@ bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex
 }
 
 
-void QuasarServer::printNiceSummary()
+void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
 {
-    fort::char_table table;
+    fort::utf8_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
     table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << "OnlConfValidation" << fort::endr;
@@ -399,10 +400,22 @@ void QuasarServer::printNiceSummary()
                 if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
                     break;
             }
+
+            std::string onlineConfigValidationResult ("no-tests-defined");
+            if (node->onlineconfigvalidators().size() == 1)
+            {
+                Device::DOnlineConfigValidator* validator = node->onlineconfigvalidators()[0];
+                std::vector<UaString> testResults;
+                OpcUa_Boolean passed;
+                validator->callValidate(testResults, passed);
+                onlineConfigValidationResult = passed ? "✔" : "✖";
+            }
+            
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
             table << node->getFullName() << (unsigned int)node->id() << stateInfo << 
                 sdoBasedInfos[0].result+"."+sdoBasedInfos[1].result << 
-                sdoBasedInfos[2].result << fort::endr;
+                sdoBasedInfos[2].result << 
+                onlineConfigValidationResult << fort::endr;
         }
         table << fort::separator;
     }

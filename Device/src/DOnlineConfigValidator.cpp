@@ -75,10 +75,16 @@ UaStatus DOnlineConfigValidator::callValidate (
     OpcUa_Boolean& passed
 )
 {
+    passed = OpcUa_True; // assume true until some test fails
     for (DSdoValidator* sdoValidator : sdovalidators())
     {
         details.push_back(sdoValidator->getFullName().c_str());
+        OpcUa_Boolean testPassed;
+        sdoValidator->callValidate(testPassed);
+        if (!testPassed)
+            passed = OpcUa_False;
     }
+    
     return OpcUa_Good;
 }
 

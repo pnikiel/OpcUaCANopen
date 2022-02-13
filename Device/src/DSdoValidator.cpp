@@ -69,9 +69,10 @@ DSdoValidator::~DSdoValidator ()
 
 /* delegators for methods */
 UaStatus DSdoValidator::callValidate (
-
+    OpcUa_Boolean& passed
 )
 {
+    passed = OpcUa_False; // TODO
     return OpcUa_BadNotImplemented;
 }
 

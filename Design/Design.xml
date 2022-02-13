@@ -411,7 +411,8 @@
     <d:configentry dataType="UaString" name="expectedValue">
       <d:documentation>One to four bytes in hex with expected (i.e. passing) value of the SDO. Example: "A2,10"</d:documentation>
     </d:configentry>
-    <d:method name="validate" executionSynchronicity="asynchronous"/>
+    <d:method name="validate" executionSynchronicity="asynchronous">
+    	<d:returnvalue dataType="OpcUa_Boolean" name="passed"></d:returnvalue></d:method>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>

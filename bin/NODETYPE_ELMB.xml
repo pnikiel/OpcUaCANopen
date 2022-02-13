@@ -239,3 +239,5 @@ object dictionary -->
 </SdoSameIndexGroup>
 
 <SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
+
+<SdoValidator name="ensureSyncForTpdo3_transmissionType" index="1802" subIndex="2" expectedValue="01"/>

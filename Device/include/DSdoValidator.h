@@ -46,7 +46,7 @@ public:
 
     /* delegators for methods */
     UaStatus callValidate (
-
+        OpcUa_Boolean& passed
     ) ;
 
 private:
