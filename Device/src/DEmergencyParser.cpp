@@ -22,7 +22,9 @@
 
 #include <DEmergencyParser.h>
 #include <ASEmergencyParser.h>
+#include <DNode.h>
 
+#include <EmergencyErrors.hpp>
 #include <Logging.hpp>
 
 using namespace Logging;
@@ -107,8 +109,11 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
 
     //TODO: we should print that we received emergency messages with error severity ERR
     // do it!
-    LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << ": received emergency, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
-        ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter()));
+    LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << 
+        ": received emergency msg, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
+        ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter())) << 
+        ", description is " <<  wrapValue(CANopen::decodeEmergencyHumanFriendly(msg, getParent()->emergencyMappingModel()));
+
 }
 
 }

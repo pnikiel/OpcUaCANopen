@@ -180,7 +180,7 @@
       <d:configRestriction>
         <d:restrictionByEnumeration>
           <d:enumerationValue value="ELMBio"/>
-          <d:enumerationValue value="CANopen"/>
+          <d:enumerationValue value="CANopen"/><d:enumerationValue value="None" />
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>

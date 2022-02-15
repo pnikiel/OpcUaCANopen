@@ -1,4 +1,44 @@
+#pragma once
+
+#include <string>
+
+// Scope is {{scope}}
+// how can we parse this ?
+
 namespace Enumerator
 {
     
+{% set classEnums = scope.split(";") %}
+{% for classEnum in classEnums %}
+
+{% set cls = classEnum.split('.')[0] %}
+{% set configEntry = classEnum.split('.')[1] %}
+
+// {{ cls }}, {{configEntry}}
+
+{% set restrictions = designInspector.get_restrictions(cls, configEntry, 'configentry') %}
+
+{# Make sure the restriction is only enumeration based -- otherwise fail! #}
+
+namespace {{cls}}
+{
+
+enum {{configEntry|capFirst}}
+{
+    {% for restriction in restrictions %}
+        {{ restriction[1] }}{% if not loop.last %},
+            {% endif %}
+    {% endfor %}
+};
+
+//! throws
+{{configEntry|capFirst}} {{configEntry}}FromString (const std::string& input);
+
+std::string {{configEntry}}ToString ({{configEntry|capFirst}}& input);
+
+
+};
+
+{% endfor %}
+
 }

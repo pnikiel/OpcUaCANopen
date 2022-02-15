@@ -33,6 +33,8 @@
 
 #include <NodeStateEngine.hpp>
 
+#include <Enumerator.hpp>
+
 namespace Device
 {
 
@@ -90,6 +92,8 @@ public:
 
     const CANopen::NodeStateEngine& nodeStateEngine () const { return m_nodeStateEngine; }
 
+    Enumerator::Node::EmergencyMappingModel emergencyMappingModel () const { return m_emergencyMappingModel; }
+
 private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
@@ -103,6 +107,8 @@ private:
     std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
 
     CANopen::NodeStateEngine m_nodeStateEngine;
+
+    Enumerator::Node::EmergencyMappingModel m_emergencyMappingModel;
 
 };
 

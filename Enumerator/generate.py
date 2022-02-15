@@ -18,10 +18,12 @@ transformDesign(
     transform_path='Enumerator/templates/designToEnumeratorBody.jinja',
     outputFile=os.path.join(args.output_dir, 'src', 'Enumerator.cpp'),
     requiresMerge=False,
-    astyleRun=True)
+    astyleRun=True,
+    additionalParam={'scope' : 'Node.emergencyMappingModel'})
 
 transformDesign(
     transform_path='Enumerator/templates/designToEnumeratorHeader.jinja',
     outputFile=os.path.join(args.output_dir, 'include', 'Enumerator.hpp'),
     requiresMerge=False,
-    astyleRun=True)
+    astyleRun=True,
+    additionalParam={'scope' : 'Node.emergencyMappingModel'})

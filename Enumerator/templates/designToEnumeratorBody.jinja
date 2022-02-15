@@ -1,2 +1,44 @@
+#include <stdexcept>
+
 #include <Enumerator.hpp>
 
+// Scope is {{scope}}
+// how can we parse this ?
+
+namespace Enumerator
+{
+    
+{% set classEnums = scope.split(";") %}
+{% for classEnum in classEnums %}
+
+{% set cls = classEnum.split('.')[0] %}
+{% set configEntry = classEnum.split('.')[1] %}
+
+// {{ cls }}, {{configEntry}}
+
+{% set restrictions = designInspector.get_restrictions(cls, configEntry, 'configentry') %}
+
+{# Make sure the restriction is only enumeration based -- otherwise fail! #}
+
+namespace {{cls}}
+{
+
+//! throws
+{{configEntry|capFirst}} {{configEntry}}FromString (const std::string& input)
+{
+    {% for restriction in restrictions %}
+    {% if not loop.first %} else {% endif %} if (input == "{{restriction[1]}}")
+        return {{restriction[1]}};
+    {% endfor %}
+    else
+        throw std::runtime_error("string invalid for enum parsing ["+input+"]");
+}
+
+//std::string {{configEntry}}ToString ({{configEntry|capFirst}}& input);
+
+
+};
+
+{% endfor %}
+
+}
