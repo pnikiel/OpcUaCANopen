@@ -4,6 +4,7 @@
 #include <FrameFactory.hpp>
 
 #include <Logging.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -126,7 +127,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
     {
         if (m_nodeGuardingOperationsState != CANopen::NodeGuardingOperationsState::AWAITING_REPLY)
         {
-            SPOOKY(m_nodeAddressForDebug) << "unsolicited(!!) NG reply is coming. Discarding." << SPOOKY_;
+            SPOOKY(m_nodeAddressForDebug) << "unsolicited(!!) NG reply is coming. Discarding." << SPOOKY_ << " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
             return;
         }
         else

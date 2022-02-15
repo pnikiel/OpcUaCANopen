@@ -180,7 +180,8 @@
       <d:configRestriction>
         <d:restrictionByEnumeration>
           <d:enumerationValue value="ELMBio"/>
-          <d:enumerationValue value="CANopen"/><d:enumerationValue value="None" />
+          <d:enumerationValue value="CANopen"/>
+          <d:enumerationValue value="None"/>
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
@@ -188,6 +189,8 @@
   <d:class name="EmergencyParser">
     <d:devicelogic/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt16" name="lastErrorCode" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="lastErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+</d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorRegister" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte3" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte4" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
@@ -412,7 +415,8 @@
       <d:documentation>One to four bytes in hex with expected (i.e. passing) value of the SDO. Example: "A2,10"</d:documentation>
     </d:configentry>
     <d:method name="validate" executionSynchronicity="asynchronous">
-    	<d:returnvalue dataType="OpcUa_Boolean" name="passed"></d:returnvalue></d:method>
+      <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
+    </d:method>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>

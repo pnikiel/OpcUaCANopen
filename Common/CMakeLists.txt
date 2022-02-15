@@ -4,6 +4,7 @@ add_library (Common OBJECT
 	src/ASUtils.cpp
         src/QuasarThreadPool.cpp
         src/Logging.cpp
+        src/PiotrsUtils.cpp
 	)
 
 if (BUILD_QUASAR_TESTS)        

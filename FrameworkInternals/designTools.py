@@ -35,7 +35,7 @@ designXSD = "Design.xsd"
 def validateDesign(context):
     """Checks quasar's design validity"""
     design_validator = DesignValidator(
-        os.path.sep.join(['Design', designXSD]), 
+        os.path.sep.join(['Design', designXSD]),
         os.path.sep.join(['Design', designXML]))
     design_validator.validate()
 
@@ -85,11 +85,11 @@ def createDiagram(context, detailLevel=0, mode='dot'):
     graphvizArgs = {
             'dot':[],
             'circo':['-Kcirco', '-Gsplines=true', '-Granksep=0.1', '-Gmindist=0', '-Goverlap=false', '-Gepsilon=0.00001'],
-            'fdp':['-Kfdp', '-Gsplines=true', '-Goverlap=false', '-Gepsilon=0.00001', '-GK=0.01', '-Gmaxiter=10000', '-Gstart=random']
+            'fdp':['-Kfdp', '-Gsplines=true', '-Goverlap=false', '-Gepsilon=0.00001', '-GK=0.01', '-Gmaxiter=10000', '-Gstart=random'],
+            'neato':['-Kneato', '-Gstart=rand', '-Goverlap=false', '-Gsplines=true', '-Gsep=0.1']
     }
     print('Using {0} as level of detail'.format(str(detailLevel)))
     print('Using {0} as layout mode. Hint: from quasar 1.3.5, you can choose among: {1}, run with -h for help.'.format(mode, ','.join(graphvizArgs.keys())))
     transformByKey(TransformKeys.CREATE_DIAGRAM_DOT, {'context': context, 'detailLevel':detailLevel})
     args = ["-Tpdf", "-o", designPath + "diagram.pdf", getTransformOutput(TransformKeys.CREATE_DIAGRAM_DOT, {'context': context})] + graphvizArgs[mode]
     subprocessWithImprovedErrors([getCommand("graphviz")] + args , "GraphViz (dot)")
-
