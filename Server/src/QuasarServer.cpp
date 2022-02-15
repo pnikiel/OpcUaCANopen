@@ -397,8 +397,13 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
             };
             for (SdoBasedInfo& info : sdoBasedInfos)
             {
-                if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
-                    break;
+                if (bus->isInSpyMode())
+                    info.result = "N/A: spy mode";
+                else
+                {
+                    if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
+                        break;
+                }
             }
 
             std::string onlineConfigValidationResult ("no-tests-defined");

@@ -34,6 +34,7 @@
 
 #include <Logging.hpp>
 #include <FrameFactory.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 using namespace std::placeholders;
@@ -76,8 +77,6 @@ DBus::DBus (
     CSockCanScan* sockCanAccess = new CSockCanScan;
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
     sockCanAccess->createBus("sock:"+port(), "Unspecified");
-    sockCanAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1)); // TODO: move to initialize
-    sockCanAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3)); // TODO: move to initialize
 
     CanModule::CCanAccess* canAccess = sockCanAccess;
     
@@ -113,7 +112,9 @@ UaStatus DBus::writeNodeGuardInterval ( const OpcUa_Double& v)
 
 void DBus::initialize()
 {
-    
+    m_canAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
+    m_canAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3));
+
     for (Device::DNode* node : nodes())
         node->initialize();
 }
@@ -133,6 +134,26 @@ void DBus::onMessageReceived (const CanMessage& msg)
     //LOG(Log::INF) << "msg came, " << msg.c_id; // some separate levels ... ?
     // what is the message
     //unsigned int functionCode = msg.c_id >> 7;
+
+
+
+    if (msg.c_id == 0x80)
+    { /* definitely a SYNC */
+        if (this->isInSpyMode())
+        {
+            // TODO: pass to the SYNC engine as the SpyMode-SYNC
+        }
+        else
+        {
+            if (DRoot::getInstance()->warningss()[0]->unexpectedSync())
+            {
+                SPOOKY(getFullName()) << "received unexpected SYNC. " << SPOOKY_ << " [WunexpectedSync] " <<
+                    "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
+            }         
+        }
+        return;
+    }
+
     unsigned int nodeId = msg.c_id & 0x7f;
     // TODO shall everything be passed to specific node
     DNode* node = getNodeById(nodeId);
@@ -143,7 +164,8 @@ void DBus::onMessageReceived (const CanMessage& msg)
         if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode()) // TODO: the model to study warnings must be invincible to the situation when the object structure is not entirely ready
         {
             SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
-                << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]";
+                << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]" <<
+                " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
         }
     }
 }
