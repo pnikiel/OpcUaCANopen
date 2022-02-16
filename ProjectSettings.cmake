@@ -24,7 +24,7 @@ set(ADDITIONAL_BOOST_LIBS filesystem )
 add_definitions(-fPIC)
 
 # Enumerator optional module settings.
-set(ENUMERATOR_SCOPE Node.emergencyMappingModel)
+set(ENUMERATOR_SCOPE Node.emergencyMappingModel,Node.stateInfoSource)
 
 #set(CANMODULE_BUILD_VENDORS ON)
 #set(CANMODULE_BUILD_ANAGATE OFF)

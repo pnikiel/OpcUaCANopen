@@ -39,6 +39,14 @@
     <d:configentry dataType="OpcUa_Boolean" name="tpdoSyncMismatch" defaultValue="true" storedInDeviceObject="true">
       <d:documentation>Warn when not receiving data after sync, or receiving too much data after sync, for TPDOs configured onSync.</d:documentation>
     </d:configentry>
+    <d:configentry dataType="OpcUa_Boolean" name="tpdoTooShort" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>Warn when received TPDO is too short.</d:documentation>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Boolean" name="unexpectedNmt" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>
+            Warn when receiving NMT Control which come from 3rd party masters.
+        </d:documentation>
+    </d:configentry>
     <d:configentry dataType="OpcUa_Boolean" name="unexpectedSync" defaultValue="true" storedInDeviceObject="true">
       <d:documentation>
             Warn when receiving SYNC which come from 3rd party masters.

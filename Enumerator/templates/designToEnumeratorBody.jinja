@@ -8,7 +8,7 @@
 namespace Enumerator
 {
     
-{% set classEnums = scope.split(";") %}
+{% set classEnums = scope.split(",") %}
 {% for classEnum in classEnums %}
 
 {% set cls = classEnum.split('.')[0] %}

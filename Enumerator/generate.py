@@ -11,6 +11,7 @@ from transformDesign import transformDesign
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--output_dir', default=quasar_path)
+parser.add_argument('--scope')
 
 args = parser.parse_args()
 
@@ -19,11 +20,11 @@ transformDesign(
     outputFile=os.path.join(args.output_dir, 'src', 'Enumerator.cpp'),
     requiresMerge=False,
     astyleRun=True,
-    additionalParam={'scope' : 'Node.emergencyMappingModel'})
+    additionalParam={'scope' : args.scope})
 
 transformDesign(
     transform_path='Enumerator/templates/designToEnumeratorHeader.jinja',
     outputFile=os.path.join(args.output_dir, 'include', 'Enumerator.hpp'),
     requiresMerge=False,
     astyleRun=True,
-    additionalParam={'scope' : 'Node.emergencyMappingModel'})
+    additionalParam={'scope' : args.scope})

@@ -22,6 +22,8 @@
 
 #include <DTpdoMultiplex.h>
 #include <ASTpdoMultiplex.h>
+#include <DRoot.h>
+#include <DWarnings.h>
 
 #include <DMultiplexedChannel.h>
 
@@ -99,8 +101,16 @@ void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
     LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
     // getting the channel number ...
     // Note: this is the standard channel demultiplexer
+
     if (msg.c_dlc < 1)
-        throw std::runtime_error("not-implemented");
+    {
+        if (DRoot::getInstance()->warningss()[0]->tpdoTooShort())
+        {
+            SPOOKY(getFullName()) << "received TPDO is too short " << wrapValue(std::to_string(msg.c_dlc)) << SPOOKY_ << "[WtpdoTooShort]";
+        }
+        return;
+    }
+
     unsigned int channelNumber = msg.c_data[0]; // this is the MPDO algorithm.
     // do we have such a channel??
     DMultiplexedChannel* channel = this->getMultiplexedChannelById(channelNumber);

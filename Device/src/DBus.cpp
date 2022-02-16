@@ -142,16 +142,17 @@ void DBus::onMessageReceived (const CanMessage& msg)
     {
         if (this->isInSpyMode())
         {
-            LOG(Log::INF, "Spy") << wrapId(getFullName()) << " seeing NMT Control from another host, CS is " << wrapId(Utils::toHexString(msg.c_data[0])) << 
+            // Feature clause FC4.1: Spy mode
+            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing NMT Control from another host, CS is " << wrapId(Utils::toHexString(msg.c_data[0])) << 
                 " and the ID is " << wrapId(std::to_string((int)msg.c_data[1]));
         }
         else
         {
-            // if (DRoot::getInstance()->warningss()[0]->unexpectedSync())
-            // {
-            //     SPOOKY(getFullName()) << "received unexpected SYNC. " << SPOOKY_ << " [WunexpectedSync] " <<
-            //         "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
-            // }         
+            if (DRoot::getInstance()->warningss()[0]->unexpectedNmt())
+            {
+                SPOOKY(getFullName()) << "received unexpected NMT. " << SPOOKY_ << " [WunexpectedNmt] " <<
+                    "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
+            }         
         }
 
         return;
@@ -162,8 +163,8 @@ void DBus::onMessageReceived (const CanMessage& msg)
     { /* definitely a SYNC */
         if (this->isInSpyMode())
         {
-            // TODO: pass to the SYNC engine as the SpyMode-SYNC
-            LOG(Log::INF, "Spy") << wrapId(getFullName()) << " seeing SYNC from another host.";
+            // Feature clause FC4.1: Spy mode
+            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SYNC from another host.";
             for (DNode* node : nodes())
                 node->notifySync();
         }
@@ -196,10 +197,10 @@ void DBus::onMessageReceived (const CanMessage& msg)
 
 void DBus::sendMessage(const CanMessage& msg)
 {
-    // TODO handle disable functions ...
     if (this->isInSpyMode())
     {
-        LOG(Log::TRC) << wrapId(getFullName()) << " message not sent, bus is in spy mode";
+        // Feature clause FC4.1: Spy mode
+        LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " message not sent, bus is in spy mode";
     }
     else
     {
@@ -260,6 +261,7 @@ void DBus::tickPublishingStatistics ()
 
 bool DBus::isInSpyMode () const
 {
+    // Feature clause FC4.1: Spy mode
     Device::DGlobalSettings* globalSettings = DRoot::getInstance()->globalsettings();
     // TODO implement
     if (globalSettings->spyMode() == "enforceTrue")
