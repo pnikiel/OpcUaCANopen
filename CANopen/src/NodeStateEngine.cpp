@@ -26,7 +26,8 @@ NodeStateEngine::NodeStateEngine(
         StateInfoModel stateInfoModel,  
         NodeState initialRequestedState,
         const std::string& nodeAddressForDebug,
-        MessageSendFunction messageSendFunction):
+        MessageSendFunction messageSendFunction,
+        bool inSpyMode):
     m_nodeId(nodeId),
     m_requestedStateEnum(initialRequestedState),
     m_currentState(NodeState::UNKNOWN),
@@ -37,7 +38,8 @@ NodeStateEngine::NodeStateEngine(
     m_previousState(CANopen::NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
     m_messageSendFunction(messageSendFunction),
-    m_lastToggleBit(DUNNO)
+    m_lastToggleBit(DUNNO),
+    m_inSpyMode(inSpyMode)
 {
     // if (m_nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
     //     throw std::runtime_error("NodeGuarding Reply Timeout *must be* smaller that NodeGuarding interval");
@@ -75,7 +77,7 @@ void NodeStateEngine::tickNodeGuarding()
 
     checkNodeGuardingTimeout(millisecondsSinceLastNgRequest);
 
-    if (millisecondsSinceLastNgRequest >= m_currentStateInfoPeriod * 1000)
+    if (!m_inSpyMode && millisecondsSinceLastNgRequest >= m_currentStateInfoPeriod * 1000)
     {
         // Feature clause FN1.1: Node monitoring by node-guarding
         LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Sending NG request";
@@ -107,13 +109,30 @@ void NodeStateEngine::notifyState(uint8_t rawState, CANopen::NodeState state)
         notification(rawState, state);
 }
 
+// TODO: this also handles NG request in the spy mode
+// TODO: shoud we split it into two functions?
 void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
 {
+    // are we in the spy mode ?
     LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " NodeManagement reply received (NG, HB or bootup)";
 
     std::lock_guard<std::mutex> lock (m_accessLock);
 
     // TODO: Heartbeat vs NodeGuarding
+
+    if (msg.c_rtr)
+    {
+        if (m_inSpyMode)
+        {   // this is legal.
+            m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
+            m_lastNodeGuardingTimePoint = std::chrono::steady_clock::now();
+        }
+        else
+        {
+            SPOOKY(m_nodeAddressForDebug) << " Received NG *REQUEST*, that is legal only with spymode on. Someone's messing with your bus! " << SPOOKY_;
+        }
+        return;
+    }
 
     if (msg.c_dlc != 1)
     {
@@ -156,7 +175,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         m_currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
         notifyState(msg.c_data[0], m_currentState);
         
-        if (stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
+        if (!m_inSpyMode && stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {
             // Feature clause FN1.3: Maintaining state
             LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 

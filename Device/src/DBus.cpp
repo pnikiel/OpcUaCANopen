@@ -135,13 +135,37 @@ void DBus::onMessageReceived (const CanMessage& msg)
     // what is the message
     //unsigned int functionCode = msg.c_id >> 7;
 
+    // TODO Msg=0x0 is the NMT control (e.g.  [id=0x0 dlc=2 data=[01 06 ]])
+    // This would be legal in the spy mode! --> Spy Mode INFORMATION
 
+    if (msg.c_id == 0x00) // NMT Control
+    {
+        if (this->isInSpyMode())
+        {
+            LOG(Log::INF, "Spy") << wrapId(getFullName()) << " seeing NMT Control from another host, CS is " << wrapId(Utils::toHexString(msg.c_data[0])) << 
+                " and the ID is " << wrapId(std::to_string((int)msg.c_data[1]));
+        }
+        else
+        {
+            // if (DRoot::getInstance()->warningss()[0]->unexpectedSync())
+            // {
+            //     SPOOKY(getFullName()) << "received unexpected SYNC. " << SPOOKY_ << " [WunexpectedSync] " <<
+            //         "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
+            // }         
+        }
+
+        return;
+
+    }
 
     if (msg.c_id == 0x80)
     { /* definitely a SYNC */
         if (this->isInSpyMode())
         {
             // TODO: pass to the SYNC engine as the SpyMode-SYNC
+            LOG(Log::INF, "Spy") << wrapId(getFullName()) << " seeing SYNC from another host.";
+            for (DNode* node : nodes())
+                node->notifySync();
         }
         else
         {
@@ -187,6 +211,9 @@ void DBus::sendMessage(const CanMessage& msg)
 
 void DBus::tickSync()
 {
+    if (isInSpyMode())
+        return; // we're not sending SYNC in the spy mode.
+
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     unsigned int millisecondsSinceLastSync = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastSyncTimePoint).count();
     // Feature clause FP1.2: Support of SYNC messages

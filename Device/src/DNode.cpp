@@ -81,7 +81,8 @@ DNode::DNode (
             m_stateInfoModel,
             CANopen::textToStateEnum(config.requestedState()), /* initial requested state */
             getFullName(), /* ID for logging */
-            std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1)),
+            std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1),
+            parent->isInSpyMode()),
         m_emergencyMappingModel(Enumerator::Node::emergencyMappingModelFromString(config.emergencyMappingModel()))
 
     /* fill up constructor initialization list here */

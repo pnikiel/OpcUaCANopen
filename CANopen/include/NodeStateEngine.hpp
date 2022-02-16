@@ -34,7 +34,8 @@ namespace CANopen
             StateInfoModel stateInfoModel,
             NodeState initialRequestedState,
             const std::string& nodeAddressForDebug,
-            MessageSendFunction messageSendFunction);
+            MessageSendFunction messageSendFunction,
+            bool inSpyMode);
 
         //! Expected to be called by the stack somehow regularly (every second).
         void tick();
@@ -93,6 +94,8 @@ namespace CANopen
         enum ToggleBit { ON, OFF, DUNNO };
         ToggleBit m_lastToggleBit; 
         StateToggleViolationNotification m_toggleViolationNotification;
+
+        const bool m_inSpyMode;
 
     };
 

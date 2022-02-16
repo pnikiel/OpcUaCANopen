@@ -66,10 +66,13 @@ struct LogComponent
 std::vector<LogComponent> LogComponents =
     {
         {"CanModule"},
+        {"Emergency"},
         {"NodeMgmt"},
         {"Sdo"},
         {"Spooky"},
-        {"Emergency"}};
+        {"Spy"}
+    };
+
 
 void printLogo()
 {
