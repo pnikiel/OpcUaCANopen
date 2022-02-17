@@ -42,6 +42,41 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
             output = "ADC: conversion timeout (channel #" + std::to_string((unsigned int)msg.c_data[4]) + ")";
             return true;
         }
+        else if (msg.c_data[3] == 0x02)
+        {
+            output = "ADC: reset failed (error id  " + std::to_string((unsigned int)msg.c_data[5]) + ")";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x03)
+        {
+            output = "ADC: offset calibration failed";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x04)
+        {
+            output = "ADC: gain calibration failed";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x10)
+        {
+            output = "ADC problem(s) during initialisation";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x11)
+        {
+            output = "ADC calibration constants: not available";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x20)
+        {
+            output = "Slave processor not responding (ELMB103 only)";
+            return true;
+        }
+        else if (msg.c_data[3] == 0x30)
+        {
+            output = "CRC error"; // TODO extra byte to be printed
+            return true;
+        }
         return false;
     }
     return false;
