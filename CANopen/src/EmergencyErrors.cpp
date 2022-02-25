@@ -1,4 +1,5 @@
 #include <map>
+#include <sstream>
 
 #include <EmergencyErrors.hpp>
 
@@ -13,11 +14,16 @@ static std::map<uint8_t, std::string> ErrorCodeMsbCANopen =
 
 bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
 {
+    std::stringstream ss;
+    // TODO: guarantee minimum length of the msg ;-)
     // This info comes from Henk's ELMBio doc, see the section about emergency errors.
     uint16_t errorCode = msg.c_data[0] | (msg.c_data[1] << 8);
     if (errorCode == 0x8100)
     {
-        output = "CAN communication"; // TODO: details
+        ss << "CAN communication (error ctr [" << 
+            (unsigned int)msg.c_data[5] << "] bus-off ctr [" << 
+            (unsigned int)msg.c_data[6] << "])";
+        output = ss.str();
         return true;
     }
     else if (errorCode == 0x8110)
@@ -77,6 +83,41 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
             output = "CRC error"; // TODO extra byte to be printed
             return true;
         }
+        else if (msg.c_data[3] == 0x41)
+        {
+            output = "EEPROM: write error"; // TODO extra byte to be printed
+            return true;
+        }
+        else if (msg.c_data[3] == 0x42)
+        {
+            output = "EEPROM: read error"; // TODO extra byte to be printed
+            return true;
+        }
+        else if (msg.c_data[3] == 0x43)
+        {
+            output = "EEPROM: read error"; // TODO extra byte to be printed
+            return true;
+        }
+        else if (msg.c_data[3] == 0xF0)
+        {
+            output = "Irregular reset"; // TODO extra byte to be printed
+            return true;
+        }
+        else if (msg.c_data[3] == 0xF1)
+        {
+            output = "Bootloader: not present";
+            return true;
+        }
+        else if (msg.c_data[3] == 0xFE)
+        {
+            output = "Bootloader is now in control";
+            return true;
+        }
+        // else if (msg.c_data[3] == 0xFE)    ERROR CODE 0x6000 perhaps -- checking with Henk TODO
+        // {
+        //     output = "Bootloader is now in control";
+        //     return true;
+        // }
         return false;
     }
     return false;

@@ -102,17 +102,21 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
         Utils::toHexString(msg.c_data[5]) + "|" +
         Utils::toHexString(msg.c_data[6]) + "|" +
         Utils::toHexString(msg.c_data[7]) + "|";
-    getAddressSpaceLink()->setEmergencyErrorBundle(emergencyBundle.c_str(), OpcUa_Good);
+    getAddressSpaceLink()->setLastEmergencyErrorBundle(emergencyBundle.c_str(), OpcUa_Good);
 
     // Feature clause FE2.1: Count emergencies
     getAddressSpaceLink()->setEmergencyErrorCounter(getAddressSpaceLink()->getEmergencyErrorCounter()+1, OpcUa_Good);
+
+    // Feature clause FE1.2: Emergency errors in human readable way
+    const std::string humanReadableDescription (CANopen::decodeEmergencyHumanFriendly(msg, getParent()->emergencyMappingModel()));
+    getAddressSpaceLink()->setLastErrorDescription( humanReadableDescription.c_str(), OpcUa_Good );
 
     //TODO: we should print that we received emergency messages with error severity ERR
     // do it!
     LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << 
         ": received emergency msg, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
         ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter())) << 
-        ", description is " <<  wrapValue(CANopen::decodeEmergencyHumanFriendly(msg, getParent()->emergencyMappingModel()));
+        ", description is " <<  wrapValue(humanReadableDescription);
 
 }
 
