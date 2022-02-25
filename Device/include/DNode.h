@@ -57,6 +57,10 @@ public:
     /* Note: never directly call this function. */
     UaStatus writeRequestedState ( const UaString& v);
 
+    /* ASYNCHRONOUS !! */
+    UaStatus writeNmtPartialBackwardsCompat (
+        OpcUa_Byte& value
+    );
 
     /* delegators for methods */
     UaStatus callReset (
@@ -103,7 +107,7 @@ private:
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
     CANopen::StateInfoModel m_stateInfoModel;
     CANopen::SdoEngine m_sdoEngine;
-    
+
     std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
 
     CANopen::NodeStateEngine m_nodeStateEngine;

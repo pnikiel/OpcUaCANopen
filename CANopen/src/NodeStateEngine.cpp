@@ -187,7 +187,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
             switch(m_requestedStateEnum)
             {
                 case 5: // to be started
-                    nmtCommand = 1; break; // start
+                    nmtCommand = NmtRequests::START; break;
                 case 4: // to be stopped
                     nmtCommand = 2; break; // stop remote node
                 case 127: // go to preoperational

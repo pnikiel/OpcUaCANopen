@@ -198,6 +198,9 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
+    <d:sourcevariable dataType="OpcUa_Byte" name="nmtPartialBackwardsCompat" addressSpaceRead="forbidden" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
+      <d:documentation>This variable is for ensuring *partial compatibility* with the Slava's CANopen OPCUA server -- see FN4.1 in the Piotr's writeup for docs.</d:documentation>
+    </d:sourcevariable>
   </d:class>
   <d:class name="EmergencyParser">
     <d:devicelogic/>

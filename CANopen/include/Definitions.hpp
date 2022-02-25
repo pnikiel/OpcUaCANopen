@@ -22,6 +22,10 @@ enum NodeState
     UNKNOWN
 };
 
-
+enum NmtRequests
+{
+    START = 1,
+    RESET = 129
+};
 
 }
