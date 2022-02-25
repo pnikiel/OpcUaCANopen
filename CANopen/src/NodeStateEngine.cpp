@@ -94,7 +94,7 @@ void NodeStateEngine::checkNodeGuardingTimeout(unsigned int millisecondsSinceLas
     {
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
         
-        LOG(Log::ERR, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
+        LOG(Log::DBG, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
             wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
         m_currentState = NodeState::DISCONNECTED;
         notifyState(1, NodeState::DISCONNECTED);
