@@ -139,7 +139,7 @@ UaStatus DNode::writeRequestedState ( const UaString& v)
 
 /* ASYNCHRONOUS !! */
 UaStatus DNode::writeNmtPartialBackwardsCompat (
-    OpcUa_Byte& value
+    OpcUa_UInt32& value
 )
 {
     if (value == CANopen::NmtRequests::RESET)

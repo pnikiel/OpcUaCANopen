@@ -59,7 +59,7 @@ public:
 
     /* ASYNCHRONOUS !! */
     UaStatus writeNmtPartialBackwardsCompat (
-        OpcUa_Byte& value
+        OpcUa_UInt32& value
     );
 
     /* delegators for methods */
