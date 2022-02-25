@@ -162,6 +162,8 @@ UaStatus DNode::callReset (
     OpcUa_Boolean& bootupReceived
 )
 {
+
+    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " received RESET request. Result will be reported"; 
     /* Piotr: I know it'd be *fancier* to solve this problem using e.g. cond variables but I think it would
        complicate it much further with marginally better outcome, while what I propose here seems alright for the application*/ 
 
@@ -185,7 +187,7 @@ UaStatus DNode::callReset (
     } while (!replyReceived && !timePassed);
 
     bootupReceived = replyReceived;
-
+    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " after RESET: expected bootup was received?" << (bool)replyReceived;
     return replyReceived? OpcUa_Good : OpcUa_BadTimeout;
 }
 
