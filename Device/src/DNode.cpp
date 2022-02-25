@@ -187,7 +187,7 @@ UaStatus DNode::callReset (
     } while (!replyReceived && !timePassed);
 
     bootupReceived = replyReceived;
-    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " after RESET: expected bootup was received?" << (bool)replyReceived;
+    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " after RESET: expected bootup was received? " << wrapValue(replyReceived?"yes":"no");
     return replyReceived? OpcUa_Good : OpcUa_BadTimeout;
 }
 
