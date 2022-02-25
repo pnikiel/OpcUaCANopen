@@ -151,7 +151,7 @@ UaStatus DNode::writeNmtPartialBackwardsCompat (
     {
         LOG(Log::ERR, "NodeMgmt") << "For node " << wrapId(getFullName()) << 
             " received address-space request different than RESET (NMT code #" << wrapValue(std::to_string((unsigned int)value)) << 
-            "). This is not supported in the new CANopen server. Refer to feature FN4.1 in the writeup";
+            "). This is not supported in the new CANopen server. Remove such calls from your applications. Refer to feature FN4.1 in the writeup for more info.";
         return OpcUa_BadUserAccessDenied;
     }
 }
