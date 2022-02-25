@@ -24,3 +24,6 @@
 </SdoSameIndexGroup>
 
 <SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
+
+<!-- we should write the SDO validators to relate to variables! -->
+<SdoValidator name="ensureFirmwareMajor_MA445" index="100A" subIndex="20" expectedValue="01"/>
