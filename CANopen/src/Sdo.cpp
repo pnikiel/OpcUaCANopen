@@ -7,6 +7,7 @@
 #include <Sdo.h>
 #include <Logging.hpp>
 #include <Utils.h>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -31,7 +32,7 @@ m_nodeId(nodeId)
 bool SdoEngine::readExpedited (
     const std::string& where,
     uint16_t index, 
-    uint16_t subIndex, 
+    uint8_t subIndex, 
     std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
 {
     LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
@@ -53,7 +54,10 @@ bool SdoEngine::readExpedited (
     initiateDomainUpload.c_dlc = 8; // TODO this is to be checked!!  Was checked and 4 did not work. Trying ;-)
     m_sendFunction(initiateDomainUpload);
 
+    m_replyExpected = true;
+
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
+    m_replyExpected = false;
     if (wait_status == std::cv_status::timeout)
     {
         LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
@@ -104,7 +108,11 @@ bool SdoEngine::readExpedited (
 
 }
 
-bool SdoEngine::writeExpedited (const std::string& where, uint16_t index, uint16_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs)
+bool SdoEngine::writeExpedited (
+    const std::string& where, 
+    uint16_t index, 
+    uint8_t subIndex, 
+    const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
 
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
@@ -162,14 +170,23 @@ bool SdoEngine::writeExpedited (const std::string& where, uint16_t index, uint16
 }
 
 
-void SdoEngine::replyCame (const CanMessage& msg)
+void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
 {
     // TODO should have state here that say whether a reply was actually expected?
-    LOG(Log::TRC) << "Received SDO reply";
+    LOG(Log::TRC, "Sdo") << "Received SDO reply";
     std::lock_guard<std::mutex> lock (m_condVarChangeLock);
-    m_lastSdoReply = msg;
-    m_replyCame = true;
-    m_condVarForReply.notify_one();
+    if (m_replyExpected)
+    {
+        m_lastSdoReply = msg;
+        m_replyCame = true;
+        m_replyExpected = false;
+        m_condVarForReply.notify_one();
+    }
+    else
+    {
+        LOG(Log::ERR, "Sdo") << "Received unexpected SDO reply " << wrapValue(Common::CanMessageToString(msg));
+    }
+
 }
 
 }
