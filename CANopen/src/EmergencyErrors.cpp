@@ -1,5 +1,6 @@
 #include <map>
 #include <sstream>
+#include <iomanip>
 
 #include <EmergencyErrors.hpp>
 
@@ -38,7 +39,7 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
     }
     else if (errorCode == 0x8210)
     {
-        output = "RPDO: too few bytes"; // TODO details about byte 3
+        output = "RPDO: too few bytes (minimum is " + std::to_string((unsigned int)msg.c_data[3]) + ")";
         return true;
     }
     else if (errorCode == 0x5000)
@@ -80,27 +81,37 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
         }
         else if (msg.c_data[3] == 0x30)
         {
-            output = "CRC error"; // TODO extra byte to be printed
+            output = "CRC error (Byte4 is " + std::to_string((unsigned int)msg.c_data[4]) + ")";
             return true;
         }
         else if (msg.c_data[3] == 0x41)
         {
-            output = "EEPROM: write error"; // TODO extra byte to be printed
+            ss << "EEPROM: write error (Param block idx [" << 
+                (unsigned int)msg.c_data[4] << "] Byte5 [" << 
+                (unsigned int)msg.c_data[5] << "])";
+            output = ss.str();
             return true;
         }
         else if (msg.c_data[3] == 0x42)
         {
-            output = "EEPROM: read error"; // TODO extra byte to be printed
+            ss << "EEPROM: read error (Param block idx [" << 
+                (unsigned int)msg.c_data[4] << "] Error_id [" << 
+                (unsigned int)msg.c_data[5] << "])";
+            output = ss.str();
             return true;
         }
         else if (msg.c_data[3] == 0x43)
         {
-            output = "EEPROM: read error"; // TODO extra byte to be printed
+            ss << "EEPROM: ADC-limits write error (Param block idx [" << 
+                (unsigned int)msg.c_data[4] << "] size [" << 
+                (unsigned int)msg.c_data[5] << "])";
+            output = ss.str();
             return true;
         }
         else if (msg.c_data[3] == 0xF0)
         {
-            output = "Irregular reset"; // TODO extra byte to be printed
+            ss << "Irregular reset (MCUCSR [" << std::hex << std::setw(2) << std::setfill('0') << "])"; 
+            output = ss.str();
             return true;
         }
         else if (msg.c_data[3] == 0xF1)
@@ -110,7 +121,7 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
         }
         else if (msg.c_data[3] == 0xFE)
         {
-            output = "Bootloader is now in control";
+            output = "Bootloader is now in control (This is *NORMAL* for an ELMB which boots up)";
             return true;
         }
         // else if (msg.c_data[3] == 0xFE)    ERROR CODE 0x6000 perhaps -- checking with Henk TODO
