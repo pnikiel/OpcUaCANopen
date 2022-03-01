@@ -110,7 +110,7 @@ bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
         }
         else if (msg.c_data[3] == 0xF0)
         {
-            ss << "Irregular reset (MCUCSR [" << std::hex << std::setw(2) << std::setfill('0') << "])"; 
+            ss << "Irregular reset (MCUCSR [" << std::hex << std::setw(2) << std::setfill('0') << msg.c_data[4] << "])"; 
             output = ss.str();
             return true;
         }
