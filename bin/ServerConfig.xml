@@ -258,7 +258,7 @@
     <!--Maximum number of backup files-->
     <UaAppTraceMaxBackup>5</UaAppTraceMaxBackup>
     <!--Trace file-->
-    <UaAppTraceFile>srvTrace.log</UaAppTraceFile>
+    <UaAppTraceFile>/localdisk/tmp/CanOpenOpcUa-srvTrace.log</UaAppTraceFile>
   </Trace>
   <!--Trace configuration end-->
 
