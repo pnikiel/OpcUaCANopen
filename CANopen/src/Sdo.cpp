@@ -143,6 +143,7 @@ bool SdoEngine::writeExpedited (
 
     m_sendFunction(initiateDomainDownload);
 
+    m_replyExpected = true;
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {

@@ -117,7 +117,7 @@
     <!-- URL of the Endpoint
          This URL is used for Discovery and to open the Endpoints in the UA stack if no StackUrl ist configured.
          [NodeName] can be used as placeholder for the computer name. -->
-    <Url>opc.tcp://[NodeName]:4841</Url>
+    <Url>opc.tcp://[NodeName]:48012</Url>
     <!-- Optional URL that allows to define a specific address the stack should use to bind to.
          Can be used to bind the endpoint to a specific network card or to localhost only.
     <StackUrl>opc.tcp://192.168.0.15:4841</StackUrl>-->
