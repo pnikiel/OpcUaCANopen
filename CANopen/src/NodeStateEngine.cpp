@@ -219,9 +219,9 @@ void NodeStateEngine::evaluateStateChange (NodeState newState)
         {
             LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state change was seen, last known state was "
                 << wrapValue(CANopen::stateEnumToText(m_previousState)) << " current is " << wrapValue(CANopen::stateEnumToText(newState));
-            for (CANopen::NodeStateChangeCallBack callBack : m_nodeStateChangeCallBacks)
-                callBack(m_previousState, newState);
         }
+        for (CANopen::NodeStateChangeCallBack callBack : m_nodeStateChangeCallBacks)
+            callBack(m_previousState, newState);
         m_previousState = newState;
     }
 }

@@ -108,7 +108,6 @@ private:
     CANopen::StateInfoModel m_stateInfoModel;
     CANopen::SdoEngine m_sdoEngine;
 
-    std::vector<CANopen::NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
 
     CANopen::NodeStateEngine m_nodeStateEngine;
 
