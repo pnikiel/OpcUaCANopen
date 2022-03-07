@@ -87,13 +87,20 @@ std::vector<uint8_t> ValueMapper::packVariantToBytes ( // offset and all the res
             throw std::runtime_error("Failed transforming variant to bytes");
         return typeAsBytesPrimitiveCast(out);
     }
-    if (dataType == "UInt16")
+    else if (dataType == "UInt16")
     {
         uint16_t out;
         if (data.toUInt16(out) != OpcUa_Good)
             throw std::runtime_error("Failed transforming variant to bytes");
         return typeAsBytesPrimitiveCast(out);
-    } 
+    }
+    else if (dataType == "Byte")
+    {
+        uint8_t out;
+        if (data.toByte(out) != OpcUa_Good)
+            throw std::runtime_error("Failed transforming variant to bytes");
+        return typeAsBytesPrimitiveCast(out);
+    }
     else if (dataType == "Boolean")
     {
         uint8_t out; // OPC-UA boolean is uint8_t
