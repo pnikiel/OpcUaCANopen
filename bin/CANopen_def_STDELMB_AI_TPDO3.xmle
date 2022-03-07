@@ -3,7 +3,7 @@
  <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
 </SdoSameIndexGroup>
 
-<SdoValidator name="ensureSyncForTpdo3_transmissionType" index="1802" subIndex="2" expectedValue="01"/>
+<!-- <SdoValidator name="ensureSyncForTpdo3_transmissionType" index="1802" subIndex="2" expectedValue="01"/> -->
 
 <SdoSameIndexGroup index="2100" name="aiConfig" >
  <SdoVariable subIndex="1" access="RW" dataType="Byte" name="channelMax" />

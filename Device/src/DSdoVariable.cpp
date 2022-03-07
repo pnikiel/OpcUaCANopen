@@ -64,7 +64,8 @@ DSdoVariable::DSdoVariable (
     const Configuration::SdoVariable& config,
     Parent_DSdoVariable* parent
 ):
-    Base_DSdoVariable( config, parent)
+    Base_DSdoVariable( config, parent),
+    m_name (config.name())
 
     /* fill up constructor initialization list here */
 {
@@ -90,6 +91,7 @@ UaStatus DSdoVariable::readValue (
     UaDateTime& sourceTime
 )
 {
+    // Feature clause FS0.1: Features common to any mode of SDO usage: R/W control
     /* Is it actually allowed to read this SDO? */
     if (access().find("R") == std::string::npos)
     {
@@ -103,6 +105,10 @@ UaStatus DSdoVariable::readValue (
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
         return OpcUa_BadOutOfService;
     }
+
+    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
+    // Synchronization: use quasar's made mutex:
+    std::lock_guard<boost::mutex> lock (m_node->getLock());
 
     std::vector<unsigned char> readData;
     bool status = m_node->sdoEngine().readExpedited(
@@ -131,6 +137,7 @@ UaStatus DSdoVariable::writeValue (
     UaVariant& value
 )
 {
+    // Feature clause FS0.1: Features common to any mode of SDO usage: R/W control
     /* Is it actually allowed to write this SDO? */
     if (access().find("W") == std::string::npos)
     {
@@ -145,6 +152,7 @@ UaStatus DSdoVariable::writeValue (
         return OpcUa_BadOutOfService;
     }
 
+    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
     // Synchronization: use quasar's made mutex:
     std::lock_guard<boost::mutex> lock (m_node->getLock());
 

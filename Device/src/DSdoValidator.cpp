@@ -22,6 +22,12 @@
 
 #include <DSdoValidator.h>
 #include <ASSdoValidator.h>
+#include <DNode.h>
+#include <DSdoVariable.h>
+
+#include <Logging.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -51,11 +57,15 @@ DSdoValidator::DSdoValidator (
     const Configuration::SdoValidator& config,
     Parent_DSdoValidator* parent
 ):
-    Base_DSdoValidator( config, parent)
+    Base_DSdoValidator( config, parent),
+    m_node(nullptr)
 
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    m_parser.DefineNameChars("0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.");
+    m_parser.SetExpr(config.assertTrueFormula());
+    
 }
 
 /* sample dtr */
@@ -72,6 +82,7 @@ UaStatus DSdoValidator::callValidate (
     OpcUa_Boolean& passed
 )
 {
+    this->validate();
     passed = OpcUa_False; // TODO
     return OpcUa_BadNotImplemented;
 }
@@ -81,5 +92,83 @@ UaStatus DSdoValidator::callValidate (
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DSdoValidator::initialize(DNode* node)
+{
+    m_node = node;
+    auto usedVariables = m_parser.GetUsedVar();
+    LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " recognized these operands:";
+    for (auto& x : usedVariables)
+    {
+        // check if we're dealing with a constant?
+        LOG(Log::INF, "SdoValidator") << "name: " << x.first; // no sense to print the value as it is not initialized yet
+        // if (Engine::isConstantDefined(x.first))
+        // {
+        //     double value = Engine::getValueOfConstant(x.first);
+        //     LOG(Log::TRC, logComponentId) << "Recognized use of constant, name: " << x.first << " value: " << value;
+        //     parser.DefineConst(x.first, value);
+        // }
+    }
+    // try
+    // {
+    //     m_parser.Eval();
+    // }
+    // catch(const mu::Parser::exception_type &e)
+    // {
+    //     std::cerr << e.GetMsg() << '\n';
+    // }
+
+
+}
+
+void DSdoValidator::validate()
+{
+    /* This is the actual validation */
+    /* Need to supply values of the variables that are used */
+        auto usedVariables = m_parser.GetUsedVar();
+    LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " recognized these operands:";
+    for (auto& x : usedVariables)
+    {
+        // check if we're dealing with a constant?
+        LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " will query SDO named " << x.first; // no sense to print the value as it is not initialized yet
+        // if (Engine::isConstantDefined(x.first))
+        // {
+        //     double value = Engine::getValueOfConstant(x.first);
+        //     LOG(Log::TRC, logComponentId) << "Recognized use of constant, name: " << x.first << " value: " << value;
+        //     parser.DefineConst(x.first, value);
+        // }
+
+        DSdoVariable* sdoVariable = m_node->getSdoByShortName(x.first); // TODO: protection for not having this short name
+        
+        // try to obtain the value
+        UaVariant sdoValueRead;
+        UaDateTime sourceTime;
+        sdoVariable->readValue(sdoValueRead, sourceTime);
+        LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " read SDO " << wrapValue(x.first) << " value obtained is " << wrapId(sdoValueRead.toString().toUtf8());
+
+        double value;
+        sdoValueRead.toDouble(value); // TODO: this might fail or there might be an inconsistency for the data types
+
+        LOG(Log::INF, "SdoValidator") << value;
+
+        m_parser.DefineConst(x.first, value);
+
+    }
+
+    LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " will try to evaluate now";
+
+    try
+    {
+        double evaluation = m_parser.Eval();
+        LOG(Log::INF, "SdoValidator") << wrapId(getFullName()) << " validation value: " << wrapValue(std::to_string(evaluation));
+    }
+    catch(const mu::Parser::exception_type &e)
+    {
+        std::cerr << e.GetMsg() << '\n';
+        LOG(Log::ERR, "SdoValidator") << wrapId(getFullName()) << " validation error: " << e.GetMsg();
+    }
+    
+
+}
 
 }

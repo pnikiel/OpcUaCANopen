@@ -73,6 +73,7 @@ public:
 
     void setIndex (uint16_t index);
 
+    std::string name() const { return m_name; }
 
 private:
     uint16_t m_index;
@@ -82,6 +83,7 @@ private:
     DBus* m_bus;
     DNode* m_node;
 
+    const std::string m_name;
 
 
 };

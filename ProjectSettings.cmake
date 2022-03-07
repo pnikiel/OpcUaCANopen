@@ -26,6 +26,8 @@ add_definitions(-fPIC)
 # Enumerator optional module settings.
 set(ENUMERATOR_SCOPE Node.emergencyMappingModel,Node.stateInfoSource)
 
+include_directories(${PROJECT_SOURCE_DIR}/CalculatedVariables/ext_components/muparser-amalgamated/include)
+
 #set(CANMODULE_BUILD_VENDORS ON)
 #set(CANMODULE_BUILD_ANAGATE OFF)
 

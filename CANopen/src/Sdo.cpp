@@ -144,6 +144,7 @@ bool SdoEngine::writeExpedited (
     m_sendFunction(initiateDomainDownload);
 
     m_replyExpected = true;
+    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {

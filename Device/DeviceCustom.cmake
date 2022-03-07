@@ -17,6 +17,9 @@
 # Initial author: Piotr Nikiel <piotr@nikiel.info> <-- specific users: remove this line and put your own name ;-)
 # This file *WILL NOT* be overwritten by quasar tools.
 
+include_directories(${PROJECT_SOURCE_DIR}/CalculatedVariables/ext_components/muparser-amalgamated/include)
+include_directories(/home/pnikiel/gitProjects/OpcUaNewCANopenServer/CalculatedVariables/ext_components/muparser-amalgamated/include)
+
 set(DEVICE_CUSTOM_SOURCES
 	src/ValueMapper.cpp
 	)

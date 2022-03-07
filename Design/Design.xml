@@ -423,16 +423,10 @@
   </d:class>
   <d:class name="SdoValidator">
     <d:devicelogic/>
-    <d:configentry dataType="UaString" name="index">
-      <d:documentation>Uint16_t as hex.</d:documentation>
-    </d:configentry>
-    <d:configentry dataType="OpcUa_Byte" name="subIndex"/>
-    <d:configentry dataType="UaString" name="expectedValue">
-      <d:documentation>One to four bytes in hex with expected (i.e. passing) value of the SDO. Example: "A2,10"</d:documentation>
-    </d:configentry>
     <d:method name="validate" executionSynchronicity="asynchronous">
       <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
     </d:method>
+    <d:configentry dataType="UaString" name="assertTrueFormula"></d:configentry>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>

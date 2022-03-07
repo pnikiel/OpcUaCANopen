@@ -21,6 +21,8 @@
 #ifndef __DNode__H__
 #define __DNode__H__
 
+#include <map>
+
 #include <Definitions.hpp>
 #include <NodeGuarding.hpp>
 #include <Sdo.h>
@@ -37,6 +39,8 @@
 
 namespace Device
 {
+
+class DSdoVariable;
 
 class
     DNode
@@ -98,6 +102,9 @@ public:
 
     Enumerator::Node::EmergencyMappingModel emergencyMappingModel () const { return m_emergencyMappingModel; }
 
+    void registerSdoByShortName (const std::string& shortName, DSdoVariable* sdoVariable);
+    DSdoVariable* getSdoByShortName (const std::string& shortName);
+
 private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
@@ -112,6 +119,9 @@ private:
     CANopen::NodeStateEngine m_nodeStateEngine;
 
     Enumerator::Node::EmergencyMappingModel m_emergencyMappingModel;
+
+    //! Need this look-up to provide formulas on SDOs, for instance for SDO Validator, etc.
+    std::map<std::string, DSdoVariable*> m_sdosByShortName;
 
 };
 

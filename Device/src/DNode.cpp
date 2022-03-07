@@ -36,6 +36,7 @@
 #include <DRoot.h>
 #include <DGlobalSettings.h>
 #include <DWarnings.h>
+#include <DOnlineConfigValidator.h>
 
 #include <FrameFactory.hpp>
 
@@ -213,11 +214,25 @@ void DNode::initialize()
     {
         sdogroup->propagateIndex();
         for (Device::DSdoVariable* variable : sdogroup->sdovariables())
+        {
+            registerSdoByShortName(sdogroup->name()+"."+variable->name(), variable);
             variable->initialize(getParent(), this);
+        }
     }
 
     for (Device::DSdoVariable* variable : sdovariables())
-            variable->initialize(getParent(), this);
+    {
+        registerSdoByShortName(variable->name(), variable);
+        variable->initialize(getParent(), this);
+    }
+    
+    for (DOnlineConfigValidator* validator : onlineconfigvalidators())
+        validator->initialize();
+
+
+    LOG(Log::TRC, "SdoValidator") << wrapId(getFullName()) << " SDO short-list established after initialize() is: ";
+    for (auto& nameObjectPair : m_sdosByShortName)
+        LOG(Log::TRC, "SdoValidator") << wrapValue(nameObjectPair.first);
     
 }
 
@@ -308,6 +323,16 @@ void DNode::notifySync ()
         tpdo->notifySync();
     for (DTpdoMultiplex* multiplex : tpdomultiplexs())
         multiplex->notifySync();
+}
+
+void DNode::registerSdoByShortName (const std::string& shortName, DSdoVariable* sdoVariable)
+{
+    m_sdosByShortName[shortName] = sdoVariable;
+}
+
+DSdoVariable* DNode::getSdoByShortName (const std::string& shortName)
+{
+    return m_sdosByShortName[shortName];
 }
 
 }

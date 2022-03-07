@@ -93,5 +93,10 @@ UaStatus DOnlineConfigValidator::callValidate (
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+void DOnlineConfigValidator::initialize()
+{
+    for (DSdoValidator* validator : sdovalidators())
+        validator->initialize(getParent());
+}
 
 }

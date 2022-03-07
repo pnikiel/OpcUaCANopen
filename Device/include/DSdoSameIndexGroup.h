@@ -60,8 +60,12 @@ public:
     uint16_t index() const { return m_index; }
     void propagateIndex();
 
+    std::string name() const { return m_name; }
+
 private:
     const uint16_t m_index;
+
+    const std::string m_name;
 
 
 

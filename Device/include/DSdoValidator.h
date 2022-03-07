@@ -22,9 +22,12 @@
 #define __DSdoValidator__H__
 
 #include <Base_DSdoValidator.h>
+#include <muParser.h>
 
 namespace Device
 {
+
+class DNode;
 
 class
     DSdoValidator
@@ -60,8 +63,12 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize(DNode* node);
+    void validate();
 
 private:
+    mu::Parser m_parser;
+    DNode* m_node;
 
 
 

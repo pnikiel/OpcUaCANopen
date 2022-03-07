@@ -54,7 +54,8 @@ DSdoSameIndexGroup::DSdoSameIndexGroup (
     Parent_DSdoSameIndexGroup* parent
 ):
     Base_DSdoSameIndexGroup( config, parent),
-    m_index(std::stoi(config.index(), nullptr, /*base*/ 16))
+    m_index(std::stoi(config.index(), nullptr, /*base*/ 16)),
+    m_name(config.name())
 
     /* fill up constructor initialization list here */
 {
