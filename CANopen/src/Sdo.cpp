@@ -148,7 +148,7 @@ bool SdoEngine::writeExpedited (
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO req!";
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
         return false;
     }
 
