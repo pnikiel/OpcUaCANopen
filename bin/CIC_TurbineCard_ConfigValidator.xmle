@@ -1,4 +1,9 @@
 <SdoValidator name="assertAdcBipolar"
-  assertTrueFormula="aiConfig.mode == 1"
+  assertTrueFormula="aiConfig.mode == 0"
   description="ADC needs bipolar mode for TU">
+</SdoValidator>
+
+<SdoValidator name="assertAdcRange5V"
+  assertTrueFormula="aiConfig.range == 4"
+  description="ADC needs 5V range TU">
 </SdoValidator>
