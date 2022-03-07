@@ -11,7 +11,7 @@
       </d:configRestriction>
       <d:documentation>enforceTrue enables spy mode on all buses declared in the configuration. See FC4.1 for exact documentation of the spy mode feature.</d:documentation>
     </d:configentry>
-    <d:configentry dataType="OpcUa_Double" name="expeditedSdoTimeoutSeconds" defaultValue="1" storedInDeviceObject="true">
+    <d:configentry dataType="OpcUa_Double" name="expeditedSdoTimeoutSeconds" defaultValue="2" storedInDeviceObject="true">
       <d:documentation>
   			Max time between SDO request (from server) and SDO reply (from a CANopen node) that is
   			permissible; otherwise a timeout condition is considered.
