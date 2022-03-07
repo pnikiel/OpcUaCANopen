@@ -334,8 +334,13 @@
       <d:returnvalue dataType="UaString" name="details">
         <d:array/>
       </d:returnvalue>
-      <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
+      <d:returnvalue dataType="OpcUa_Boolean" name="passed"/><d:returnvalue dataType="OpcUa_UInt32"
+      	name="numberOfFailures">
+</d:returnvalue>
     </d:method>
+    <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="failuresNumberLastRun"
+    	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+    </d:cachevariable>
   </d:class>
   <d:class name="MultiplexedChannel">
     <d:devicelogic/>
@@ -426,7 +431,8 @@
     <d:method name="validate" executionSynchronicity="asynchronous">
       <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
     </d:method>
-    <d:configentry dataType="UaString" name="assertTrueFormula"></d:configentry>
+    <d:configentry dataType="UaString" name="assertTrueFormula" storedInDeviceObject="true"/>
+    <d:configentry name="description" dataType="UaString" storedInDeviceObject="true"/>
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>

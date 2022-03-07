@@ -47,7 +47,8 @@ public:
     /* delegators for methods */
     UaStatus callValidate (
         std::vector<UaString>& details,
-        OpcUa_Boolean& passed
+        OpcUa_Boolean& passed,
+        OpcUa_UInt32& numberOfFailures
     ) ;
 
 private:

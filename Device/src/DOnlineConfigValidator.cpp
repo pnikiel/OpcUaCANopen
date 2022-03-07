@@ -72,19 +72,25 @@ DOnlineConfigValidator::~DOnlineConfigValidator ()
 /* delegators for methods */
 UaStatus DOnlineConfigValidator::callValidate (
     std::vector<UaString>& details,
-    OpcUa_Boolean& passed
+    OpcUa_Boolean& passed,
+    OpcUa_UInt32& numberOfFailures
 )
 {
     passed = OpcUa_True; // assume true until some test fails
+    unsigned int numberFailures = 0;
     for (DSdoValidator* sdoValidator : sdovalidators())
     {
         details.push_back(sdoValidator->getFullName().c_str());
         OpcUa_Boolean testPassed;
         sdoValidator->callValidate(testPassed);
         if (!testPassed)
+        {
             passed = OpcUa_False;
+            numberFailures++;
+        }
     }
-    
+    getAddressSpaceLink()->setFailuresNumberLastRun(numberFailures, OpcUa_Good);
+    numberOfFailures = numberFailures; // TODO maybe optimize this one
     return OpcUa_Good;
 }
 

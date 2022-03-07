@@ -64,10 +64,9 @@ private:
 
 public:
     void initialize(DNode* node);
-    void validate();
+    bool validate(std::string* outDescription = nullptr);
 
 private:
-    mu::Parser m_parser;
     DNode* m_node;
 
 

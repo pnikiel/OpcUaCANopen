@@ -26,4 +26,7 @@
 <SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
 
 <!-- we should write the SDO validators to relate to variables! -->
-<SdoValidator name="assertFirmwareVersionMA446" assertTrueFormula="elmbSw.swVersion == 875839821 && elmbSw.swMinorVersion == 909127728" />
+<SdoValidator name="assertFirmwareVersionMA446" 
+  assertTrueFormula="elmbSw.swVersion == 875839821 &amp;&amp; elmbSw.swMinorVersion == 909127728"
+  description="MA446 ELMBio firmware is necessary for having the lost-RTR firmware bug fixed">
+</SdoValidator>

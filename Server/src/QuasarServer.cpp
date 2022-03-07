@@ -416,8 +416,9 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 Device::DOnlineConfigValidator* validator = node->onlineconfigvalidators()[0];
                 std::vector<UaString> testResults;
                 OpcUa_Boolean passed;
-                validator->callValidate(testResults, passed);
-                onlineConfigValidationResult = passed ? "✔" : "✖";
+                OpcUa_UInt32 numberOfFailures;
+                validator->callValidate(testResults, passed, numberOfFailures);
+                onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)"; 
             }
             
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
