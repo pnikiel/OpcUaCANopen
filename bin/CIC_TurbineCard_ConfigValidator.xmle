@@ -1,0 +1,4 @@
+<SdoValidator name="assertAdcBipolar"
+  assertTrueFormula="aiConfig.mode == 1"
+  description="ADC needs bipolar mode for TU">
+</SdoValidator>
