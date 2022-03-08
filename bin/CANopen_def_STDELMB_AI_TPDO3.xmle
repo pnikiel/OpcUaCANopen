@@ -12,6 +12,11 @@
  <SdoVariable subIndex="4" access="RW" dataType="Byte" name="mode" />
 </SdoSameIndexGroup>
 
+<SdoValidator name="assertSyncTransmission"
+  assertTrueFormula="aiTransmit.aiTransmissionType == 1"
+  description="AI_TPDO3 model requires SYNC-based transfer">
+</SdoValidator>
+
 <TpdoMultiplex name="TPDO3" selector="3" transportMechanism="sync">
   <MultiplexedChannelConfigurationGenerator numberOfChannels="64" name="gic">
     <MultiplexedChannel name="specimen" id="1">

@@ -7,3 +7,8 @@
   assertTrueFormula="aiConfig.range == 4"
   description="ADC needs 5V range TU">
 </SdoValidator>
+
+<SdoValidator name="assertRate15Hz"
+  assertTrueFormula="aiConfig.rate == 0"
+  description="15Hz conversion rate is standard for TU ELMBs">
+</SdoValidator>
