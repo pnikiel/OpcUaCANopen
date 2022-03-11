@@ -87,6 +87,9 @@
       <d:configRestriction>
         <d:restrictionByPattern pattern="50k|125k|250k|DontConfigure"/>
       </d:configRestriction>
+      <d:documentation>
+        Bitrate of the CAN interface. The special value <i>DontConfigure</i> indicates preserving the current port state, which is especially useful if elevated privileges would be needed.
+      </d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="spyMode" defaultValue="inheritFromGlobalSettings">
       <d:configRestriction>
@@ -98,7 +101,7 @@
       </d:configRestriction>
       <d:documentation>
     		When activated (i.e. true, or inheriting true from global settings) the server will never
-    		transmit anything on that particular bus and will listen only. This mode is useful
+    		transmit anything on that particular bus and will listen only. This mode is useful for debugging/development. See FC4.1 in Piotr's write-up.
 
     	</d:documentation>
     </d:configentry>
@@ -110,7 +113,10 @@
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_Double" name="nodeGuardInterval" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
-      <d:documentation>The NG interval in seconds for all nodes configured for NodeGuarding. 10 is a typical value.</d:documentation>
+      <d:documentation>
+        The NG interval in seconds for all nodes configured for NodeGuarding. 10 is a typical value.
+        <b>Note the units will be changed to milli-seconds for better compatibility with the classic CANopen OPC-UA server.</b>
+      </d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
     </d:cachevariable>
@@ -169,11 +175,9 @@
     </d:method>
     <d:hasobjects instantiateUsing="configuration" class="Tpdo"/>
     <d:hasobjects instantiateUsing="configuration" class="TpdoMultiplex"/>
-    <d:hasobjects instantiateUsing="configuration" class="Rpdo">
-</d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="Rpdo"/>
     <d:hasobjects instantiateUsing="configuration" class="SdoSameIndexGroup"/>
-    <d:hasobjects instantiateUsing="configuration" class="SdoVariable">
-</d:hasobjects>
+    <d:hasobjects instantiateUsing="configuration" class="SdoVariable"/>
     <d:hasobjects instantiateUsing="design" class="EmergencyParser">
       <d:object name="Emergency"/>
     </d:hasobjects>
@@ -201,6 +205,9 @@
     <d:sourcevariable dataType="OpcUa_UInt32" name="nmtPartialBackwardsCompat" addressSpaceRead="forbidden" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
       <d:documentation>This variable is for ensuring *partial compatibility* with the Slava's CANopen OPCUA server -- see FN4.1 in the Piotr's writeup for docs.</d:documentation>
     </d:sourcevariable>
+    <d:documentation>
+      This class corresponds to a CANopen node. <i>Standard ELMB example: one object of this class corresponds to one ELMB.</i>
+    </d:documentation>
   </d:class>
   <d:class name="EmergencyParser">
     <d:devicelogic/>
@@ -344,8 +351,15 @@
   </d:class>
   <d:class name="MultiplexedChannel">
     <d:devicelogic/>
-    <d:configentry dataType="OpcUa_UInt16" name="id" isKey="true"/>
+    <d:configentry dataType="OpcUa_UInt16" name="id" isKey="true">
+      <d:documentation>
+        CANopen node ID of the node.
+      </d:documentation>
+    </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
+    <d:documentation>
+      A channel that is read-out using multiplexed TPDO. <i>Standard ELMB example: all analog input channels are multiplexed using TPDO3.</i>
+    </d:documentation>
   </d:class>
   <d:class name="ExtractedValue" singleVariableNode="true">
     <d:devicelogic/>
@@ -360,6 +374,9 @@
           <d:enumerationValue value="Int32"/>
         </d:restrictionByEnumeration>
       </d:configRestriction>
+      <d:documentation>
+        DataType which should be used to interprete received data.
+      </d:documentation>
     </d:configentry>
     <d:configentry dataType="OpcUa_Byte" name="offset" storedInDeviceObject="true">
       <d:configRestriction>
@@ -375,10 +392,20 @@
         <d:restrictionByPattern pattern="0|1|2|3|4|5|6|7|-"/>
       </d:configRestriction>
     </d:configentry>
+    <d:documentation>
+      ExtractedValue is used to map fields of TPDOs and multiplexed TPDOs to actual variables, thus providing a bridge between chosen TPDO structure and its address-space counterpart.
+    </d:documentation>
   </d:class>
   <d:class name="MultiplexedChannelConfigurationGenerator">
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
-    <d:configentry dataType="OpcUa_Byte" name="numberOfChannels"/>
+    <d:configentry dataType="OpcUa_Byte" name="numberOfChannels">
+      <d:documentation>
+        How many identical channels should be configured in this multiplex?
+      </d:documentation>
+    </d:configentry>
+    <d:documentation>
+      This class models only the configuration generator for multiplex -- it vanishes for runtime.
+    </d:documentation>
   </d:class>
   <d:class name="SdoSameIndexGroup">
     <d:devicelogic/>
