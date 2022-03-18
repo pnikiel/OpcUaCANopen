@@ -439,7 +439,7 @@ void QuasarServer::signalAction()
     table.set_border_style(FT_BOLD_STYLE);
 
     table << fort::header << "(Bus) Object" << "CAN state" << "#toErr" << "-" << fort::endr;
-    table << fort::header << "(Node) Object" << "CANopen state" << "#Emrg" << "#Boot" << fort::endr;
+    table << fort::header << "(Node) Object" << "CANopen state" << "#Bootups" << "#Emergs" << fort::endr;
 
     
 
