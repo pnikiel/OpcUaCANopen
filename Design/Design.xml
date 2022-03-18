@@ -63,14 +63,16 @@
     <d:hasobjects instantiateUsing="configuration" class="Node"/>
     <d:configentry dataType="UaString" name="provider" storedInDeviceObject="true">
       <d:documentation>CanModule implementation type name.
-			The following known implementations are listed below (note, some implementations are operating system dependent
-			or may be disabled from the build process):
-			<ul><li>sock - Linux only, standard Linux SocketCAN interface. Works with VCAN, Systec (systec_can driver), Peak and other SocketCAN compatible interfaces.</li><li>an - Linux+Windows, Anagate Ethernet-CAN bridges from the Analytica company.</li></ul>
+			  The following known implementations are listed below (note, some implementations are operating system dependent or may be disabled from the build process):
 			</d:documentation>
       <d:configRestriction>
         <d:restrictionByEnumeration>
-          <d:enumerationValue value="sock"/>
-          <d:enumerationValue value="an"/>
+          <d:enumerationValue value="sock">
+            <d:documentation>SocketCAN (Linux only). Supports VCAN (Linux native virtual CAN driver), SysTec (with dedicated drivers, e.g. ATLAS RPMs) and PEAK (with standard drivers) under Linux.</d:documentation>
+          </d:enumerationValue>
+          <d:enumerationValue value="an">
+            <d:documentation>Anagate Ethernet-CAN bridges from the Analytica company (Linux and Windows).</d:documentation>
+          </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
@@ -196,11 +198,18 @@
     <d:configentry dataType="UaString" name="emergencyMappingModel" defaultValue="ELMBio">
       <d:configRestriction>
         <d:restrictionByEnumeration>
-          <d:enumerationValue value="ELMBio"/>
-          <d:enumerationValue value="CANopen"/>
-          <d:enumerationValue value="None"/>
+          <d:enumerationValue value="ELMBio">
+            <d:documentation>Try to parse the emergency using the ELMBio model first, then fall back to CANopen model if necessary.</d:documentation>
+          </d:enumerationValue>
+          <d:enumerationValue value="CANopen">
+            <d:documentation>Parse the emergency messages using the generic CANopen model only.</d:documentation>
+          </d:enumerationValue>
+          <d:enumerationValue value="None">
+            <d:documentation>Do not parse the emergency messages at all (does not publish anything in the <code>lastErrorDescription</code>).</d:documentation>
+          </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
+      <d:documentation>How to parse the emergency objects into their human-readable description?</d:documentation>
     </d:configentry>
     <d:sourcevariable dataType="OpcUa_UInt32" name="nmtPartialBackwardsCompat" addressSpaceRead="forbidden" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
       <d:documentation>This variable is for ensuring *partial compatibility* with the Slava's CANopen OPCUA server -- see FN4.1 in the Piotr's writeup for docs.</d:documentation>
