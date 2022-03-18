@@ -379,6 +379,7 @@
         <d:restrictionByEnumeration>
           <d:enumerationValue value="Boolean"/>
           <d:enumerationValue value="Byte"/>
+          <d:enumerationValue value="UInt16"/>
           <d:enumerationValue value="UInt32"/>
           <d:enumerationValue value="Int32"/>
         </d:restrictionByEnumeration>
