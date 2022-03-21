@@ -381,7 +381,9 @@
           <d:enumerationValue value="Byte"/>
           <d:enumerationValue value="UInt16"/>
           <d:enumerationValue value="UInt32"/>
+          <d:enumerationValue value="Int16"/>
           <d:enumerationValue value="Int32"/>
+          <d:enumerationValue value="Float"/>
         </d:restrictionByEnumeration>
       </d:configRestriction>
       <d:documentation>

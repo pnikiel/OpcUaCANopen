@@ -1,6 +1,8 @@
 #include <CanMessage.h>
 #include <uavariant.h>
 
+#include <Enumerator.hpp>
+
 class ValueMapper
 {
 public:
@@ -8,6 +10,13 @@ public:
         const uint8_t* bytes, 
         size_t size,
         const std::string& dataType, 
+        unsigned int offset, 
+        const std::string& booleanFromBit);
+
+    static UaVariant extractFromBytesIntoVariant (
+        const uint8_t* bytes, 
+        size_t size,
+        Enumerator::ExtractedValue::DataType dataType, 
         unsigned int offset, 
         const std::string& booleanFromBit);
 

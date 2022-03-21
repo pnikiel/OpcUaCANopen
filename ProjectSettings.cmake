@@ -24,7 +24,7 @@ set(ADDITIONAL_BOOST_LIBS filesystem )
 add_definitions(-fPIC)
 
 # Enumerator optional module settings.
-set(ENUMERATOR_SCOPE Node.emergencyMappingModel,Node.stateInfoSource)
+set(ENUMERATOR_SCOPE Node.emergencyMappingModel,Node.stateInfoSource,ExtractedValue.dataType)
 
 include_directories(${PROJECT_SOURCE_DIR}/CalculatedVariables/ext_components/muparser-amalgamated/include)
 

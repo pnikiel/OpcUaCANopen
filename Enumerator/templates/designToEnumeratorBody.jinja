@@ -34,7 +34,18 @@ namespace {{cls}}
         throw std::runtime_error("string invalid for enum parsing ["+input+"]");
 }
 
-//std::string {{configEntry}}ToString ({{configEntry|capFirst}}& input);
+std::string {{configEntry}}ToString ({{configEntry|capFirst}}& input)
+{
+    switch (input)
+    {
+        {% for restriction in restrictions %}
+            case {{restriction[1]}}: return "{{restriction[1]}}";
+        {% endfor %}
+        default:
+            throw std::logic_error("value not handled (this is weird)");
+    };
+}
+
 
 
 };

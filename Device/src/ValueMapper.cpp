@@ -1,5 +1,7 @@
 #include <ValueMapper.h>
 
+using namespace Enumerator::ExtractedValue;
+
 template<typename T>
 //! "primitive cast" is because we don't do any byte-order manipulation here
 static T bytesAsTypePrimitiveCast(const uint8_t* bytes, size_t size, size_t offset)
@@ -28,37 +30,59 @@ UaVariant ValueMapper::extractFromBytesIntoVariant (
     unsigned int offset, 
     const std::string& booleanFromBit)
 {
-    // TODO Certain data types are missing here, e.g. float.
+    Enumerator::ExtractedValue::DataType dataTypeAsEnum (dataTypeFromString(dataType));
+    return extractFromBytesIntoVariant(bytes, size, dataTypeAsEnum, offset, booleanFromBit);
+}
+
+UaVariant ValueMapper::extractFromBytesIntoVariant (
+    const uint8_t* bytes, 
+    size_t size,
+    Enumerator::ExtractedValue::DataType dataType, 
+    unsigned int offset, 
+    const std::string& booleanFromBit)
+{
     UaVariant output;
-    if (dataType == "Int32")
-        output.setInt32(bytesAsTypePrimitiveCast<int32_t>(bytes, size, offset));
-    else if (dataType == "UInt32")
-        output.setUInt32(bytesAsTypePrimitiveCast<uint32_t>(bytes, size, offset));
-    else if (dataType == "Int16")
-        output.setInt16(bytesAsTypePrimitiveCast<int16_t>(bytes, size, offset));
-    else if (dataType == "UInt16")
-        output.setInt16(bytesAsTypePrimitiveCast<uint16_t>(bytes, size, offset));
-    else if (dataType == "Byte")
+    switch(dataType)
     {
-        if (offset > size)
-            throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
-        output.setByte(bytes[offset]);
+        case Boolean:
+            {
+                if (offset > size)
+                throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
+                unsigned char byte = bytes[offset];
+                if (booleanFromBit == "-") // whole word
+                    output.setBoolean(byte != 0);
+                else
+                {
+                    unsigned int bitIndex = std::stoi(booleanFromBit); // TODO: check if we cover all cases!
+                    output.setBoolean(byte & 1<<bitIndex);
+                }
+            }
+            break;
+        case Byte:
+            {
+                if (offset > size)
+                    throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
+                output.setByte(bytes[offset]);
+            }
+            break;
+        case Int16:
+            output.setInt16(bytesAsTypePrimitiveCast<int16_t>(bytes, size, offset));
+            break;
+        case UInt16:
+            output.setUInt16(bytesAsTypePrimitiveCast<uint16_t>(bytes, size, offset));
+            break;
+        case Int32:
+            output.setInt32(bytesAsTypePrimitiveCast<int32_t>(bytes, size, offset));
+            break;
+        case UInt32:
+            output.setUInt32(bytesAsTypePrimitiveCast<uint32_t>(bytes, size, offset));
+            break;
+        case Float:
+            output.setFloat(bytesAsTypePrimitiveCast<float>(bytes, size, offset));
+            break;
+        default:
+            throw std::logic_error("Unknown extraction dataType [" + dataTypeToString(dataType) + "]");
     }
-    else if (dataType == "Boolean")
-    {
-        if (offset > size)
-            throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
-        unsigned char byte = bytes[offset];
-        if (booleanFromBit == "-") // whole word
-            output.setBoolean(byte != 0);
-        else
-        {
-            unsigned int bitIndex = std::stoi(booleanFromBit); // TODO: check if we cover all cases!
-            output.setBoolean(byte & 1<<bitIndex);
-        }
-    }
-    else
-        throw std::logic_error("Unknown extraction dataType [" + dataType + "]");
     return output;
 }
 
