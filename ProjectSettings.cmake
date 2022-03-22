@@ -4,7 +4,7 @@
 ## ----------------------------------------------------
 
 set(CUSTOM_SERVER_MODULES CanModule CANopen Warnings libfort Enumerator)
-set(EXECUTABLE OpcUaServer)
+set(EXECUTABLE CanOpenOpcUa)
 set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan )
 set(SERVER_LINK_LIBRARIES -lsocketcan )
 set(SERVER_LINK_DIRECTORIES  )
@@ -27,6 +27,8 @@ add_definitions(-fPIC)
 set(ENUMERATOR_SCOPE Node.emergencyMappingModel,Node.stateInfoSource,ExtractedValue.dataType)
 
 include_directories(${PROJECT_SOURCE_DIR}/CalculatedVariables/ext_components/muparser-amalgamated/include)
+
+set(CMAKE_PROJECT_HOMEPAGE_URL "https://gitlab.cern.ch/atlas-dcs-opcua-servers/CanOpenOpcUa")
 
 #set(CANMODULE_BUILD_VENDORS ON)
 #set(CANMODULE_BUILD_ANAGATE OFF)
