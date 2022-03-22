@@ -4,14 +4,100 @@
 
 #include <EmergencyErrors.hpp>
 
+// Feature clause: FE1.2: Emergency errors in human readable way (the whole file!)
+
 namespace CANopen
 {
 
-static std::map<uint8_t, std::string> ErrorCodeMsbCANopen = 
+const static std::map<uint8_t, std::string> ErrorCodeMsbCANopen = 
 {
+    /* Check Henk's CANopen for the source */
     {0x00, "Error Reset or No Error"},
-    {0x10, "Generic Error"}
+    {0x10, "Generic Error"},
+
+    {0x20, "Current (generic)"},
+    {0x21, "Current, device input side"},
+    {0x22, "Current, inside the device"},
+    {0x23, "Current, device output side"},
+
+    {0x30, "Voltage (generic)"},
+    {0x31, "Voltage (mains)"},
+    {0x32, "Voltage (inside the device)"},
+    {0x33, "Voltage (output)"},
+
+
+    {0x40, "Temperature (generic)"},
+    {0x41, "Temperature (ambient)"},
+    {0x42, "Temperature (device)"},
+
+    {0x50, "Device hardware"},
+
+    {0x60, "Device software (generic)"},
+    {0x61, "Device software (internal)"},
+    {0x62, "Device software (user)"},
+    {0x63, "Device software (data set)"},
+
+    {0x70, "Additional modules"},
+
+    {0x80, "Monitoring (generic)"},
+    /* 0x81, 0x82 handled as specific subcodes algorithmically below */
+    {0x90, "External error"},
+    {0xF0, "Additional functions"},
+    {0xFF, "Device specific"}
+
 };
+
+bool tryDecodeCANopenEmergency (const CanMessage& msg, std::string& output)
+{
+    uint8_t errorCodeMsb = msg.c_data[1];
+    uint8_t errorCodeLsb = msg.c_data[0];
+
+    try
+    {
+        output = ErrorCodeMsbCANopen.at(errorCodeMsb);
+        return true;
+    }
+    catch(const std::out_of_range& e)
+    {
+        if (errorCodeMsb == 0x81)
+        {
+            switch (errorCodeLsb)
+            {
+                case 0x10:
+                    output = "CAN overrun";
+                    return true;
+                case 0x20:
+                    output = "Error Passive";
+                    return true;
+                case 0x30:
+                    output = "Life Guard Error or Heartbeat Error";
+                    return true;
+                case 0x40:
+                    output = "Recovered from Bus-Off";
+                    return true;
+                default:
+                    return false; // unknown.
+            }
+        }
+        else if (errorCodeMsb == 0x82)
+        {
+            switch (errorCodeLsb)
+            {
+                case 0x10:
+                    output = "Protocol error: PDO not processed due to length error";
+                    return true;
+                case 0x20:
+                    output = "Protocol error: Length exceeded";
+                    return true;
+                default:
+                    return false; // unknown
+            }
+        }
+        else
+            return false;
+    }
+    
+}
 
 bool tryDecodeElmbIoEmergency (const CanMessage& msg, std::string& output)
 {
@@ -141,11 +227,20 @@ std::string decodeEmergencyHumanFriendly(const CanMessage& msg, Enumerator::Node
     {
         if (tryDecodeElmbIoEmergency(msg, output))
             return output;
+        else if (tryDecodeCANopenEmergency(msg, output))
+            return output;
         else
-            0; // TODO: decode CANopen
-
+            return "Unknown code for human-readable resolution";
     }
-    return "?";
+    else if (emergencyMappingModel == Enumerator::Node::EmergencyMappingModel::CANopen)
+    {
+        if (tryDecodeCANopenEmergency(msg, output))
+            return output;
+        else
+            return "Unknown code for human-readable resolution in the chosen model";    
+    }
+    else
+        return "The chosen EmergencyMappingModel [" + Enumerator::Node::emergencyMappingModelToString(emergencyMappingModel) + "] is not able to parse the error";
 }
 
 }
