@@ -4,7 +4,10 @@ project(CanOpenOpcUa HOMEPAGE_URL "https://gitlab.cern.ch/atlas-dcs-opcua-server
 cmake_minimum_required(VERSION 3.10)
 
 set(CPACK_PACKAGE_NAME "CanOpenOpcUa" )
-set(CPACK_PACKAGE_VENDOR "CERN/pnikiel" )
+set(CPACK_PACKAGE_VENDOR "CERN/ATLAS-DCS/pnikiel" )
+set(CPACK_GENERATOR "RPM")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/CanOpenOpcUa")
+set(CPACK_RPM_PACKAGE_NAME "${CPACK_PACKAGE_NAME}" )
 
 # Get type of Linux to not confuse CC7/ C8 RPMs
 execute_process(COMMAND lsb_release -is OUTPUT_VARIABLE lsb_release_id OUTPUT_STRIP_TRAILING_WHITESPACE)
@@ -28,18 +31,18 @@ list(GET versions_dot_sep 0 CPACK_PACKAGE_VERSION_MAJOR)
 list(GET versions_dot_sep 1 CPACK_PACKAGE_VERSION_MINOR)
 list(GET versions_dot_sep 2 CPACK_PACKAGE_VERSION_PATCH)
 
-SET( CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/opt" )
+#SET( CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/opt" )
 
 # post-install stuff
 set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${PROJECT_SOURCE_DIR}/RPM/postinstall.sh)
 
-install(TARGETS CanOpenOpcUa RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+install(TARGETS CanOpenOpcUa RUNTIME DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/bin" )
 install(
   FILES
     ${PROJECT_SOURCE_DIR}/bin/ServerConfig.xml
     ${PROJECT_SOURCE_DIR}/bin/config.xml
-  DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+  DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/bin")
 
-install(FILES ${PROJECT_BINARY_DIR}/Configuration/Configuration.xsd DESTINATION ${CMAKE_INSTALL_PREFIX}/Configuration)
+install(FILES ${PROJECT_BINARY_DIR}/Configuration/Configuration.xsd DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/Configuration" )
 
 include(CPack)
