@@ -203,7 +203,7 @@ void DNode::initialize()
     m_nodeStateEngine.setLoggingName(getFullName());
     m_nodeStateEngine.setNodeGuardingReplyTimeout(DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout());
     if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
-        m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardInterval()); // node guarding interval to be in seconds
+        m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs() / 1000.0); // node guarding interval to be in seconds
     else
         throw std::runtime_error("not-implemented HB");
 

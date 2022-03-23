@@ -96,9 +96,9 @@ DBus::~DBus ()
 
 /* Note: never directly call this function. */
 
-UaStatus DBus::writeNodeGuardInterval ( const OpcUa_Double& v)
+UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
 {
-    return OpcUa_BadNotImplemented;
+    return OpcUa_BadNotImplemented; // TODO
 }
 
 

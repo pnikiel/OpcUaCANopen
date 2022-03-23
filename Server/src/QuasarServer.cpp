@@ -421,7 +421,7 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)"; 
             }
             
-            std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardInterval())) + "s ";
+            std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardIntervalMs())) + "ms ";
             table << node->getFullName() << (unsigned int)node->id() << stateInfo << 
                 sdoBasedInfos[0].result+"."+sdoBasedInfos[1].result << 
                 sdoBasedInfos[2].result << 

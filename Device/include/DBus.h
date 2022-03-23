@@ -52,7 +52,7 @@ public:
     /* delegators for
     cachevariables and sourcevariables */
     /* Note: never directly call this function. */
-    UaStatus writeNodeGuardInterval ( const OpcUa_Double& v);
+    UaStatus writeNodeGuardIntervalMs ( const OpcUa_UInt32& v);
 
 
     /* delegators for methods */
