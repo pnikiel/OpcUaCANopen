@@ -23,7 +23,15 @@
 #include "QuasarServer.h"
 
 int main (int argc, char *argv[])
-{
-	QuasarServer quasarServer ;
-	return quasarServer.startApplication(argc, argv);
+{	
+	try
+	{
+		QuasarServer quasarServer ;
+		return quasarServer.startApplication(argc, argv);
+	}
+	catch(const std::exception& e)
+	{
+		std::cerr << e.what() << '\n';
+	}
+
 }

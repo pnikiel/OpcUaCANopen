@@ -136,6 +136,14 @@ void printLogo()
 QuasarServer::QuasarServer() : BaseQuasarServer()
 {
     printLogo();
+
+    // the check for LittleEndian arch. Reason for that is most ValueMapper algorithms base on this assumption.
+    uint32_t checkWordU32 = 0x12345678;
+    uint8_t* checkPtr = reinterpret_cast<uint8_t*>(&checkWordU32);
+    if (*checkPtr != (checkWordU32 & 0xff))
+    {
+        throw std::runtime_error("It seems that you're running this program on an architecture different from LittleEndian. With current ValueMapping algorithms this would deliver wrong results. Consider contributing or contact Piotr.");
+    }
 }
 
 QuasarServer::~QuasarServer()
