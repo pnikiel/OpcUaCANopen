@@ -134,10 +134,10 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         return;
     }
 
-    if (msg.c_dlc != 1)
+    if (msg.c_dlc < 1)
     {
         SPOOKY(m_nodeAddressForDebug) << " CANopen protocol violation, received NMT reply and the data size is " << wrapValue(std::to_string(msg.c_dlc)) << 
-            " (should be 1)" << SPOOKY_;
+            " (should be 1+)" << SPOOKY_;
         return;
     }
     if (msg.c_data[0] == 0)
