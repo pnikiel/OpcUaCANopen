@@ -1,37 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='ASCII'?>
 <!DOCTYPE configuration [
-
-        <!ENTITY STDELMB_FOUNDATIONS SYSTEM "CANopen_def_STDELMB_FOUNDATIONS.xmle">
-        <!ENTITY STDELMB_DI_TPDO1_C SYSTEM "CANopen_def_STDELMB_DI_TPDO1_C.xmle">
-        <!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
-        ]>
-<configuration xmlns="http://cern.ch/quasar/Configuration"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://cern.ch/quasar/Configuration ../Configuration/Configuration.xsd ">
+<!ENTITY STDELMB_FOUNDATIONS SYSTEM "CANopen_def_STDELMB_FOUNDATIONS.xmle">
+<!ENTITY STDELMB_DI_TPDO1_C SYSTEM "CANopen_def_STDELMB_DI_TPDO1_C.xmle">
+<!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
+]>
+<configuration xmlns="http://cern.ch/quasar/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://cern.ch/quasar/Configuration ../Configuration/Configuration.xsd ">
 	<StandardMetaData>
 		<Log>
 			<ComponentLogLevels>
-				<ComponentLogLevel logLevel="ERR" componentName="CanModule" />
-				<ComponentLogLevel
-					logLevel="INF" componentName="CalcVars" />
-				<ComponentLogLevel logLevel="TRC" componentName="Sdo" />
+				<ComponentLogLevel logLevel="ERR" componentName="CanModule"/>
+				<ComponentLogLevel logLevel="INF" componentName="CalcVars"/>
+				<ComponentLogLevel logLevel="TRC" componentName="Sdo"/>
 			</ComponentLogLevels>
 		</Log>
 	</StandardMetaData>
-	<GlobalSettings name="GlobalSettings"  />
-	<Bus name="bus1" provider="sock" port="vcan0" nodeGuardInterval="10" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings">
+	<GlobalSettings name="GlobalSettings"/>
+	<Bus name="bus1" provider="sock" port="vcan0" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings" nodeGuardIntervalMs="10000">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;
 			&STDELMB_DI_TPDO1_C;
       			&STDELMB_AI_TPDO3;
-			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R" />
+			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R"/>
 		</Node>
 
 		<Node name="elmb2" requestedState="OPERATIONAL" id="2" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;
 			&STDELMB_DI_TPDO1_C;
       			&STDELMB_AI_TPDO3;
-			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R" />
+			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R"/>
 		</Node>
 	</Bus>
 
