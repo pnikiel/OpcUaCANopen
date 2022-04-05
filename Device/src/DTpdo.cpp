@@ -121,6 +121,7 @@ UaStatus DTpdo::writeInvokeRtr (
     // Note: "value" is not relevant; we use this function to invoked action(s) from WinCC OA.
     // Feature clause FP6.2: RTR and initialization of on-change data (invoking on request)
     this->sendRtr(); // TODO If in spy mode, mention it, also catch potential exceptions.
+    m_numRtrsInvokedAddressSpace++; // safe increase is assured by quasar mutex on this quasar variable (see Design)
     return OpcUa_Good;
 }
 
