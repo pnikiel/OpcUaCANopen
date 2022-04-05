@@ -274,4 +274,9 @@ void DBus::shutDown()
     m_canAccess->stopBus();
 }
 
+void DBus::getStatistics(CanModule::CanStatistics& statistics) const
+{
+    m_canAccess->getStatistics(statistics);
+}
+
 }

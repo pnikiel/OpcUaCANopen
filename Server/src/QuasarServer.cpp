@@ -446,11 +446,8 @@ void QuasarServer::signalAction()
     fort::char_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
-    table << fort::header << "(Bus) Object" << "CAN state" << "#toErr" << "-" << fort::endr;
-    table << fort::header << "(Node) Object" << "CANopen state" << "#Bootups" << "#Emergs" << fort::endr;
-
-    
-
+    table << fort::header << "(Bus) Object" << "CAN state" << "#toErr" << "txRate" << "rxRate" << "#totalTx" << "#totalRx" << fort::endr;
+    table << fort::header << "(Node) Object" << "CANopen state" << "#Bootups" << "#Emergs" << "-" << "-" << "-" << fort::endr;
 
     std::cout << std::endl
               << Quasar::TermColors::ForeGreen() << "*** Ctrl-Z: list info ***" << Quasar::TermColors::StyleReset() 
@@ -465,14 +462,19 @@ void QuasarServer::signalAction()
         }
         else
             portErrorStr = "?"; // from null
-        table << "(Bus) " + bus->getFullName() << portErrorStr << bus->getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() << fort::endr;
+        
+        CanModule::CanStatistics statistics;
+        bus->getStatistics(statistics);
+
+        table << "(Bus) " + bus->getFullName() << portErrorStr << bus->getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() << 
+            statistics.txRate () << statistics.rxRate() << statistics.totalTransmitted() << statistics.totalReceived() <<  fort::endr;
         for (Device::DNode *node : bus->nodes())
         {
             table << 
                 "---> " + node->getFullName() << 
                 CANopen::stateEnumToText(node->nodeStateEngine().currentState()) <<
                 node->getAddressSpaceLink()->getBootupCounter() << 
-                node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << fort::endr;
+                node->emergencyparsers()[0]->getAddressSpaceLink()->getEmergencyErrorCounter() << "-" << "-" << "-" << fort::endr;
             
             table[table.cur_row()-1][1].set_cell_content_text_style(fort::text_style::bold);
             if (node->nodeStateEngine().currentState() == CANopen::NodeState::DISCONNECTED)

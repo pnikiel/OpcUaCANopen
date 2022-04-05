@@ -84,6 +84,8 @@ public:
 
     void addBusErrorNotification(BusErrorNotification notification) { m_busErrorNotifications.push_back(notification); }
 
+    void getStatistics(CanModule::CanStatistics& statistics) const;
+
 private:
     GhostPointer<CanModule::CCanAccess> m_canAccess;
 
