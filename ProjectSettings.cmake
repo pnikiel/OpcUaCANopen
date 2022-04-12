@@ -6,7 +6,7 @@
 set(CUSTOM_SERVER_MODULES CanModule CANopen Warnings libfort Enumerator)
 set(EXECUTABLE CanOpenOpcUa)
 set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan )
-set(SERVER_LINK_LIBRARIES -lsocketcan )
+set(SERVER_LINK_LIBRARIES /usr/local/lib/libsocketcan.a )
 set(SERVER_LINK_DIRECTORIES  )
 
 ##
