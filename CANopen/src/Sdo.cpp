@@ -24,7 +24,9 @@ static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
 
 SdoEngine::SdoEngine (MessageSendFunction messageSendFunction, unsigned char nodeId):
 m_sendFunction(messageSendFunction),
-m_nodeId(nodeId)
+m_nodeId(nodeId),
+m_replyCame(false),
+m_replyExpected(false)
 {
 
 }
