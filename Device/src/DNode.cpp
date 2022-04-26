@@ -253,7 +253,28 @@ void DNode::onMessageReceived (const CanMessage& msg)
         case 0x9: // TPDO4
             onTpdoReceived(msg); break; 
 
-        case 0xb: m_sdoEngine.replyCame(msg); break;
+        case 0xb: // CobId 0x580...
+        {
+            if (getParent()->isInSpyMode())
+            {
+                LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+            }
+            else
+                m_sdoEngine.replyCame(msg);
+        }
+            break;
+
+        case 0xc: // CobId 0x600...
+        {
+            if (getParent()->isInSpyMode())
+            {
+                LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+            }
+            else
+                SPOOKY(getFullName()) << " SDO request is seen ... hmm ... another host on the bus. It's BAD!";
+        }
+            break;
+
         // various NMts
         case 0xe: m_nodeStateEngine.onNodeManagementReplyReceived(msg); break;
         
