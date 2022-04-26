@@ -93,24 +93,24 @@
   </ThreadPoolSettings>
 
   <!--Build information for the server application software-->
-  <ApplicationUri>urn:CERN:QuasarOpcUaServer</ApplicationUri>
-  <ManufacturerName>CERN</ManufacturerName>
-  <ApplicationName>OPC UA SERVER</ApplicationName>
+  <ApplicationUri>urn:CERN:CanOpenOpcUa</ApplicationUri>
+  <ManufacturerName>CERN(pnikiel)</ManufacturerName>
+  <ApplicationName>CANopen OPC UA SERVER</ApplicationName>
   <SoftwareVersion>1.0.0</SoftwareVersion>
   <BuildNumber>000</BuildNumber>
   <!--Build information end-->
 
   <!--Server instance information defined for the server installation.
       [NodeName} can be used as placeholder for the computer name. -->
-  <ServerUri>urn:[NodeName]:CERN:QuasarOpcUaServer</ServerUri>
-  <ServerName>OpcUaServer@[NodeName]</ServerName>
+  <ServerUri>urn:[NodeName]:CERN:CanOpenOpcUa</ServerUri>
+  <ServerName>CanOpen@[NodeName]</ServerName>
   <!--Server instance information end-->
 
   <!--Endpoint configuration
       This part of the configuration defines the OPC UA communication endpoints
       for the server and their security configurations-->
   <!--Folder used to store rejected client certificates. Administrators can copy files from here to the trust list.-->
-  <RejectedCertificatesDirectory>[ApplicationPath]/PKI/CA/rejected</RejectedCertificatesDirectory>
+  <RejectedCertificatesDirectory>/localdisk/tmp/PKI/CA/rejected</RejectedCertificatesDirectory>
   <!--List of configured Endpoints end-->
   <UaEndpoint>
     <SerializerType>Binary</SerializerType>
@@ -129,12 +129,12 @@
         Different Endpoints can have different stores and different server certificates.-->
     <CertificateStore>
       <!--File based certificate store used with OpenSSL
-          [ApplicationPath] can be used as placeholder for the application path. -->
+          /localdisk/tmp can be used as placeholder for the application path. -->
       <OpenSSLStore>
-        <CertificateTrustListLocation>[ApplicationPath]/PKI/CA/certs/</CertificateTrustListLocation>
-        <CertificateRevocationListLocation>[ApplicationPath]/PKI/CA/crl/OpcUaServer.crl</CertificateRevocationListLocation>
-        <ServerCertificate>[ApplicationPath]/PKI/CA/certs/OpcUaServer.der</ServerCertificate>
-        <ServerPrivateKey>[ApplicationPath]/PKI/CA/private/OpcUaServer.pem</ServerPrivateKey>
+        <CertificateTrustListLocation>/localdisk/tmp/PKI/CA/certs/</CertificateTrustListLocation>
+        <CertificateRevocationListLocation>/localdisk/tmp/PKI/CA/crl/CanOpenOpcUa.crl</CertificateRevocationListLocation>
+        <ServerCertificate>/localdisk/tmp/PKI/CA/certs/CanOpenOpcUa.der</ServerCertificate>
+        <ServerPrivateKey>/localdisk/tmp/PKI/CA/private/CanOpenOpcUa.pem</ServerPrivateKey>
       </OpenSSLStore>
       <!--Windows based certificate store.
         - <StoreLocation> location of the store. Valid values are LocalMachine and CurrentUser
@@ -189,7 +189,7 @@
     <AutomaticCertificateExchange>true</AutomaticCertificateExchange>
     <!--File name and path of the discovery server certificate to be stored in a file based sever trust list
         This parameter is ignored if the Windows certificate store is used for the first configured endpoint -->
-    <DiscoveryServerCertificateFile>[ApplicationPath]/PKI/CA/certs/LocalDiscoveryServer.der</DiscoveryServerCertificateFile>
+    <DiscoveryServerCertificateFile>/localdisk/tmp/PKI/CA/certs/LocalDiscoveryServer.der</DiscoveryServerCertificateFile>
     <!--Store name used for the local discovery server in the windows certificate store -->
     <DiscoveryServerStoreName>UA Applications</DiscoveryServerStoreName>
     <!--Certificate name of the local discovery server in the windows certificate store -->
