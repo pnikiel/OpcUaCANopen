@@ -97,6 +97,8 @@ namespace CANopen
 
         const bool m_inSpyMode;
 
+        unsigned int m_stefansNgGraceCounter;
+
     };
 
 }

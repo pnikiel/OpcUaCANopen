@@ -39,7 +39,8 @@ NodeStateEngine::NodeStateEngine(
     m_nodeGuardingReplyTimeoutMs(1000),
     m_messageSendFunction(messageSendFunction),
     m_lastToggleBit(DUNNO),
-    m_inSpyMode(inSpyMode)
+    m_inSpyMode(inSpyMode),
+    m_stefansNgGraceCounter(0)
 {
     // if (m_nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
     //     throw std::runtime_error("NodeGuarding Reply Timeout *must be* smaller that NodeGuarding interval");
@@ -94,10 +95,16 @@ void NodeStateEngine::checkNodeGuardingTimeout(unsigned int millisecondsSinceLas
     {
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE;
         
+        m_stefansNgGraceCounter++;
+
         LOG(Log::DBG, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
-            wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request.";
-        m_currentState = NodeState::DISCONNECTED;
-        notifyState(1, NodeState::DISCONNECTED);
+            wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request. (Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
+        
+        if (m_stefansNgGraceCounter > 3)
+        {
+            m_currentState = NodeState::DISCONNECTED;
+            notifyState(1, NodeState::DISCONNECTED);
+        }
     }
 }
 
@@ -151,6 +158,8 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         }
         else
             m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE; // we're awaiting reply, so now we got it.
+
+        m_stefansNgGraceCounter=0;
 
         // Feature FN1.1.2
         // TODO implement actual NG reply logic
