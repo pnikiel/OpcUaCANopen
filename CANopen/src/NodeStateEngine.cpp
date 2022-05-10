@@ -100,6 +100,7 @@ void NodeStateEngine::checkNodeGuardingTimeout(unsigned int millisecondsSinceLas
         LOG(Log::DBG, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
             wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request. (Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
         
+        // Feature clause FN1.1.3: Grace for node guarding replies
         if (m_stefansNgGraceCounter > 3)
         {
             m_currentState = NodeState::DISCONNECTED;
