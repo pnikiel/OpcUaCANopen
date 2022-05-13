@@ -5,9 +5,9 @@
 
 set(CUSTOM_SERVER_MODULES CanModule CANopen Warnings libfort Enumerator)
 set(EXECUTABLE CanOpenOpcUa)
-set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan )
-set(SERVER_LINK_LIBRARIES /usr/local/lib/libsocketcan.a )
-set(SERVER_LINK_DIRECTORIES  )
+set(SERVER_INCLUDE_DIRECTORIES CanModule/CanInterfaceImplementations/sockcan "/det/dcs/Development/pnikiel/PiotrsLibs/include" )
+set(SERVER_LINK_LIBRARIES /usr/local/lib/libsocketcan.a -lpaho-mqttpp3 -lpaho-mqtt3a )
+set(SERVER_LINK_DIRECTORIES /usr/local/lib64 "/det/dcs/Development/pnikiel/PiotrsLibs/lib64/" )
 
 ##
 ## If ON, in addition to an executable, a shared object will be created.

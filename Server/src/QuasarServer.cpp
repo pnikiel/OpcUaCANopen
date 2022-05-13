@@ -23,10 +23,12 @@
 #include <signal.h>
 #include <thread>
 #include <iomanip>
+#include <stdlib.h>
 
 #include "QuasarServer.h"
 #include <LogIt.h>
 #include <shutdown.h>
+#include <PiotrsCentralLogging.hpp>
 
 
 #include <fort.hpp>
@@ -218,6 +220,9 @@ void QuasarServer::initializeLogIt()
     BaseQuasarServer::initializeLogIt();
     for (auto &logComponent : LogComponents)
         logComponent.handle = Log::registerLoggingComponent(logComponent.name);
+    PiotrsCentralLogging* sink = new PiotrsCentralLogging(); // maybe we pass some settings here?
+    sink->initialize();
+    LogItInstance::getInstance()->m_logSinksInstance.addSink(sink);
     LOG(Log::INF) << "Logging initialized.";
 }
 
