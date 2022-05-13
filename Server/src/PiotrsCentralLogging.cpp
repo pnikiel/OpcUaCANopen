@@ -23,7 +23,11 @@ bool PiotrsCentralLogging::initialize()
     options.set_automatic_reconnect(true);
     options.set_automatic_reconnect(1, 10); // no more than 10 secs for reconnect attempt
 
-    m_mqttClient = new mqtt::client(m_configuration.mqttBrokerHostName, "piotrs_srvr");
+    
+    char hostname_ch [128];
+    gethostname (hostname_ch, sizeof hostname_ch -1);
+
+    m_mqttClient = new mqtt::client(m_configuration.mqttBrokerHostName, std::string(hostname_ch)+":"+std::to_string(getpid()));
     m_mqttClient->connect(options);
 
     m_dispatcher = std::thread(&PiotrsCentralLogging::dispatchThread, this);
