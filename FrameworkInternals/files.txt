@@ -13,7 +13,7 @@
             },
             "CMakeLists.txt": {
                 "install": "overwrite",
-                "md5": "ae06392fde8e0b07ef61d615ecc6e512",
+                "md5": "62f8a799bbfbc7a19616e31fa251a6e8",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -166,7 +166,7 @@
                 "use_defaults": "file_defaults_of_directory"
             },
             "designToClassBody.jinja": {
-                "md5": "9d5fdf73221b8c8e618e26dcb1cce041",
+                "md5": "b52632d556b6bcbcda065add80a974a5",
                 "use_defaults": "file_defaults_of_directory"
             },
             "designToClassHeader.jinja": {
@@ -411,7 +411,7 @@
         },
         "files": {
             "designToConfigDocumentationHtml.jinja": {
-                "md5": "d83dafe6d98c62c6e88f97a542253399",
+                "md5": "9172a8fc650a5446b0ec8dff9c6582e3",
                 "use_defaults": "file_defaults_of_directory"
             },
             "designToConfigValidator.jinja": {
@@ -419,7 +419,7 @@
                 "use_defaults": "file_defaults_of_directory"
             },
             "designToConfigurationXSD.jinja": {
-                "md5": "e7cfd2739428181ed49985f014f57b47",
+                "md5": "98eb51e5ad724dfc424db17043faeed1",
                 "use_defaults": "file_defaults_of_directory"
             },
             "designToConfigurator.jinja": {
@@ -441,7 +441,7 @@
             },
             "Design.xsd": {
                 "install": "overwrite",
-                "md5": "7b2c2e1046b1c1b554756d845f670def",
+                "md5": "ae6501907f3f7f905fdfb7577e3f0c64",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -456,7 +456,7 @@
             },
             "quasarVersion.txt": {
                 "install": "overwrite",
-                "md5": "1492a5f19a61460cfa10a01f60f1b661",
+                "md5": "0cb5dc4bf16e84b4b635e5d3ae0335c8",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -580,7 +580,7 @@
             },
             "ChangeLog.html": {
                 "install": "overwrite",
-                "md5": "a4f72a816602c7eb712d832d8803b8b9",
+                "md5": "a07c5941a5ce12dad6b878a7d4cb7184",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -626,13 +626,13 @@
             },
             "quasar.html": {
                 "install": "overwrite",
-                "md5": "91504bae8efd563aa1675c690acce04b",
+                "md5": "3f2a75d0ef8aa34f7eae7c6c812dc180",
                 "must_be_versioned": true,
                 "must_exist": true
             },
             "quasarCommands.html": {
                 "install": "overwrite",
-                "md5": "b8ac609abc4854cd2aef3d89c5d6ccd3",
+                "md5": "b0ef9a8041a0d8f98b7f47358f7ae5fe",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -690,7 +690,7 @@
             },
             "DesignValidator.py": {
                 "install": "overwrite",
-                "md5": "b796fafc1fb2372940caab17d006bb7c",
+                "md5": "4d55d3bc7bb36794ba7ff3f2f1595597",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -800,7 +800,7 @@
             },
             "manage_files.py": {
                 "install": "overwrite",
-                "md5": "2764cbc6e0363c397c398869b4fe4dd0",
+                "md5": "7f14b1477833dda343410aa75042e512",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -818,7 +818,7 @@
             },
             "quasarCommands.py": {
                 "install": "overwrite",
-                "md5": "e24d551e7aa34f66c65e63b83ecd9a50",
+                "md5": "eebcfd52f05613ea164f379a29ceefb2",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -1285,7 +1285,7 @@
             },
             "QuasarVersion.h": {
                 "install": "overwrite",
-                "md5": "6cd51886ab55bfaa9e8e5c37ec7f2255",
+                "md5": "ef6ef84d9f2439f67cb1d32ccad1d004",
                 "must_be_versioned": true,
                 "must_exist": true
             },
@@ -1388,7 +1388,7 @@
             },
             "ServerConfig.xsd": {
                 "install": "overwrite",
-                "md5": "1b515543edbb1a1d1cc9650971685288",
+                "md5": "12215455a645f4e8e69d8c4e520d9150",
                 "must_be_versioned": true,
                 "must_exist": true
             },
