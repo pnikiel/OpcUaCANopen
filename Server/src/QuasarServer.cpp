@@ -395,6 +395,7 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
     {
         for (Device::DNode *node : bus->nodes())
         {
+            bool assumeSuccessful = true;
             struct SdoBasedInfo
             {
                 uint16_t index;
@@ -414,19 +415,29 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 else
                 {
                     if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
+                    {
+                        assumeSuccessful = false;
                         break;
+                    }
                 }
             }
 
             std::string onlineConfigValidationResult ("no-tests-defined");
             if (node->onlineconfigvalidators().size() == 1)
             {
-                Device::DOnlineConfigValidator* validator = node->onlineconfigvalidators()[0];
-                std::vector<UaString> testResults;
-                OpcUa_Boolean passed;
-                OpcUa_UInt32 numberOfFailures;
-                validator->callValidate(testResults, passed, numberOfFailures);
-                onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)"; 
+                if (assumeSuccessful)
+                {
+                    Device::DOnlineConfigValidator* validator = node->onlineconfigvalidators()[0];
+                    std::vector<UaString> testResults;
+                    OpcUa_Boolean passed;
+                    OpcUa_UInt32 numberOfFailures;
+                    validator->callValidate(testResults, passed, numberOfFailures);
+                    onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)"; 
+                }
+                else
+                {
+                    onlineConfigValidationResult = "✖ (skipped)";
+                }
             }
             
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardIntervalMs())) + "ms ";
