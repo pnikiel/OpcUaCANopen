@@ -116,7 +116,7 @@ UaStatus DSdoVariable::readValue (
         m_index, 
         m_subIndex, 
         readData, 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds());
     if (!status)
         return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
@@ -162,7 +162,7 @@ UaStatus DSdoVariable::writeValue (
         m_index, 
         m_subIndex, 
         bytes, 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoTimeoutSeconds());    
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds());    
     return status ? OpcUa_Good : OpcUa_Bad;
 }
 
