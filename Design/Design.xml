@@ -117,9 +117,11 @@
     	</d:documentation>
     </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Int16" name="portError" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-		</d:cachevariable>
+      <d:documentation>Zero when port is believed to be in perfect operational condition (equivalent to OK in CAN status) and non-zero for ERROR_ACTIVE, ERROR_PASSIVE, BUS_OFF or their variants. Null when provider or port does not support or can't report its state (e.g. for VCAN interface).</d:documentation>
+    </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-		</d:cachevariable>
+      <d:documentation>Textual description of the port status; might be provider-dependent.</d:documentation>
+    </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="regular">
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
     </d:cachevariable>
@@ -129,14 +131,23 @@
       </d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>
+        Number of CAN frames transmitted by the server in the observation period.
+      </d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalReceived" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>
+        Number of CAN frames received by the server in the observation period.
+      </d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsTxRate" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>TX rate in frames/sec.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Double" name="statsRxRate" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>RX rate in frames/sec.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTransitionsIntoErrorCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
+      <d:documentation>How many times this bus went into error state?</d:documentation>
     </d:cachevariable>
   </d:class>
   <d:class name="Node">
@@ -156,7 +167,7 @@
       <d:documentation>CANopen state of the node understood as what node-guarding returns (toggling is not filtered out).</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="stateNoToggle" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-      <d:documentation>TODO me ;-)</d:documentation>
+      <d:documentation>State with the toggle bit filtered out.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="stateAsText" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
       <d:documentation>CANopen state, enhanced with DISCONNECTED and UNKNOWN state, shown as text, one of:
@@ -202,6 +213,7 @@
       </d:configRestriction>
     </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="stateToggleViolationCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
+      <d:documentation>Increments every time a state violation happens, which helps to identify ELMBs with firmware or connectivity issues.</d:documentation>
     </d:cachevariable>
     <d:configentry dataType="UaString" name="emergencyMappingModel" defaultValue="ELMBio">
       <d:configRestriction>
@@ -230,7 +242,10 @@
     <d:devicelogic/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt16" name="lastErrorCode" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="lastErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-</d:cachevariable>
+      <d:documentation>
+        Human-readable description of the last emergency error, depending on the chosen emergency mapping model.
+      </d:documentation>
+    </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorRegister" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte3" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte4" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
@@ -238,8 +253,14 @@
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte6" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_Byte" name="lastErrorByte7" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="emergencyErrorCounter" nullPolicy="nullForbidden" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good" initialValue="0">
-</d:cachevariable>
+      <d:documentation>
+        Increments on every emergency message received from the node.
+      </d:documentation>
+    </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="lastEmergencyErrorBundle" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData" initialValue="">
+      <d:documentation>
+        A string representation of the whole emergency object. For example <verbatim>0x5000|90|1|2c|0|0|80|</verbatim>.
+      </d:documentation>
     </d:cachevariable>
   </d:class>
   <d:class name="Tpdo">
@@ -269,6 +290,7 @@
     <d:sourcevariable dataType="OpcUa_UInt32" name="invokeRtr" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="of_containing_object" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
       <d:documentation>Writing to this variable invokes the RTR for this TPDO. It is a compatibility mode for WinCC OA which can not do method calls. Reading from this variable returns number of times the RTR was invoked in this way.</d:documentation>
     </d:sourcevariable>
+    <d:documentation>Corresponds to one non-multiplexed TPDO object.</d:documentation>
   </d:class>
   <d:class name="TpdoMultiplex">
     <d:devicelogic/>
@@ -317,6 +339,7 @@
       </d:configRestriction>
     </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaByteString" name="cache" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good">
+      <d:documentation>Presents current cached value of the Rpdo as the whole CANopen communication object. Primary use is debugging.</d:documentation>
     </d:cachevariable>
     <d:hasobjects instantiateUsing="configuration" class="RpdoCachedVariable"/>
   </d:class>
@@ -364,6 +387,7 @@
     </d:method>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="failuresNumberLastRun"
     	nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
+      <d:documentation>Presents the number of failures experienced in the last run of the validator. Can be used to set an alert on it.</d:documentation>
     </d:cachevariable>
   </d:class>
   <d:class name="MultiplexedChannel">
@@ -381,7 +405,10 @@
   <d:class name="ExtractedValue" singleVariableNode="true">
     <d:devicelogic/>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaVariant" name="value" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
-  	</d:cachevariable>
+  	  <d:documentation>
+        Value extracted from CAN frame is placed here. 
+      </d:documentation>
+    </d:cachevariable>
     <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
       <d:configRestriction>
         <d:restrictionByEnumeration>
@@ -435,6 +462,7 @@
         <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
       </d:configRestriction>
     </d:configentry>
+    <d:documentation>Convenience class to group all SDOs with the same object index.</d:documentation>
   </d:class>
   <d:class name="SdoVariable" singleVariableNode="true">
     <d:devicelogic/>
@@ -470,8 +498,8 @@
         <d:restrictionByPattern pattern="0|1|2|3|4|5|6|7|-"/>
       </d:configRestriction>
     </d:configentry>
-    <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no">
-</d:sourcevariable>
+    <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no"/>
+    <d:documentation>A variable that corresponds to one object dictionary entry.</d:documentation>
   </d:class>
   <d:class name="SdoValidator">
     <d:devicelogic/>
