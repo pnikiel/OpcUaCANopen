@@ -27,6 +27,7 @@ add_library (Server OBJECT
 	src/QuasarServer.cpp
 	src/QuasarUaTraceHook.cpp
 	src/CtrlZTable.cpp
+	src/ConfigurationProcessing.cxx
 )
 # Ensure that this module is built as the very last one.
 add_dependencies( Server ${SERVER_MODULES} ) 
