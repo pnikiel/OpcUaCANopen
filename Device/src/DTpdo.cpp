@@ -63,10 +63,11 @@ DTpdo::DTpdo (
     Parent_DTpdo* parent
 ):
     Base_DTpdo( config, parent),
-    m_onSync( config.transportMechanism() == "sync" ),
+    m_onSync( config.transportMechanism() == "sync" ), // TODO this is to be moved to tranpsport mechanism enum
     m_firstIteration(true),
     m_receivedCtrSinceLastSync (0),
-    m_numRtrsInvokedAddressSpace (0)
+    m_numRtrsInvokedAddressSpace (0),
+    m_transportMechanism(Enumerator::Tpdo::transportMechanismFromString(config.transportMechanism()))
 
     /* fill up constructor initialization list here */
 {
@@ -184,6 +185,19 @@ void DTpdo::notifyBusError ()
 {
     for (DExtractedValue* extractedValue : extractedvalues())
         extractedValue->notifyBusError();
+}
+
+void DTpdo::tick()
+{
+    if (m_transportMechanism == Enumerator::Tpdo::asyncPeriodicRtrWithRequests)
+    {
+        unsigned int msPassed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_lastPeriodicRtr).count();
+        if (msPassed > 61000) // TODO: make configurable and put into global settings ?
+        {
+            this->sendRtr(); // of course, after the delay.
+            m_lastPeriodicRtr = std::chrono::steady_clock::now();
+        }
+    }
 }
 
 }

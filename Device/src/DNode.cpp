@@ -327,6 +327,8 @@ void DNode::onTpdoReceived (const CanMessage& msg)
 void DNode::tick()
 {
     m_nodeStateEngine.tick();
+    for (DTpdo* tpdo : tpdos())
+        tpdo->tick();
 }
 
 

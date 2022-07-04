@@ -26,6 +26,7 @@
 #include <CanMessage.h>
 
 #include <Base_DTpdo.h>
+#include <Enumerator.hpp>
 
 namespace Device
 {
@@ -78,17 +79,22 @@ public:
     //! To be called when the bus goes down
     void notifyBusError ();
 
+    void tick(); // periodic trigger, here mostly to trigger the periodic RTR feature.
+
 private:
     // sends RTR corresponding to this TPDO
     void sendRtr();
     bool m_onSync;
     bool m_firstIteration;
+    Enumerator::Tpdo::TransportMechanism m_transportMechanism;
 
     unsigned int m_receivedCtrSinceLastSync;
 
     std::mutex m_accessLock;
 
     unsigned int m_numRtrsInvokedAddressSpace;
+
+    std::chrono::steady_clock::time_point m_lastPeriodicRtr;
 
 };
 

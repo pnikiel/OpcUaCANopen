@@ -20,7 +20,7 @@
   <SdoVariable subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
 </SdoSameIndexGroup>
 
-<Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">
+<Tpdo name="TPDO1" selector="1" transportMechanism="asyncPeriodicRtrWithRequests">
   <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />
   <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_F_1" offset="0" />
   <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_F_2" offset="0" />
