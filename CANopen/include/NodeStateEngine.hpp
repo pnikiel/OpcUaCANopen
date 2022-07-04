@@ -34,8 +34,7 @@ namespace CANopen
             StateInfoModel stateInfoModel,
             NodeState initialRequestedState,
             const std::string& nodeAddressForDebug,
-            MessageSendFunction messageSendFunction,
-            bool inSpyMode);
+            MessageSendFunction messageSendFunction);
 
         //! Expected to be called by the stack somehow regularly (every second).
         void tick();
@@ -45,6 +44,7 @@ namespace CANopen
 
         void setLoggingName(const std::string& name) { m_nodeAddressForDebug = name; }
         void setNodeGuardingReplyTimeout(float seconds) { m_nodeGuardingReplyTimeoutMs = 1000.0 * seconds; }
+        void setIsInSpyMode(bool spyMode) { m_inSpyMode = spyMode; }
 
         void setStateInfoPeriod (float seconds);
 
@@ -95,7 +95,7 @@ namespace CANopen
         ToggleBit m_lastToggleBit; 
         StateToggleViolationNotification m_toggleViolationNotification;
 
-        const bool m_inSpyMode;
+        bool m_inSpyMode;
 
         unsigned int m_stefansNgGraceCounter;
 

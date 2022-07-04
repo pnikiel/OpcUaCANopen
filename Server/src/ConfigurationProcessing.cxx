@@ -1,8 +1,10 @@
+// @author pnikiel
+// note: this is spawned out from QuasarServer.
+
 #include <ConfigurationProcessing.hxx>
 #include <ConfigurationDecorationUtils.h>
 #include <LogIt.h>
 #include <Warnings.hxx>
-
 
 using namespace Configuration;
 
