@@ -82,8 +82,7 @@ DNode::DNode (
             m_stateInfoModel,
             CANopen::textToStateEnum(config.requestedState()), /* initial requested state */
             getFullName(), /* ID for logging */
-            std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1),
-            parent->isInSpyMode()),
+            std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1)),
         m_emergencyMappingModel(Enumerator::Node::emergencyMappingModelFromString(config.emergencyMappingModel()))
 
     /* fill up constructor initialization list here */
@@ -201,6 +200,7 @@ UaStatus DNode::callReset (
 void DNode::initialize()
 {
     m_nodeStateEngine.setLoggingName(getFullName());
+    m_nodeStateEngine.setIsInSpyMode(getParent()->isInSpyMode());
     m_nodeStateEngine.setNodeGuardingReplyTimeout(DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout());
     if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
         m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs() / 1000.0); // node guarding interval to be in seconds

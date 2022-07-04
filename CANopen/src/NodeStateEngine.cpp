@@ -26,8 +26,7 @@ NodeStateEngine::NodeStateEngine(
         StateInfoModel stateInfoModel,  
         NodeState initialRequestedState,
         const std::string& nodeAddressForDebug,
-        MessageSendFunction messageSendFunction,
-        bool inSpyMode):
+        MessageSendFunction messageSendFunction):
     m_nodeId(nodeId),
     m_requestedStateEnum(initialRequestedState),
     m_currentState(NodeState::UNKNOWN),
@@ -39,7 +38,7 @@ NodeStateEngine::NodeStateEngine(
     m_nodeGuardingReplyTimeoutMs(1000),
     m_messageSendFunction(messageSendFunction),
     m_lastToggleBit(DUNNO),
-    m_inSpyMode(inSpyMode),
+    m_inSpyMode(false),
     m_stefansNgGraceCounter(0)
 {
     // if (m_nodeGuardingReplyTimeout > stateInfoPeriodSeconds)
