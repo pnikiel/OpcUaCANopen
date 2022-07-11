@@ -76,7 +76,8 @@ DBus::DBus (
     //CanModule::CCanAccess* canAccess = loader->openCanBus("sock:vcan0", "Unspecified");
     CSockCanScan* sockCanAccess = new CSockCanScan;
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
-    sockCanAccess->createBus("sock:"+port(), "Unspecified");
+    if (sockCanAccess->createBus("sock:"+port(), translateBusSettingsToCanModuleFormat(config.settings())) != 0)
+        throw std::runtime_error("failed to create the bus");
 
     CanModule::CCanAccess* canAccess = sockCanAccess;
     
@@ -277,6 +278,16 @@ void DBus::shutDown()
 void DBus::getStatistics(CanModule::CanStatistics& statistics) const
 {
     m_canAccess->getStatistics(statistics);
+}
+
+std::string DBus::translateBusSettingsToCanModuleFormat (const std::string& busSettingsInServerFormat)
+{
+    if (busSettingsInServerFormat == "125k")
+        return "125000";
+    else if (busSettingsInServerFormat == "DontConfigure")
+        return "Unspecified";
+    else
+        throw std::runtime_error("Configuration error: can't parse [" + busSettingsInServerFormat + "] as the bus setting" );
 }
 
 }

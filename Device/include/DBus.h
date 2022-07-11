@@ -104,6 +104,8 @@ private:
 
     std::vector<BusErrorNotification> m_busErrorNotifications;
 
+    std::string translateBusSettingsToCanModuleFormat (const std::string& busSettingsInServerFormat);
+
 
 
 };
