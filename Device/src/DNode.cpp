@@ -302,6 +302,22 @@ void DNode::onEmergencyReceived (const CanMessage& msg)
 
 void DNode::onTpdoReceived (const CanMessage& msg)
 {
+    if (msg.c_rtr)
+    {
+        // if in spy mode that is fine, otherwise it's fucked up.
+        if (getParent()->isInSpyMode())
+        {
+            // Feature clause FC4.1: Spy mode
+            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing TPDO RTR from another master.";
+        }
+        else
+        {
+            SPOOKY(getFullName()) << "Seeing unexpected TPDO RTR " << SPOOKY_ << 
+                    "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
+            return;
+        }
+    }
+
     unsigned int functionCode = msg.c_id >> 7;
     unsigned int pdoSelector = (functionCode-1) / 2;
 
