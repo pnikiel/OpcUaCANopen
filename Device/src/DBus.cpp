@@ -114,7 +114,7 @@ UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
 void DBus::initialize()
 {
     m_canAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
-    m_canAccess->canMessageError.connect(std::bind(&DBus::onError, this, placeholders::_1, placeholders::_2, placeholders::_3));
+    m_canAccess->canMessageError.connect(std::bind(&DBus::onError, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     for (Device::DNode* node : nodes())
         node->initialize();
