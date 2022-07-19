@@ -16,13 +16,15 @@
 
 # Author: Piotr Nikiel <piotr@nikiel.info>
 
+configure_file( include/OpcuaToolkitInfo.hpp.in ${CMAKE_BINARY_DIR}/generated/OpcuaToolkitInfo.hpp )
+include_directories( ${CMAKE_BINARY_DIR}/generated/ )
+
 add_library (Server OBJECT
 	src/main.cpp 
 	src/opcserver.cpp
 	src/opcserver_open62541.cpp
 	src/shutdown.cpp 
-	src/serverconfigxml.cpp 
-	src/QuasarServerCallback.cpp
+	src/serverconfigxml.cpp
 	src/BaseQuasarServer.cpp
 	src/QuasarServer.cpp
 	src/QuasarUaTraceHook.cpp
