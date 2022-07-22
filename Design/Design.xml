@@ -96,7 +96,7 @@
     </d:configentry>
     <d:configentry dataType="UaString" name="settings">
       <d:configRestriction>
-        <d:restrictionByPattern pattern="50k|125k|250k|DontConfigure"/>
+        <d:restrictionByPattern pattern="50k|100k|125k|250k|DontConfigure"/>
       </d:configRestriction>
       <d:documentation>
         Bitrate of the CAN interface. The special value <i>DontConfigure</i> indicates preserving the current port state, which is especially useful if elevated privileges would be needed.

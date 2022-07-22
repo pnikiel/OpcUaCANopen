@@ -282,8 +282,14 @@ void DBus::getStatistics(CanModule::CanStatistics& statistics) const
 
 std::string DBus::translateBusSettingsToCanModuleFormat (const std::string& busSettingsInServerFormat)
 {
-    if (busSettingsInServerFormat == "125k")
+    if (busSettingsInServerFormat == "50k")
+        return "50000";
+    else if (busSettingsInServerFormat == "100k")
+        return "100000";
+    else if (busSettingsInServerFormat == "125k")
         return "125000";
+    else if (busSettingsInServerFormat == "250k")
+        return "250000";
     else if (busSettingsInServerFormat == "DontConfigure")
         return "Unspecified";
     else
