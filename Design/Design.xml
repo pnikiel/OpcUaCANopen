@@ -517,6 +517,15 @@
         The special value inheritGlobal (which is also the default) signifies that the value from globalSettings is to be used.
       </d:documentation>
     </d:configentry>
+    <d:configentry name="expeditedSdoWriteTimeoutSeconds" dataType="UaString" defaultValue="inheritGlobal">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="inheritGlobal|[0-9]?[1-9]+" />
+      </d:configRestriction>
+      <d:documentation>
+        How much time is given for expedited SDO write until it timeouts?
+        The special value inheritGlobal (which is also the default) signifies that the value from globalSettings is to be used.
+      </d:documentation>
+    </d:configentry>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no"/>
     <d:documentation>A variable that corresponds to one object dictionary entry.</d:documentation>
   </d:class>

@@ -67,7 +67,9 @@ DSdoVariable::DSdoVariable (
     Base_DSdoVariable( config, parent),
     m_name (config.name()),
     m_expeditedReadTimeoutInheritsGlobal(config.expeditedSdoReadTimeoutSeconds() == "inheritGlobal"),
-    m_expeditedReadTimeoutSecondsFromConfig(1) // sane initialization in case of fuckup however this value won't ever be used.
+    m_expeditedReadTimeoutSecondsFromConfig(1), // sane initialization in case of fuckup however this value won't ever be used.
+    m_expeditedWriteTimeoutInheritsGlobal(config.expeditedSdoWriteTimeoutSeconds() == "inheritGlobal"),
+    m_expeditedWriteTimeoutSecondsFromConfig(1) // sane initialization in case of fuckup however this value won't ever be used.
 
     /* fill up constructor initialization list here */
 {
@@ -80,6 +82,10 @@ DSdoVariable::DSdoVariable (
     if (!m_expeditedReadTimeoutInheritsGlobal)
     {
         m_expeditedReadTimeoutSecondsFromConfig = std::stoi(config.expeditedSdoReadTimeoutSeconds(), nullptr);
+    }
+    if (!m_expeditedWriteTimeoutInheritsGlobal)
+    {
+        m_expeditedWriteTimeoutSecondsFromConfig = std::stoi(config.expeditedSdoWriteTimeoutSeconds(), nullptr);
     }
 }
 
@@ -166,12 +172,17 @@ UaStatus DSdoVariable::writeValue (
     std::lock_guard<boost::mutex> lock (m_node->getLock());
 
     std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+
+    unsigned int timeoutMs = m_expeditedWriteTimeoutInheritsGlobal ? 
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
+        1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
+
     bool status = m_node->sdoEngine().writeExpedited(
         getFullName(),
         m_index, 
         m_subIndex, 
         bytes, 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds());    
+        timeoutMs);    
     return status ? OpcUa_Good : OpcUa_Bad;
 }
 

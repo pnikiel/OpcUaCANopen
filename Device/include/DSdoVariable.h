@@ -87,6 +87,8 @@ private:
 
     const bool m_expeditedReadTimeoutInheritsGlobal;
     unsigned int m_expeditedReadTimeoutSecondsFromConfig; // valid only if not global
+    const bool m_expeditedWriteTimeoutInheritsGlobal;
+    unsigned int m_expeditedWriteTimeoutSecondsFromConfig; // valid only if not global
 
 
 };
