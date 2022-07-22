@@ -85,6 +85,9 @@ private:
 
     const std::string m_name;
 
+    const bool m_expeditedReadTimeoutInheritsGlobal;
+    unsigned int m_expeditedReadTimeoutSecondsFromConfig; // valid only if not global
+
 
 };
 

@@ -65,7 +65,9 @@ DSdoVariable::DSdoVariable (
     Parent_DSdoVariable* parent
 ):
     Base_DSdoVariable( config, parent),
-    m_name (config.name())
+    m_name (config.name()),
+    m_expeditedReadTimeoutInheritsGlobal(config.expeditedSdoReadTimeoutSeconds() == "inheritGlobal"),
+    m_expeditedReadTimeoutSecondsFromConfig(1) // sane initialization in case of fuckup however this value won't ever be used.
 
     /* fill up constructor initialization list here */
 {
@@ -74,6 +76,10 @@ DSdoVariable::DSdoVariable (
     if (config.index() != "fromGroup")
     {
         m_index = std::stoi(config.index(), nullptr, /*base*/ 16);
+    }
+    if (!m_expeditedReadTimeoutInheritsGlobal)
+    {
+        m_expeditedReadTimeoutSecondsFromConfig = std::stoi(config.expeditedSdoReadTimeoutSeconds(), nullptr);
     }
 }
 
@@ -111,12 +117,15 @@ UaStatus DSdoVariable::readValue (
     std::lock_guard<boost::mutex> lock (m_node->getLock());
 
     std::vector<unsigned char> readData;
+    unsigned int timeoutMs = m_expeditedReadTimeoutInheritsGlobal ? 
+        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
+        1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
     bool status = m_node->sdoEngine().readExpedited(
         getFullName(),
         m_index, 
         m_subIndex, 
         readData, 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds());
+        timeoutMs);
     if (!status)
         return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
