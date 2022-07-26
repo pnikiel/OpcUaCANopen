@@ -85,7 +85,7 @@
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
-    <d:configentry dataType="UaString" name="port" storedInDeviceObject="true">
+    <d:configentry dataType="UaString" name="port" storedInDeviceObject="true" isKey="true">
       <d:documentation>
 				CAN port identifier in the system, which will be opened
 				using the provider (see provider attribute). Is
