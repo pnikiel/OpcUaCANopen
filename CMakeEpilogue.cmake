@@ -31,6 +31,9 @@ list(GET versions_dot_sep 0 CPACK_PACKAGE_VERSION_MAJOR)
 list(GET versions_dot_sep 1 CPACK_PACKAGE_VERSION_MINOR)
 list(GET versions_dot_sep 2 CPACK_PACKAGE_VERSION_PATCH)
 
+# And also to the version indicator
+file(WRITE ${PROJECT_SOURCE_DIR}/Server/include/version.h "#define VERSION_STR \"${git_describe_output}\"" )
+
 # Create documentation
 
 add_custom_command(
