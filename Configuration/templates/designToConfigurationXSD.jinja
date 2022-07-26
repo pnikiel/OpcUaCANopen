@@ -163,7 +163,11 @@
 	    
     </xs:sequence>
     
-    <xs:attribute name="name" type="tns:ObjectName" use="required"/>
+    {% if  designInspector.get_class_default_instance_name(className) %}
+      <xs:attribute name="name" type="tns:ObjectName" use='optional' default="{{get_class_default_instance_name(className)}}"/>
+    {% else %}
+      <xs:attribute name="name" type="tns:ObjectName" use="required"/>
+    {% endif %}
     
     <!-- processing scalar cache vars for class [{{className}}] -->
     {% for scalarCacheVarByConfig in designInspector.objectify_cache_variables(className, restrict_by="[@initializeWith='configuration' and not(d:array)]") %}

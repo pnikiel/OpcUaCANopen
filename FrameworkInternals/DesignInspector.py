@@ -84,6 +84,12 @@ class DesignInspector():
         device_logic = self.xpath('/d:design/d:class[@name="{0}"]/d:devicelogic'.format(class_name))
         return len(device_logic) > 0 ## no devicelogic element means empty list returned
 
+    def get_class_default_instance_name(self, class_name):
+        """Returns default instance name or None if not applicable"""
+        default_instance_name = self.xpath(
+            f'/d:design/d:class[@name="{class_name}"]/@defaultInstanceName')
+        return None if len(default_instance_name) == 0 else default_instance_name[0]
+
     def get_has_objects_origin_names(self, class_name, include_root=False):
         """Finds all classes (and Root, if requested) that have has_objects
         pointing to class_name """
@@ -145,6 +151,16 @@ class DesignInspector():
                 and "maxOccurs" in has_objects.keys()
                 and has_objects.get("minOccurs") == "1"
                 and has_objects.get("maxOccurs") == "1")
+                
+    def is_class_always_singleton(self, class_name, instantiated_by_filter=None):
+        """Returns True if every instance of the target class is a singleton, with
+           instantiation mechanism (design/configuration) optionally filtered"""
+        filter_str = '' if instantiated_by_filter is None else f"and @instantiateUsing='{instantiated_by_filter}'"
+        has_objects_list = self.objectify_any(f"//d:hasobjects[@class='{class_name}' {filter_str}]")
+        if len(has_objects_list) > 0:
+            is_singleton = lambda has_objects: self.is_has_objects_singleton_any2(has_objects)
+            return all(map(is_singleton, has_objects_list))
+        return False
 
     def has_objects_class_names(self, class_name, only_with_device_logic=False):
         """Returns a list of names of all classes that are 'children' (in has_objects) sense of
