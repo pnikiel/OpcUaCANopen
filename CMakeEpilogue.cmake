@@ -31,10 +31,32 @@ list(GET versions_dot_sep 0 CPACK_PACKAGE_VERSION_MAJOR)
 list(GET versions_dot_sep 1 CPACK_PACKAGE_VERSION_MINOR)
 list(GET versions_dot_sep 2 CPACK_PACKAGE_VERSION_PATCH)
 
+# Create documentation
+
+add_custom_command(
+  OUTPUT ${PROJECT_SOURCE_DIR}/Documentation/AddressSpaceDoc.html
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMAND ${PYTHON_COMMAND} ${PROJECT_SOURCE_DIR}/quasar.py generate as_doc
+  DEPENDS ${DESIGN_FILE}
+  )
+
+add_custom_target(as_doc DEPENDS ${PROJECT_SOURCE_DIR}/Documentation/AddressSpaceDoc.html )
+
+add_custom_command(
+  OUTPUT ${PROJECT_SOURCE_DIR}/Documentation/ConfigDocumentation.html
+  WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+  COMMAND ${PYTHON_COMMAND} ${PROJECT_SOURCE_DIR}/quasar.py generate config_doc
+  DEPENDS ${DESIGN_FILE}
+  )
+
+add_custom_target(config_doc DEPENDS ${PROJECT_SOURCE_DIR}/Documentation/ConfigDocumentation.html )
+
 #SET( CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/opt" )
 
 # post-install stuff
 set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE ${PROJECT_SOURCE_DIR}/RPM/scriptlets/post_install.sh)
+
+
 
 install(TARGETS CanOpenOpcUa RUNTIME DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/bin" )
 install(
@@ -42,7 +64,14 @@ install(
     ${PROJECT_SOURCE_DIR}/bin/ServerConfig.xml
     ${PROJECT_SOURCE_DIR}/bin/config.xml
   DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/bin")
+install(
+    FILES 
+    ${PROJECT_SOURCE_DIR}/Documentation/AddressSpaceDoc.html
+    ${PROJECT_SOURCE_DIR}/Documentation/ConfigDocumentation.html
+  DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/doc")
 
 install(FILES ${PROJECT_BINARY_DIR}/Configuration/Configuration.xsd DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/Configuration" )
 
 include(CPack)
+
+add_custom_target(rpm_with_docs DEPENDS as_doc config_doc package)
