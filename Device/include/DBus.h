@@ -106,6 +106,8 @@ private:
 
     std::string translateBusSettingsToCanModuleFormat (const std::string& busSettingsInServerFormat);
 
+    int m_lastErrorCode; // to compare in onError against the current value to handle transitions
+
 
 
 };

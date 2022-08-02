@@ -67,7 +67,8 @@ DBus::DBus (
     const Configuration::Bus& config,
     Parent_DBus* parent
 ):
-    Base_DBus( config, parent)
+    Base_DBus( config, parent),
+    m_lastErrorCode(0)
 
     /* fill up constructor initialization list here */
 {
@@ -235,9 +236,12 @@ void DBus::onError (const int errorCode, const char* errorDescription, timeval&)
     getAddressSpaceLink()->setPortError(errorCode, OpcUa_Good);
     getAddressSpaceLink()->setPortErrorDescription(errorDescription, OpcUa_Good);
 
-    // Feature clause FC2.1: CAN port statistics
-    // TODO: we should count when there is the transition from Good to Bad, but that is to be revisited with the CAN module.
-    getAddressSpaceLink()->setStatsTransitionsIntoErrorCounter(getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() + 1, OpcUa_Good);
+    if (errorCode != 0 && m_lastErrorCode == 0)
+        // Feature clause FC2.1: CAN port statistics
+        getAddressSpaceLink()->setStatsTransitionsIntoErrorCounter(
+            getAddressSpaceLink()->getStatsTransitionsIntoErrorCounter() + 1,
+            OpcUa_Good);
+    m_lastErrorCode = errorCode;
 
     if (errorCode != 0)
     {
