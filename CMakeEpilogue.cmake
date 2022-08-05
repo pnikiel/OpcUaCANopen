@@ -72,9 +72,11 @@ install(
     ${PROJECT_SOURCE_DIR}/Documentation/AddressSpaceDoc.html
     ${PROJECT_SOURCE_DIR}/Documentation/ConfigDocumentation.html
   DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/doc")
+
+file(GLOB example_configuration_files ${PROJECT_SOURCE_DIR}/Documentation/ExampleConfiguration/* )
 install(
     FILES
-    ${PROJECT_SOURCE_DIR}/Documentation/SampleConfiguration/*
+    ${example_configuration_files}
     DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/example_config"
 )
 
