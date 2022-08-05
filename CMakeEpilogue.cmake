@@ -68,10 +68,15 @@ install(
     ${PROJECT_SOURCE_DIR}/bin/config.xml
   DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/bin")
 install(
-    FILES 
+    FILES
     ${PROJECT_SOURCE_DIR}/Documentation/AddressSpaceDoc.html
     ${PROJECT_SOURCE_DIR}/Documentation/ConfigDocumentation.html
   DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/doc")
+install(
+    FILES
+    ${PROJECT_SOURCE_DIR}/Documentation/SampleConfiguration/*
+    DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/example_config"
+)
 
 install(FILES ${PROJECT_BINARY_DIR}/Configuration/Configuration.xsd DESTINATION "${CPACK_PACKAGING_INSTALL_PREFIX}/Configuration" )
 
