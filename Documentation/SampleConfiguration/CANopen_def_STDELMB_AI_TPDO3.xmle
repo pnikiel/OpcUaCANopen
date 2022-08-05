@@ -1,0 +1,27 @@
+<SdoSameIndexGroup index="1802" name="aiTransmit" >
+ <SdoVariable subIndex="2" access="RW" dataType="Byte" name="aiTransmissionType" />
+ <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
+</SdoSameIndexGroup>
+
+<!-- <SdoValidator name="ensureSyncForTpdo3_transmissionType" index="1802" subIndex="2" expectedValue="01"/> -->
+
+<SdoSameIndexGroup index="2100" name="aiConfig" >
+ <SdoVariable subIndex="1" access="RW" dataType="Byte" name="channelMax" />
+ <SdoVariable subIndex="2" access="RW" dataType="Byte" name="rate" />
+ <SdoVariable subIndex="3" access="RW" dataType="Byte" name="range" />
+ <SdoVariable subIndex="4" access="RW" dataType="Byte" name="mode" />
+</SdoSameIndexGroup>
+
+<SdoValidator name="assertSyncTransmission"
+  assertTrueFormula="aiTransmit.aiTransmissionType == 1"
+  description="AI_TPDO3 model requires SYNC-based transfer">
+</SdoValidator>
+
+<TpdoMultiplex name="TPDO3" selector="3" transportMechanism="sync">
+  <MultiplexedChannelConfigurationGenerator numberOfChannels="64" name="gic">
+    <MultiplexedChannel name="specimen" id="1">
+      <ExtractedValue name="adcFlag" dataType="Byte" offset="1" />
+      <ExtractedValue name="value" dataType="Int32" offset="2" />
+    </MultiplexedChannel>
+  </MultiplexedChannelConfigurationGenerator>
+</TpdoMultiplex>

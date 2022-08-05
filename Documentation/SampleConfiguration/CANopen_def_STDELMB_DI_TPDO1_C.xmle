@@ -1,0 +1,48 @@
+<SdoSameIndexGroup index="1800" name="diTransmit">
+  <SdoVariable subIndex="2" access="RW" dataType="Byte" name="diTransmissionType" />
+  <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="diEventTimer" />
+</SdoSameIndexGroup>
+
+<SdoVariable subIndex="0" access="RW" dataType="Boolean" index="6005" name="diGlobalInterruptEnable" />
+<SdoVariable subIndex="0" access="RW" dataType="Byte" index="2200" name="diDebounceTimer" />
+
+<SdoSameIndexGroup index="6006" name="diInterrupt" >
+  <SdoVariable subIndex="1" access="RW" dataType="Byte" name="diInterruptMaskF" />
+  <SdoVariable subIndex="2" access="RW" dataType="Byte" name="diInterruptMaskA" />
+  <SdoVariable subIndex="3" access="RW" dataType="Byte" name="diInterruptMaskC" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="6208" name="dioPortA" >
+  <SdoVariable subIndex="2" access="RW" dataType="Byte" name="dioOutputMaskA" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="6208" name="dioPortC" >
+  <SdoVariable subIndex="1" access="RW" dataType="Byte" name="dioOutputMaskC" />
+</SdoSameIndexGroup>
+
+<Tpdo name="TPDO1" selector="1" transportMechanism="asyncSupportsRtr">
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_F_0" offset="0" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_F_1" offset="0" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_F_2" offset="0" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_F_3" offset="0" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_F_4" offset="0" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_F_5" offset="0" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_F_6" offset="0" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_F_7" offset="0" />
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_A_0" offset="1" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_A_1" offset="1" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_A_2" offset="1" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_A_3" offset="1" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_A_4" offset="1" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_A_5" offset="1" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_A_6" offset="1" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_A_7" offset="1" />
+  <ExtractedValue booleanFromBit="0" dataType="Boolean" name="di_C_0" offset="2" />
+  <ExtractedValue booleanFromBit="1" dataType="Boolean" name="di_C_1" offset="2" />
+  <ExtractedValue booleanFromBit="2" dataType="Boolean" name="di_C_2" offset="2" />
+  <ExtractedValue booleanFromBit="3" dataType="Boolean" name="di_C_3" offset="2" />
+  <ExtractedValue booleanFromBit="4" dataType="Boolean" name="di_C_4" offset="2" />
+  <ExtractedValue booleanFromBit="5" dataType="Boolean" name="di_C_5" offset="2" />
+  <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_C_6" offset="2" />
+  <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_C_7" offset="2" />
+</Tpdo>

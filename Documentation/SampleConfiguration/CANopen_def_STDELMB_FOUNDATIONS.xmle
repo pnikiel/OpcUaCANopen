@@ -1,0 +1,27 @@
+<!-- NodeError is gone as being useless for ELMB -->
+
+<SdoVariable index="1009" subIndex="0" access="R" dataType="UInt32"  name="hwVersion" />
+
+<SdoSameIndexGroup index="100A" name="elmbSw" >
+  <SdoVariable subIndex="0" access="R" dataType="UInt32" name="swVersion" />
+  <SdoVariable subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
+</SdoSameIndexGroup>
+
+<SdoVariable index="100C" subIndex="0" access="R" dataType="UInt16" name="guardTime" />
+<SdoVariable index="100D" subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
+
+<SdoSameIndexGroup index="1010" name="storeParams">
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="save"/>
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="1011" name="restoreParams">
+  <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="load"/>
+</SdoSameIndexGroup>
+
+<SdoVariable index="3100" subIndex="0" access="R" dataType="UInt32" name="serialNumber" />
+
+<!-- we should write the SDO validators to relate to variables! -->
+<SdoValidator name="assertFirmwareVersionMA446" 
+  assertTrueFormula="elmbSw.swVersion == 875839821 &amp;&amp; elmbSw.swMinorVersion == 909127728"
+  description="MA446 ELMBio firmware is necessary for having the lost-RTR firmware bug fixed">
+</SdoValidator>
