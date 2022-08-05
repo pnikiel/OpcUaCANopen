@@ -5,3 +5,4 @@ add_custom_command(OUTPUT ${PROJECT_BINARY_DIR}/Warnings/Warnings.cpp
     )
 
 add_library (Warnings OBJECT ${PROJECT_BINARY_DIR}/Warnings/Warnings.cpp)
+add_dependencies (Warnings Configuration.hxx_GENERATED )
