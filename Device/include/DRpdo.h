@@ -57,7 +57,7 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
-    auto& getCache() { return m_cache; }
+    std::vector<uint8_t>& getCache() { return m_cache; }
     void propagateCache();
 
 private:
