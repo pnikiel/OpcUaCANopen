@@ -68,6 +68,13 @@ bool SdoEngine::readExpedited (
         return false;
     }
 
+    if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
+    {
+        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+            ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << ERROR_;
+        return false;        
+    }
 
     // parse the SDO reply message
     // TODO: is the size of the message correct to take further assumptions? it should be 8 bytes precisely,
@@ -166,7 +173,14 @@ bool SdoEngine::writeExpedited (
         return false;
     }
 
-    // TODO we're not checking the return!
+    if (m_lastSdoReply.c_data[0] != 0x60)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
+ << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << SPOOKY_;
+        return false;
+    } 
+
     LOG(Log::TRC, "Sdo") << wrapId(where) << " - SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
     return true;
 
