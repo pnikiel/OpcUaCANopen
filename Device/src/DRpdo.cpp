@@ -105,7 +105,7 @@ void DRpdo::propagateCache()
     );
 
     rpdoMessage.c_id = 0x200 + getParent()->id();
-    rpdoMessage.c_dlc = sizeof m_cache;
+    rpdoMessage.c_dlc = m_cache.size();
     getParent()->getParent()->sendMessage(rpdoMessage);
 }
 
