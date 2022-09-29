@@ -145,7 +145,7 @@ void DBus::onMessageReceived (const CanMessage& msg)
         if (this->isInSpyMode())
         {
             // Feature clause FC4.1: Spy mode
-            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing NMT Control from another host, CS is " << wrapId(Utils::toHexString(msg.c_data[0])) << 
+            LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing NMT Control from another host, CS is " << wrapId(Utils::toHexString(msg.c_data[0])) << 
                 " and the ID is " << wrapId(std::to_string((int)msg.c_data[1]));
         }
         else
@@ -166,7 +166,7 @@ void DBus::onMessageReceived (const CanMessage& msg)
         if (this->isInSpyMode())
         {
             // Feature clause FC4.1: Spy mode
-            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SYNC from another host.";
+            LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SYNC from another host.";
             for (DNode* node : nodes())
                 node->notifySync();
         }
@@ -202,7 +202,7 @@ void DBus::sendMessage(const CanMessage& msg)
     if (this->isInSpyMode())
     {
         // Feature clause FC4.1: Spy mode
-        LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " message not sent, bus is in spy mode";
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " message not sent, bus is in spy mode";
     }
     else
     {

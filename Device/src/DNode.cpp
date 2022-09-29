@@ -41,6 +41,7 @@
 #include <FrameFactory.hpp>
 
 #include <Logging.hpp>
+#include <MyLogComponents.h>
 
 using namespace Logging;
 
@@ -131,7 +132,7 @@ UaStatus DNode::writeRequestedState ( const UaString& v)
     }
     catch(const std::exception& e)
     {
-        LOG(Log::ERR, "NodeMgmt") << "For node " << wrapId(getFullName()) << " requestedState written by client was out of range " << wrapValue(v.toUtf8());
+        LOG(Log::ERR, MyLogComponents::nodemgmt()) << "For node " << wrapId(getFullName()) << " requestedState written by client was out of range " << wrapValue(v.toUtf8());
         return OpcUa_BadOutOfRange;
     }
 }
@@ -149,7 +150,7 @@ UaStatus DNode::writeNmtPartialBackwardsCompat (
     }
     else
     {
-        LOG(Log::ERR, "NodeMgmt") << "For node " << wrapId(getFullName()) << 
+        LOG(Log::ERR, MyLogComponents::nodemgmt()) << "For node " << wrapId(getFullName()) << 
             " received address-space request different than RESET (NMT code #" << wrapValue(std::to_string((unsigned int)value)) << 
             "). This is not supported in the new CANopen server. Remove such calls from your applications. Refer to feature FN4.1 in the writeup for more info.";
         return OpcUa_BadUserAccessDenied;
@@ -163,7 +164,7 @@ UaStatus DNode::callReset (
 )
 {
 
-    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " received RESET request. Result will be reported"; 
+    LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(getFullName()) << " received RESET request. Result will be reported"; 
     /* Piotr: I know it'd be *fancier* to solve this problem using e.g. cond variables but I think it would
        complicate it much further with marginally better outcome, while what I propose here seems alright for the application*/ 
 
@@ -187,7 +188,7 @@ UaStatus DNode::callReset (
     } while (!replyReceived && !timePassed);
 
     bootupReceived = replyReceived;
-    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " after RESET: expected bootup was received? " << wrapValue(replyReceived?"yes":"no");
+    LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(getFullName()) << " after RESET: expected bootup was received? " << wrapValue(replyReceived?"yes":"no");
     return replyReceived? OpcUa_Good : OpcUa_BadTimeout;
 }
 
@@ -257,7 +258,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
         {
             if (getParent()->isInSpyMode())
             {
-                LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+                LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
             }
             else
                 m_sdoEngine.replyCame(msg);
@@ -268,7 +269,7 @@ void DNode::onMessageReceived (const CanMessage& msg)
         {
             if (getParent()->isInSpyMode())
             {
-                LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+                LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
             }
             else
                 SPOOKY(getFullName()) << " SDO request is seen ... hmm ... another host on the bus. It's BAD!";
@@ -308,7 +309,7 @@ void DNode::onTpdoReceived (const CanMessage& msg)
         if (getParent()->isInSpyMode())
         {
             // Feature clause FC4.1: Spy mode
-            LOG(Log::TRC, "Spy") << wrapId(getFullName()) << " seeing TPDO RTR from another master.";
+            LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing TPDO RTR from another master.";
         }
         else
         {
