@@ -51,7 +51,7 @@
 #include <CtrlZTable.hpp>
 #include <ConfigurationProcessing.hxx>
 #include "version.h"
-
+#include <MyLogComponents.h>
 
 using namespace Logging;
 
@@ -193,7 +193,11 @@ void QuasarServer::initializeLogIt()
 {
     BaseQuasarServer::initializeLogIt();
     for (auto &logComponent : LogComponents)
+    {
         logComponent.handle = Log::registerLoggingComponent(logComponent.name);
+        if (logComponent.name == "Spooky")
+            MyLogComponents::s_spooky =logComponent.handle;
+    }
     LOG(Log::INF) << "Logging initialized.";
 }
 

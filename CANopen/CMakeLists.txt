@@ -5,3 +5,5 @@ add_library(CANopen OBJECT
     src/NodeStateEngine.cpp
     src/EmergencyErrors.cpp
     )
+
+add_dependencies (CANopen Enumerator)
