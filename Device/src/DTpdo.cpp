@@ -83,12 +83,12 @@ DTpdo::DTpdo (
                 {
                     if (getParent()->getParent()->isInSpyMode())
                     {
-                        LOG(Log::DBG, "NodeMgmt") << wrapId(getFullName()) << " would send RTR for state change into OPERATIONAL, but we're in the spy mode.";
+                        LOG(Log::DBG, MyLogComponents::nodemgmt()) << wrapId(getFullName()) << " would send RTR for state change into OPERATIONAL, but we're in the spy mode.";
                     }
                     else
                     {
                         // Note: Feature clause FP6.2
-                        LOG(Log::DBG, "NodeMgmt") << wrapId(getFullName()) << " sending RTR for state change into OPERATIONAL";
+                        LOG(Log::DBG, MyLogComponents::nodemgmt()) << wrapId(getFullName()) << " sending RTR for state change into OPERATIONAL";
                         this->sendRtr();
                     }
                 }

@@ -288,7 +288,7 @@ void DNode::onBootupReceived ()
 {
     // Feature clause: FN2.1: Count bootups
     getAddressSpaceLink()->setBootupCounter( getAddressSpaceLink()->getBootupCounter()+1, OpcUa_Good );
-    LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(getFullName()) << " bootup msg received. Current bootup counter is " 
+    LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(getFullName()) << " bootup msg received. Current bootup counter is " 
         << wrapValue(std::to_string(getAddressSpaceLink()->getBootupCounter()));
 
     // TODO FSM notification that reception of bootup is equivalent of the PREOP state

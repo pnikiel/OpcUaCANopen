@@ -55,7 +55,7 @@ NodeStateEngine::NodeStateEngine(
 void NodeStateEngine::tick()
 {
     // TODO: must be synchronized with other things that might affect the state.
-    LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " (tick)";
+    LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " (tick)";
 
     std::lock_guard<std::mutex> lock (m_accessLock);
 
@@ -80,7 +80,7 @@ void NodeStateEngine::tickNodeGuarding()
     if (!m_inSpyMode && millisecondsSinceLastNgRequest >= m_currentStateInfoPeriod * 1000)
     {
         // Feature clause FN1.1: Node monitoring by node-guarding
-        LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Sending NG request";
+        LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " Sending NG request";
         m_messageSendFunction(CANopen::makeNodeGuardingRequest(m_nodeId));
         m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::AWAITING_REPLY;
         m_lastNodeGuardingTimePoint = now;
@@ -96,7 +96,7 @@ void NodeStateEngine::checkNodeGuardingTimeout(unsigned int millisecondsSinceLas
         
         m_stefansNgGraceCounter++;
 
-        LOG(Log::DBG, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
+        LOG(Log::DBG, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " Timeout for NodeGuarding reply. " << 
             wrapValue(std::to_string(millisecondsSinceLastNgRequest)) << "ms elapsed since last NG request. (Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
         
         // Feature clause FN1.1.3: Grace for node guarding replies
@@ -121,7 +121,7 @@ void NodeStateEngine::notifyState(uint8_t rawState, CANopen::NodeState state)
 void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
 {
     // are we in the spy mode ?
-    LOG(Log::TRC, "NodeMgmt") << wrapId(m_nodeAddressForDebug) << " NodeManagement reply received (NG, HB or bootup)";
+    LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " NodeManagement reply received (NG, HB or bootup)";
 
     std::lock_guard<std::mutex> lock (m_accessLock);
 
@@ -187,7 +187,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         if (!m_inSpyMode && stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {
             // Feature clause FN1.3: Maintaining state
-            LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
+            LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
                 << wrapValue(CANopen::stateEnumToText(m_currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
             // send therefore a message for correcting
 
@@ -205,7 +205,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
             }
 
             m_messageSendFunction(CANopen::makeNodeManagementServiceRequest(m_nodeId, nmtCommand));
-            LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " sent NMT service request to change state, CS was " << 
+            LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " sent NMT service request to change state, CS was " << 
                 wrapValue(std::to_string((int)nmtCommand));
 
         }
@@ -226,7 +226,7 @@ void NodeStateEngine::evaluateStateChange (NodeState newState)
     {
         if (m_previousState != CANopen::NodeState::UNKNOWN)
         {
-            LOG(Log::INF, "NodeMgmt") << "For node " << wrapId(m_nodeAddressForDebug) << " state change was seen, last known state was "
+            LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " state change was seen, last known state was "
                 << wrapValue(CANopen::stateEnumToText(m_previousState)) << " current is " << wrapValue(CANopen::stateEnumToText(newState));
         }
         for (CANopen::NodeStateChangeCallBack callBack : m_nodeStateChangeCallBacks)
