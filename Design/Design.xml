@@ -35,6 +35,15 @@
     		NodeGuarding timeout is declared.
     	</d:documentation>
     </d:configentry>
+    <d:configentry name="asyncPeriodicRtrPeriodSeconds" dataType="OpcUa_UInt32" defaultValue="61" storedInDeviceObject="true">
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="10" />
+      </d:configRestriction>
+      <d:documentation>
+        When Periodic-RTR feature is used (that applies mostly to TPDO configuration), this setting determines how often a RTR is emitted.
+        See FP6.3: Periodic RTR.
+      </d:documentation>
+    </d:configentry>
     <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
   <d:class name="Warnings">

@@ -26,6 +26,7 @@
 #include <ASTpdo.h>
 #include <DNode.h>
 #include <DBus.h>
+#include <DGlobalSettings.h>
 
 #include <DExtractedValue.h>
 
@@ -192,8 +193,9 @@ void DTpdo::tick()
     if (m_transportMechanism == Enumerator::Tpdo::asyncPeriodicRtrWithRequests)
     {
         unsigned int msPassed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_lastPeriodicRtr).count();
-        if (msPassed > 61000) // TODO: make configurable and put into global settings ?
+        if (msPassed >= DRoot::getInstance()->globalsettings()->asyncPeriodicRtrPeriodSeconds())
         {
+            // FP6.3: Periodic RTR
             this->sendRtr(); // of course, after the delay.
             m_lastPeriodicRtr = std::chrono::steady_clock::now();
         }
