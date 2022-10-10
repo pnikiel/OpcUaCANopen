@@ -193,7 +193,7 @@ void DTpdo::tick()
     if (m_transportMechanism == Enumerator::Tpdo::asyncPeriodicRtrWithRequests)
     {
         unsigned int msPassed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - m_lastPeriodicRtr).count();
-        if (msPassed >= DRoot::getInstance()->globalsettings()->asyncPeriodicRtrPeriodSeconds())
+        if (msPassed >= 1000*DRoot::getInstance()->globalsettings()->asyncPeriodicRtrPeriodSeconds())
         {
             // FP6.3: Periodic RTR
             this->sendRtr(); // of course, after the delay.
