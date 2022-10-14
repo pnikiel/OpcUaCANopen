@@ -27,7 +27,6 @@ void processMultiplexedChannelConfigurationGenerator(Configuration::Configuratio
 
                     if (specimen.name() != "specimen")
                         throw std::runtime_error("Specimen must be called specimen ;-) ");
-                    LOG(Log::INF) << "found GenerateIdenticalChannels!";
                     for (unsigned int chno = 0; chno < generator.numberOfChannels(); chno++)
                     {
                         // Note from Piotr:
