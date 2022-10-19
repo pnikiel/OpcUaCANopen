@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <d:design xmlns:d="http://cern.ch/quasar/Design" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" projectShortName="OpcUaNewCANopenServer" xsi:schemaLocation="http://cern.ch/quasar/Design Design.xsd " author="Piotr Nikiel (ATLAS Central DCS)">
-  <d:class name="GlobalSettings">
+  <d:class name="GlobalSettings" defaultInstanceName="GlobalSettings">
     <d:devicelogic/>
     <d:configentry dataType="UaString" name="spyMode" defaultValue="suggestFalse" storedInDeviceObject="true">
       <d:configRestriction>

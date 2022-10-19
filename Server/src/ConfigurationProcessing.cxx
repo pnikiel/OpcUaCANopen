@@ -53,7 +53,7 @@ template <typename Tcoll, typename Tparent, typename Tchild>
 static void ensureObjectPresent(Tcoll &collection, Tparent &parent, Tchild object, size_t id, const std::string &expectedName)
 {
     if (collection.size() < 1)
-    {
+    {    
         DecorationUtils::push_back(
             parent,
             collection,
@@ -73,7 +73,7 @@ void processGlobalSettings(Configuration::Configuration &configuration)
     ensureObjectPresent(
         configuration.GlobalSettings(),
         configuration,
-        Configuration::GlobalSettings("GlobalSettings"),
+        Configuration::GlobalSettings(),
         Configuration::Configuration::GlobalSettings_id,
         "GlobalSettings");
 }
