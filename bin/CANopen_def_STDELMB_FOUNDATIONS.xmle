@@ -7,13 +7,8 @@
   <SdoVariable subIndex="1" access="R" dataType="UInt32" name="swMinorVersion" />
 </SdoSameIndexGroup>
 
-<SdoSameIndexGroup index="100C" name="guardTime">
-  <SdoVariable subIndex="0" access="R" dataType="UInt16" name="guardTime" />
-</SdoSameIndexGroup>
-
-<SdoSameIndexGroup index="100D" name="lifeTime">
-  <SdoVariable subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
-</SdoSameIndexGroup>
+<SdoVariable index="100C" subIndex="0" access="R" dataType="UInt16" name="guardTime" />
+<SdoVariable index="100D" subIndex="0" access="RW" dataType="Byte" name="lifeTime" />
 
 <SdoSameIndexGroup index="1010" name="storeParams">
   <SdoVariable subIndex="1" access="RW" dataType="UInt32" name="save"/>

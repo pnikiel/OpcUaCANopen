@@ -1,3 +1,20 @@
+<SdoSameIndexGroup index="1802" name="aiTransmit" >
+ <SdoVariable subIndex="2" access="RW" dataType="Byte" name="aiTransmissionType" />
+ <SdoVariable subIndex="5" access="RW" dataType="UInt16" name="aiEventTimer" />
+</SdoSameIndexGroup>
+
+<SdoSameIndexGroup index="2100" name="aiConfig" >
+ <SdoVariable subIndex="1" access="RW" dataType="Byte" name="channelMax" />
+ <SdoVariable subIndex="2" access="RW" dataType="Byte" name="rate" />
+ <SdoVariable subIndex="3" access="RW" dataType="Byte" name="range" />
+ <SdoVariable subIndex="4" access="RW" dataType="Byte" name="mode" />
+</SdoSameIndexGroup>
+
+<SdoValidator name="assertNoSyncTransmission"
+  assertTrueFormula="aiTransmit.aiTransmissionType == 255 &amp;&amp; aiTransmit.aiEventTimer == 0"
+  description="AI_SDO model requires only on-request AI conversions">
+</SdoValidator>
+
 <SdoSameIndexGroup index="2404" name="aisdo">
    <SdoVariable subIndex="01" access="R" dataType="Int32" name="aisdo_0"/>
    <SdoVariable subIndex="02" access="R" dataType="Int32" name="aisdo_1"/>
