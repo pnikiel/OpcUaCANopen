@@ -108,8 +108,12 @@ void printLogo()
 }
 
 
-QuasarServer::QuasarServer() : BaseQuasarServer()
+QuasarServer::QuasarServer() :
+    BaseQuasarServer(),
+    m_forceDontReconfigure(false)
 {
+
+    QuasarServer::s_instance = this;
 
     // the check for LittleEndian arch. Reason for that is most ValueMapper algorithms base on this assumption.
     uint32_t checkWordU32 = 0x12345678;
@@ -143,7 +147,8 @@ void QuasarServer::mainLoop()
     printServerMsg(" Shutting down server");
 }
 
-QuasarServer *quasarServer(nullptr);
+QuasarServer* QuasarServer::s_instance = nullptr;
+
 void handleCtrlZ(int)
 {
     printCtrlZTable();
@@ -173,7 +178,7 @@ void QuasarServer::initialize()
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
         bus->initialize();
 
-    quasarServer = this;
+    
     signal(SIGTSTP, handleCtrlZ);
 
     printLogo();
@@ -231,6 +236,8 @@ void QuasarServer::appendCustomCommandLineOptions(
     }
     commandLineOptions.add_options()("Wall", po::bool_switch(&Warnings::allWarnings), "Turn on all warnings");
     commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
+
+    commandLineOptions.add_options()("force_dont_reconfigure", po::bool_switch(&m_forceDontReconfigure)->default_value(false), "Force DontReconfigure CanModule option per all declared buses which will avoid elevated privileges on some platforms");
 }
 
 bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)

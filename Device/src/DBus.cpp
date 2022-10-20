@@ -19,6 +19,7 @@
 
 
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
+#include <QuasarServer.h>
 
 #include <DBus.h>
 #include <ASBus.h>
@@ -77,7 +78,13 @@ DBus::DBus (
     //CanModule::CCanAccess* canAccess = loader->openCanBus("sock:vcan0", "Unspecified");
     CSockCanScan* sockCanAccess = new CSockCanScan;
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
-    if (sockCanAccess->createBus("sock:"+port(), translateBusSettingsToCanModuleFormat(config.settings())) != 0)
+    std::string settings(translateBusSettingsToCanModuleFormat(config.settings()));
+    if (QuasarServer::instance()->getForceDontReconfigure())
+    {
+        LOG(Log::INF) << "Bus: " << wrapId(port()) << " note: forcing DontReconfigure mode as per command line args";
+        settings = "Unspecified";
+    }
+    if (sockCanAccess->createBus("sock:"+port(), settings) != 0)
         throw std::runtime_error("failed to create the bus");
 
     CanModule::CCanAccess* canAccess = sockCanAccess;

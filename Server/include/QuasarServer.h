@@ -62,10 +62,17 @@ public:
 
     void signalAction();
 
+    static QuasarServer* instance() { return s_instance; }
+    bool getForceDontReconfigure () const { return m_forceDontReconfigure; }
+
 private:
     //Disable copy-constructor and assignment-operator
     QuasarServer( const QuasarServer& server );
     void operator=( const QuasarServer& server );
+
+    bool m_forceDontReconfigure;
+
+    static QuasarServer* s_instance;
 
 };
 
