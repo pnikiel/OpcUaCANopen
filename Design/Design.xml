@@ -46,7 +46,7 @@
     </d:configentry>
     <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
-  <d:class name="Warnings">
+  <d:class name="Warnings" defaultInstanceName="Warnings">
     <d:devicelogic/>
     <d:configentry dataType="OpcUa_Boolean" name="rxFromUnknownNode" defaultValue="true" storedInDeviceObject="true">
       <d:documentation>Warn when receiving messages from undeclared node.</d:documentation>
@@ -548,7 +548,7 @@
   </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>
-    <d:hasobjects instantiateUsing="configuration" class="Warnings"/>
+    <d:hasobjects instantiateUsing="configuration" class="Warnings" maxOccurs="1" minOccurs="1"/>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>
 </d:design>

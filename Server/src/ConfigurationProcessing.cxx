@@ -75,16 +75,16 @@ void processGlobalSettings(Configuration::Configuration &configuration)
         configuration,
         Configuration::GlobalSettings(),
         Configuration::Configuration::GlobalSettings_id,
-        "GlobalSettings");
+        Configuration::GlobalSettings::name_default_value());
 }
 void processWarnings(Configuration::Configuration &configuration)
 {
     ensureObjectPresent(
         configuration.Warnings(),
         configuration,
-        Configuration::Warnings("Warnings"),
+        Configuration::Warnings(),
         Configuration::Configuration::Warnings_id,
-        "Warnings");
+        Configuration::Warnings::name_default_value());
     Warnings::validateWarnings();
     Warnings::passToConfiguration(configuration.Warnings()[0]);
     Warnings::logWarningsConfiguration(configuration.Warnings()[0]);
