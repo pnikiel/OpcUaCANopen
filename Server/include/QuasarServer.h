@@ -64,6 +64,7 @@ public:
 
     static QuasarServer* instance() { return s_instance; }
     bool getForceDontReconfigure () const { return m_forceDontReconfigure; }
+    bool getMapToVcan () const { return m_mapToVcan; }
 
 private:
     //Disable copy-constructor and assignment-operator
@@ -71,6 +72,7 @@ private:
     void operator=( const QuasarServer& server );
 
     bool m_forceDontReconfigure;
+    bool m_mapToVcan;
 
     static QuasarServer* s_instance;
 

@@ -18,6 +18,8 @@
  */
 
 
+#include <boost/regex.hpp>
+
 #include <Configuration.hxx> // TODO; should go away, is already in Base class for ages
 #include <QuasarServer.h>
 
@@ -78,13 +80,28 @@ DBus::DBus (
     //CanModule::CCanAccess* canAccess = loader->openCanBus("sock:vcan0", "Unspecified");
     CSockCanScan* sockCanAccess = new CSockCanScan;
     sockCanAccess->initialiseLogging(LogItInstance::getInstance());
+    std::string portName(port());
+    // CAN->to->VCAN map here (if requested)
+    if (QuasarServer::instance()->getMapToVcan())
+    {
+        // is the port name already regular like canX (with X being a number) so transition to VCAN is kind of natural?
+        boost::regex canWithNumber ("^can\\d+$");
+	    boost::smatch matchResults;
+
+        if (boost::regex_match( portName, matchResults, canWithNumber ))
+            // cool - can map to vcan safely.
+            portName = "v" + portName;
+        else
+            throw std::runtime_error("Chosen command mapToVcan does not work with port name ["+port()+"] given in the config as it does not follow known port naming");
+    }
+
     std::string settings(translateBusSettingsToCanModuleFormat(config.settings()));
     if (QuasarServer::instance()->getForceDontReconfigure())
     {
         LOG(Log::INF) << "Bus: " << wrapId(port()) << " note: forcing DontReconfigure mode as per command line args";
         settings = "Unspecified";
     }
-    if (sockCanAccess->createBus("sock:"+port(), settings) != 0)
+    if (sockCanAccess->createBus("sock:"+portName, settings) != 0)
         throw std::runtime_error("failed to create the bus");
 
     CanModule::CCanAccess* canAccess = sockCanAccess;
