@@ -242,7 +242,7 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("map_to_vcan",            po::bool_switch(&m_mapToVcan)->default_value(false), "Map to VCAN port names whenever possible");
 }
 
-bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString, std::string fullname)
+bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString, const std::string& fullname)
 {
     std::vector<uint8_t> output;
     try
