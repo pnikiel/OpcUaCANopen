@@ -240,12 +240,12 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("force_dont_reconfigure", po::bool_switch(&m_forceDontReconfigure)->default_value(false), "Force DontReconfigure CanModule option per all declared buses which will avoid elevated privileges on some platforms");
 }
 
-bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
+bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString, std::string fullname)
 {
     std::vector<uint8_t> output;
     try
     {
-        if (!engine.readExpedited("-", index, subIndex, output, 50))
+        if (!engine.readExpedited(fullname, index, subIndex, output, 50))
             return false;
         outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
@@ -261,6 +261,7 @@ bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex
 
 void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
 {
+
     fort::utf8_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
@@ -289,7 +290,7 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                     info.result = "N/A: spy mode";
                 else
                 {
-                    if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result))
+                    if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result, node->getFullName()))
                     {
                         assumeSuccessful = false;
                         break;
