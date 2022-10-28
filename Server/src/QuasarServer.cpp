@@ -110,7 +110,8 @@ void printLogo()
 
 QuasarServer::QuasarServer() :
     BaseQuasarServer(),
-    m_forceDontReconfigure(false)
+    m_forceDontReconfigure(false),
+    m_mapToVcan(false)
 {
 
     QuasarServer::s_instance = this;
@@ -238,6 +239,7 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
 
     commandLineOptions.add_options()("force_dont_reconfigure", po::bool_switch(&m_forceDontReconfigure)->default_value(false), "Force DontReconfigure CanModule option per all declared buses which will avoid elevated privileges on some platforms");
+    commandLineOptions.add_options()("map_to_vcan",            po::bool_switch(&m_mapToVcan)->default_value(false), "Map to VCAN port names whenever possible");
 }
 
 bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString, std::string fullname)
