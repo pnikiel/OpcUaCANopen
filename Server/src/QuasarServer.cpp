@@ -40,6 +40,8 @@
 #include <ASBus.h>
 #include <ASNode.h>
 #include <ASEmergencyParser.h>
+#include <ASMeta.h>
+#include <ASNodeQueries.h>
 
 #include <Configuration.hxx>
 #include <Configurator.h>
@@ -159,7 +161,12 @@ void QuasarServer::initialize()
 {
     LOG(Log::INF) << "Initializing Quasar server.";
 
-    // TODO make it a separate method
+    // fill up product version.
+    AddressSpace::ASMeta* meta = AddressSpace::findByStringId<AddressSpace::ASMeta> (getNodeManager(), "Meta");
+    if (meta)
+        meta->setProductVersion(VERSION_STR, OpcUa_Good);
+
+    // TODO make it a separate method to parse components
     for (auto &logComponent : LogComponents)
     {
         if (logComponent.logLevelFromArgs != "")

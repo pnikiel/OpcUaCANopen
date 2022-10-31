@@ -76,6 +76,9 @@
   		</d:documentation>
     </d:configentry>
   </d:class>
+  <d:class name="Meta">
+    <d:cachevariable name="productVersion" addressSpaceWrite="forbidden" dataType="UaString" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
+  </d:class>
   <d:class name="Bus">
     <d:devicelogic/>
     <d:hasobjects instantiateUsing="configuration" class="Node"/>
@@ -549,6 +552,9 @@
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>
     <d:hasobjects instantiateUsing="configuration" class="Warnings" maxOccurs="1" minOccurs="1"/>
+    <d:hasobjects class="Meta" instantiateUsing="design" minOccurs="1" maxOccurs="1">
+      <d:object name="Meta" />
+    </d:hasobjects>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>
 </d:design>
