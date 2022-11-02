@@ -33,6 +33,7 @@ NodeStateEngine::NodeStateEngine(
     m_nodeAddressForDebug(nodeAddressForDebug),
     m_stateInfoModel(stateInfoModel),
     m_currentStateInfoPeriod(10), // Expected to be overwritten 
+    m_lastHeartBeatTimePoint(std::chrono::steady_clock::now()), // some sane init even if HB not used.
     m_nodeGuardingOperationsState(IDLE),
     m_previousState(CANopen::NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
@@ -61,8 +62,20 @@ void NodeStateEngine::tick()
 
     if (m_stateInfoModel == NODEGUARDING)
         tickNodeGuarding();
+    else if (m_stateInfoModel == HEARTBEAT)
+    {
+        unsigned int millisecondsSinceLastHeartBeat = std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - m_lastHeartBeatTimePoint).count();
+        if (!m_inSpyMode && millisecondsSinceLastHeartBeat >= m_currentStateInfoPeriod * 1000)
+        {
+            // Feature FN1.2: Node monitoring by heart-beating
+            LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " HB timeout -- node is DISCONNECTED";
+            m_currentState = NodeState::DISCONNECTED;
+            notifyState(1, NodeState::DISCONNECTED);
+            m_lastHeartBeatTimePoint = std::chrono::steady_clock::now(); // m_lastHeartBeatTimePoint we should rename it to heart beat action or something like this as this will confuse people
+        }
+    }
     else
-        throw std::runtime_error("not-implemented-yet");
+        throw std::logic_error("StateInfoModel logic error");
 
 }
 
@@ -150,14 +163,25 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
     if (msg.c_data[0] == 0)
         this->onBootupReceived(msg);
     else
-    {
-        if (m_nodeGuardingOperationsState != CANopen::NodeGuardingOperationsState::AWAITING_REPLY)
+    { // HB or NG reply
+        if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
         {
-            SPOOKY(m_nodeAddressForDebug) << "unsolicited(!!) NG reply is coming. Discarding." << SPOOKY_ << " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
-            return;
+            // Feature FN1.1: Node monitoring by node-guarding
+            if (m_nodeGuardingOperationsState != CANopen::NodeGuardingOperationsState::AWAITING_REPLY)
+            {
+                SPOOKY(m_nodeAddressForDebug) << "unsolicited(!!) NG reply is coming. Discarding." << SPOOKY_ << " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
+                return;
+            }
+            else
+                m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE; // we're awaiting reply, so now we got it.
+        }
+        else if (m_stateInfoModel == CANopen::StateInfoModel::HEARTBEAT)
+        {
+            // Feature FN1.2: Node monitoring by heart-beating
+            m_lastHeartBeatTimePoint = std::chrono::steady_clock::now();
         }
         else
-            m_nodeGuardingOperationsState = CANopen::NodeGuardingOperationsState::IDLE; // we're awaiting reply, so now we got it.
+            throw std::logic_error("State info model seems unsupported");
 
         m_stefansNgGraceCounter=0;
 
@@ -182,7 +206,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
 
         uint8_t stateNoToggle = stateToggled & 0x7f;
         m_currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
-        notifyState(msg.c_data[0], m_currentState);
+        notifyState(msg.c_data[0],   m_currentState);
         
         if (!m_inSpyMode && stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {

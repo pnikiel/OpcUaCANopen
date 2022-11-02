@@ -44,6 +44,8 @@
         See FP6.3: Periodic RTR.
       </d:documentation>
     </d:configentry>
+    <d:configentry name="heartBeatWindowSeconds" dataType="OpcUa_UInt32" defaultValue="5" storedInDeviceObject="true">
+    </d:configentry>
     <d:documentation>GlobalSettings is a collection of settings per whole server instance.</d:documentation>
   </d:class>
   <d:class name="Warnings" defaultInstanceName="Warnings">

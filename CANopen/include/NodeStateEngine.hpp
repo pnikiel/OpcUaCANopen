@@ -71,13 +71,19 @@ namespace CANopen
         //! Triggers to the FSM should be synchronized.
         std::mutex m_accessLock;
 
+        // NG
         std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
         CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
+
+        // HB
+        std::chrono::steady_clock::time_point m_lastHeartBeatTimePoint;
+
+        // NG + HB
         CANopen::NodeState m_previousState;
         CANopen::NodeState m_requestedStateEnum;
         CANopen::NodeState m_currentState;
 
-        unsigned int m_nodeGuardingReplyTimeoutMs;
+        unsigned int m_nodeGuardingReplyTimeoutMs; // TODO move up
 
         MessageSendFunction m_messageSendFunction;
 

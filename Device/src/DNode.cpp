@@ -206,7 +206,7 @@ void DNode::initialize()
     if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
         m_nodeStateEngine.setStateInfoPeriod(getParent()->getAddressSpaceLink()->getNodeGuardIntervalMs() / 1000.0); // node guarding interval to be in seconds
     else
-        throw std::runtime_error("not-implemented HB");
+        m_nodeStateEngine.setStateInfoPeriod(DRoot::getInstance()->globalsettings()->heartBeatWindowSeconds());
 
     for (DTpdoMultiplex* tpdoMultiplex : tpdomultiplexs())
         tpdoMultiplex->initialize();
