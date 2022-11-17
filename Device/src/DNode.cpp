@@ -223,6 +223,8 @@ void DNode::initialize()
 
     for (Device::DSdoVariable* variable : sdovariables())
     {
+        if (variable->index() == Configuration::SdoVariable::index_default_value())
+            throw std::runtime_error("Stage2 Configuration error: Independent SDO variable needs exact SDO index. (at [" + variable->getFullName() + "]");
         registerSdoByShortName(variable->name(), variable);
         variable->initialize(getParent(), this);
     }
