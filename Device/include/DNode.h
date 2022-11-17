@@ -109,6 +109,8 @@ private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
 
+    void propagateNullToTpdos ();
+
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
     CANopen::NodeState m_previousState;
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;

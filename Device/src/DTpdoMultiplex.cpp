@@ -131,7 +131,7 @@ void DTpdoMultiplex::notifySync ()
         channel->notifySync();
 }
 
-void DTpdoMultiplex::notifyBusError ()
+void DTpdoMultiplex::propagateNull ()
 {
     for (DMultiplexedChannel* channel : multiplexedchannels())
         channel->notifyBusError();

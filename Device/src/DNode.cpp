@@ -106,11 +106,20 @@ DNode::DNode (
     getParent()->addBusErrorNotification([this]()
     {
         // Feature clause: FC3.1: Propagation of CAN port state into affected variables
-        for (DTpdo* tpdo : tpdos())
-            tpdo->notifyBusError();
-        for (DTpdoMultiplex* multiplex : tpdomultiplexs())
-            multiplex->notifyBusError();
+        this->propagateNullToTpdos();
+    
     });
+
+    // FN5.1: Propagation of state transitions into affected variables
+    addNodeStateChangeCallBack(
+    [this](CANopen::NodeState previous, CANopen::NodeState current)
+    {   
+        if ((previous == CANopen::NodeState::OPERATIONAL || previous == CANopen::NodeState::STOPPED) && (current == CANopen::NodeState::DISCONNECTED || current == CANopen::NodeState::UNKNOWN))
+        {
+            this->propagateNullToTpdos();
+        }
+    });
+
 }
 
 /* sample dtr */
@@ -375,6 +384,14 @@ void DNode::registerSdoByShortName (const std::string& shortName, DSdoVariable* 
 DSdoVariable* DNode::getSdoByShortName (const std::string& shortName)
 {
     return m_sdosByShortName[shortName];
+}
+
+void DNode::propagateNullToTpdos ()
+{
+    for (DTpdo* tpdo : tpdos())
+        tpdo->propagateNull();
+    for (DTpdoMultiplex* multiplex : tpdomultiplexs())
+        multiplex->propagateNull();
 }
 
 }

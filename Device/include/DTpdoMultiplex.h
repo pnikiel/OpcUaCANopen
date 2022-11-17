@@ -67,7 +67,7 @@ public:
     void notifySync ();
 
     //! To be called when the bus goes down
-    void notifyBusError ();
+    void propagateNull ();
 
 private:
 

@@ -125,7 +125,7 @@ void DMultiplexedChannel::notifySync ()
 void DMultiplexedChannel::notifyBusError ()
 {
     for (DExtractedValue* extractedValue : extractedvalues())
-        extractedValue->notifyBusError();
+        extractedValue->propagateNull();
 }
 
 }

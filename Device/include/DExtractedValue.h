@@ -62,7 +62,7 @@ public:
     void onReplyReceived(const CanMessage& msg);
 
     //! To be called when the bus goes down
-    void notifyBusError ();
+    void propagateNull ();
 
 private:
 
