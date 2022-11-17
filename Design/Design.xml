@@ -496,12 +496,16 @@
       <d:configRestriction>
         <d:restrictionByPattern pattern="fromGroup|[0-9A-F]{1,4}"/>
       </d:configRestriction>
+      <d:documentation>
+        For an independent declaration (i.e. the SdoVariable instantiated directly under Node), it is the SDO index of the variable <emph>in hexadecimal</emph>
+        (e.g. 100D in this config entry, corresponding to 4109 decimal, would map to heart-beat life-time of a typical CANopen node). 
+        For a declaration under SdoSameIndexGroup, it can be skipped or the default of "fromGroup" can be used.
+      </d:documentation>
     </d:configentry>
     <d:configentry dataType="OpcUa_Byte" name="subIndex">
-      <d:configRestriction>
-        <d:restrictionByPattern pattern="[0-9A-F]{1,4}"/>
-      </d:configRestriction>
-      <d:documentation>subIndex is decimal!</d:documentation>
+      <d:documentation>
+        SDO subIndex, compulsory for all cases. In contrast to the SDO index, this one is <emph>in decimal</emph> format.
+      </d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="dataType" storedInDeviceObject="true">
       <d:configRestriction>
@@ -516,8 +520,13 @@
     </d:configentry>
     <d:configentry dataType="UaString" name="access" storedInDeviceObject="true">
       <d:configRestriction>
-        <d:restrictionByPattern pattern="R|RW|W"/>
+        <d:restrictionByEnumeration>
+          <d:enumerationValue value="R"><d:documentation>The server permitts reading from a CANopen node only (i.e. Domain Upload in CANopen parlance).</d:documentation></d:enumerationValue>
+          <d:enumerationValue value="RW"><d:documentation>The server permitts reading and writing from/to a CANopen node (i.e. both Domain Upload and Download in CANopen parlance).</d:documentation></d:enumerationValue>
+          <d:enumerationValue value="W"><d:documentation>The server permitts writing to a CANopen node only (i.e. Domain Download in CANopen parlance).</d:documentation></d:enumerationValue>
+        </d:restrictionByEnumeration>
       </d:configRestriction>
+      <d:documentation>Which direction of data flow is permitted?</d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="booleanFromBit" defaultValue="-" storedInDeviceObject="true">
       <d:configRestriction>
