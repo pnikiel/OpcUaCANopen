@@ -33,7 +33,7 @@ NodeStateEngine::NodeStateEngine(
     m_nodeAddressForDebug(nodeAddressForDebug),
     m_stateInfoModel(stateInfoModel),
     m_currentStateInfoPeriod(10), // Expected to be overwritten 
-    m_lastHeartBeatTimePoint(std::chrono::steady_clock::now()), // some sane init even if HB not used.
+    m_heartBeatWindowStartTimePoint(std::chrono::steady_clock::now()), // some sane init even if HB not used.
     m_nodeGuardingOperationsState(IDLE),
     m_previousState(CANopen::NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
@@ -64,16 +64,7 @@ void NodeStateEngine::tick()
         tickNodeGuarding();
     else if (m_stateInfoModel == HEARTBEAT)
     {
-        // TODO Stefan's grace counter for HB ?
-        unsigned int millisecondsSinceLastHeartBeat = std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - m_lastHeartBeatTimePoint).count();
-        if (!m_inSpyMode && millisecondsSinceLastHeartBeat >= m_currentStateInfoPeriod * 1000)
-        {
-            // Feature FN1.2: Node monitoring by heart-beating
-            LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " HB timeout -- node is DISCONNECTED";
-            m_currentState = NodeState::DISCONNECTED;
-            notifyState(1, NodeState::DISCONNECTED);
-            m_lastHeartBeatTimePoint = std::chrono::steady_clock::now(); // m_lastHeartBeatTimePoint we should rename it to heart beat action or something like this as this will confuse people
-        }
+        tickHeartBeat();
     }
     else
         throw std::logic_error("StateInfoModel logic error");
@@ -119,6 +110,27 @@ void NodeStateEngine::checkNodeGuardingTimeout(unsigned int millisecondsSinceLas
             m_currentState = NodeState::DISCONNECTED;
             notifyState(1, NodeState::DISCONNECTED);
         }
+    }
+}
+
+void NodeStateEngine::tickHeartBeat()
+{
+    unsigned int millisecondsInTheWindow = std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - m_heartBeatWindowStartTimePoint).count();
+    if (!m_inSpyMode && millisecondsInTheWindow >= m_currentStateInfoPeriod * 1000)
+    {
+        // Feature FN1.2: Node monitoring by heart-beating
+        // Timeout handling.
+        m_stefansNgGraceCounter++;
+        LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " HB timeout, " <<
+            wrapValue(std::to_string(millisecondsInTheWindow)) << "ms in the present window, XX ms since last HB, " <<
+            " (Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
+        // Feature clause FN1.2.1: Grace for heart-beating
+        if (m_stefansNgGraceCounter > 3)
+        {
+            m_currentState = NodeState::DISCONNECTED;
+            notifyState(1, NodeState::DISCONNECTED);
+        }
+        m_heartBeatWindowStartTimePoint = std::chrono::steady_clock::now(); // m_heartBeatWindowStartTimePoint we should rename it to heart beat action or something like this as this will confuse people
     }
 }
 
@@ -194,7 +206,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         else if (m_stateInfoModel == CANopen::StateInfoModel::HEARTBEAT)
         {
             // Feature FN1.2: Node monitoring by heart-beating
-            m_lastHeartBeatTimePoint = std::chrono::steady_clock::now();
+            m_heartBeatWindowStartTimePoint = std::chrono::steady_clock::now();
         }
         else
             throw std::logic_error("State info model seems unsupported");

@@ -76,7 +76,8 @@ namespace CANopen
         CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
 
         // HB
-        std::chrono::steady_clock::time_point m_lastHeartBeatTimePoint;
+        /* The window start is either last time we got HB, or last time we performed a timeout action */
+        std::chrono::steady_clock::time_point m_heartBeatWindowStartTimePoint;
 
         // NG + HB
         CANopen::NodeState m_previousState;
@@ -89,6 +90,8 @@ namespace CANopen
 
         void tickNodeGuarding();
         void checkNodeGuardingTimeout(unsigned int millisecondsSinceLastNgRequest);
+
+        void tickHeartBeat();
 
         //! This gets called when state information was obtained.
         void notifyState(uint8_t rawState, CANopen::NodeState state);
