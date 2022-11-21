@@ -209,7 +209,11 @@ void QuasarServer::initializeLogIt()
     {
         logComponent.handle = Log::registerLoggingComponent(logComponent.name);
         if (logComponent.name == "Spooky")
-            MyLogComponents::s_spooky =logComponent.handle;
+            MyLogComponents::s_spooky = logComponent.handle;
+        if (logComponent.name == "NodeMgmt")
+            MyLogComponents::s_nodemgmt = logComponent.handle;
+        if (logComponent.name == "Spy")
+            MyLogComponents::s_spy = logComponent.handle;
     }
     LOG(Log::INF) << "Logging initialized.";
 }
