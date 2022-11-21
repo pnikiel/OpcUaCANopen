@@ -122,8 +122,8 @@ void NodeStateEngine::tickHeartBeat()
         // Timeout handling.
         m_stefansNgGraceCounter++;
         LOG(Log::TRC, MyLogComponents::nodemgmt()) << wrapId(m_nodeAddressForDebug) << " HB timeout, " <<
-            wrapValue(std::to_string(millisecondsInTheWindow)) << "ms in the present window, XX ms since last HB, " <<
-            " (Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
+            wrapValue(std::to_string(millisecondsInTheWindow)) << "ms in the present window, " <<
+            "(Stefan's grace counter is " << wrapValue(std::to_string(m_stefansNgGraceCounter)) << ")";
         // Feature clause FN1.2.1: Grace for heart-beating
         if (m_stefansNgGraceCounter > 3)
         {
