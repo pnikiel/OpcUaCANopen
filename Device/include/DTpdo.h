@@ -77,7 +77,7 @@ public:
     void notifySync ();
 
     //! To be called when the bus goes down
-    void notifyBusError ();
+    void propagateNull ();
 
     void tick(); // periodic trigger, here mostly to trigger the periodic RTR feature.
 

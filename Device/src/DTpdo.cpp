@@ -182,10 +182,10 @@ void DTpdo::notifySync ()
 }
 
     
-void DTpdo::notifyBusError ()
+void DTpdo::propagateNull ()
 {
     for (DExtractedValue* extractedValue : extractedvalues())
-        extractedValue->notifyBusError();
+        extractedValue->propagateNull();
 }
 
 void DTpdo::tick()

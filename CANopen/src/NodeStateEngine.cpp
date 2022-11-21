@@ -64,6 +64,7 @@ void NodeStateEngine::tick()
         tickNodeGuarding();
     else if (m_stateInfoModel == HEARTBEAT)
     {
+        // TODO Stefan's grace counter for HB ?
         unsigned int millisecondsSinceLastHeartBeat = std::chrono::duration_cast<std::chrono::milliseconds> (std::chrono::steady_clock::now() - m_lastHeartBeatTimePoint).count();
         if (!m_inSpyMode && millisecondsSinceLastHeartBeat >= m_currentStateInfoPeriod * 1000)
         {
@@ -163,7 +164,22 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
     if (msg.c_data[0] == 0)
         this->onBootupReceived(msg);
     else
-    { // HB or NG reply
+    {
+        /* Does this state at all make any sense? Filter out bullshit replies or noise. */
+        uint8_t stateToggled = msg.c_data[0];
+        uint8_t stateNoToggle = stateToggled & 0x7f;
+        decltype(m_currentState) receivedState;
+        try
+        {
+            receivedState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
+        }
+        catch (const std::out_of_range& e)
+        {
+            LOG(Log::ERR, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " received sick/invalid state [" << wrapValue(std::to_string(stateNoToggle)) << "], ignoring.";
+            return;
+        };
+        
+        /* We know that the received state makes sense */
         if (m_stateInfoModel == CANopen::StateInfoModel::NODEGUARDING)
         {
             // Feature FN1.1: Node monitoring by node-guarding
@@ -189,7 +205,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         // TODO implement actual NG reply logic
 
         // Feature clause FN1.1.1: Toggle bit support
-        uint8_t stateToggled = msg.c_data[0];
+        // TODO break into a sep function
         ToggleBit currentToggleBit = stateToggled & 0x80 ? ON : OFF;
         if (m_currentState != NodeState::DISCONNECTED) // DISCONNECTED is the only state where there is no toggling, so we don't check.
         {
@@ -204,10 +220,10 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         }
         m_lastToggleBit = currentToggleBit;
 
-        uint8_t stateNoToggle = stateToggled & 0x7f;
-        m_currentState = CANopen::noToggleNgReplyToStateEnum(stateNoToggle);
+        m_currentState = receivedState;
         notifyState(msg.c_data[0],   m_currentState);
         
+        // TODO break the block above into separate function "maintaining state"
         if (!m_inSpyMode && stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
         {
             // Feature clause FN1.3: Maintaining state
