@@ -4,6 +4,7 @@ add_library(CANopen OBJECT
     src/Sdo.cpp
     src/NodeStateEngine.cpp
     src/EmergencyErrors.cpp
+    src/CobidCoordinator.cpp
     )
 
 add_dependencies (CANopen Enumerator)

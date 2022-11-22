@@ -27,6 +27,7 @@
 #include <CCanAccess.h>
 
 #include <NodeGuarding.hpp>
+#include <CobidMessageRouter.hpp>
 
 #include <Base_DBus.h>
 
@@ -86,6 +87,8 @@ public:
 
     void getStatistics(CanModule::CanStatistics& statistics) const;
 
+    CANopen::CobidCoordinator& cobidCoordinator() { return m_cobidCoordinator; } // TODO probably move it somehow.
+
 private:
     GhostPointer<CanModule::CCanAccess> m_canAccess;
 
@@ -107,6 +110,8 @@ private:
     std::string translateBusSettingsToCanModuleFormat (const std::string& busSettingsInServerFormat);
 
     int m_lastErrorCode; // to compare in onError against the current value to handle transitions
+
+    CANopen::CobidCoordinator m_cobidCoordinator;
 
 
 

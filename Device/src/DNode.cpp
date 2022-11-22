@@ -245,6 +245,10 @@ void DNode::initialize()
     LOG(Log::TRC, "SdoValidator") << wrapId(getFullName()) << " SDO short-list established after initialize() is: ";
     for (auto& nameObjectPair : m_sdosByShortName)
         LOG(Log::TRC, "SdoValidator") << wrapValue(nameObjectPair.first);
+
+    CANopen::CobidEntry receiveNgOrHb;
+    receiveNgOrHb.cobid = 0x700 + id(); // TODO nicer somehow ?
+    getParent()->cobidCoordinator().addEntry(receiveNgOrHb);
     
 }
 
