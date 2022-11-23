@@ -20,7 +20,7 @@ void CobidCoordinator::printDiagnostics()
     fort::char_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
-    table << fort::header << "cobid" << fort::endr;
+    table << fort::header << "cobid" << "node" << fort::endr;
 
     for (auto& x : m_cobids)
     {
