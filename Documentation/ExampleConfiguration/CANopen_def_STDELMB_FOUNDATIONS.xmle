@@ -25,3 +25,5 @@
   assertTrueFormula="elmbSw.swVersion == 875839821 &amp;&amp; elmbSw.swMinorVersion == 909127728"
   description="MA446 ELMBio firmware is necessary for having the lost-RTR firmware bug fixed">
 </SdoValidator>
+
+<FreeVariable name="~model:STDELMB_FOUNDATIONS.version" type="Int32" initialValue="1"/>

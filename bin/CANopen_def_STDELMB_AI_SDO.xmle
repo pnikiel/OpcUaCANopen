@@ -81,3 +81,5 @@
    <SdoVariable subIndex="63" access="R" dataType="Int32" name="aisdo_62"/>
    <SdoVariable subIndex="64" access="R" dataType="Int32" name="aisdo_63"/>
 </SdoSameIndexGroup>
+
+<FreeVariable name="~model:STDELMB_AI_SDO.version" type="Int32" initialValue="1"/>
