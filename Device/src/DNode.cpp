@@ -217,6 +217,9 @@ void DNode::initialize()
     else
         m_nodeStateEngine.setStateInfoPeriod(DRoot::getInstance()->globalsettings()->heartBeatWindowSeconds());
 
+    for (DTpdo* tpdo : tpdos())
+        tpdo->initialize();
+
     for (DTpdoMultiplex* tpdoMultiplex : tpdomultiplexs())
         tpdoMultiplex->initialize();
         
@@ -246,10 +249,10 @@ void DNode::initialize()
     for (auto& nameObjectPair : m_sdosByShortName)
         LOG(Log::TRC, "SdoValidator") << wrapValue(nameObjectPair.first);
 
-    CANopen::CobidEntry receiveNgOrHb;
-    receiveNgOrHb.cobid = 0x700 + id(); // TODO nicer somehow ?
-    getParent()->cobidCoordinator().addEntry(receiveNgOrHb);
-    
+    // CANopen::CobidEntry receiveNgOrHb;
+    // receiveNgOrHb.cobid = 0x700 + id(); // TODO nicer somehow ?
+    // getParent()->cobidCoordinator().addEntry(receiveNgOrHb);
+    getParent()->cobidCoordinator().registerCobid(0x700 + id(), getFullName(), "StateInformation"); // TODO no receiver yet
 }
 
 void DNode::onMessageReceived (const CanMessage& msg)

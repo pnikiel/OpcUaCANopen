@@ -212,6 +212,8 @@ void DBus::onMessageReceived (const CanMessage& msg)
         return;
     }
 
+    m_cobidCoordinator.dispatch(msg);
+
     unsigned int nodeId = msg.c_id & 0x7f;
     // TODO shall everything be passed to specific node
     DNode* node = getNodeById(nodeId);

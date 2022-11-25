@@ -71,6 +71,8 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize ();
+
     void onReplyReceived(const CanMessage& msg);
 
     //! To be called just before the server emits sync

@@ -135,6 +135,14 @@ UaStatus DTpdo::writeInvokeRtr (
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
 
+void DTpdo::initialize ()
+{
+    getParent()->getParent()->cobidCoordinator().registerCobid(
+        0x380 + getParent()->id(),
+        getParent()->getFullName(),
+        "TPDO XXX FIX ME");
+}
+
 void DTpdo::onReplyReceived(const CanMessage& msg)
 {
     std::lock_guard<std::mutex> lock (m_accessLock); // operating on shared data, e.g. m_receivedCtrSinceLastSync
