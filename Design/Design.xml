@@ -140,8 +140,12 @@
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="2000"/>  
+      </d:configRestriction>
       <d:documentation>
         The NG interval in miliseconds for all nodes configured for NodeGuarding. 10000 is a typical value.
+        <b>It must be higher than the nodeGuardingReplyTimeout from GlobalSettings.</b>
       </d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="statsTotalTransmitted" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
