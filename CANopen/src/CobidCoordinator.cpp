@@ -13,7 +13,7 @@ void CobidCoordinator::addEntry(const CobidEntry& entry)
 {
     if (m_cobids.count(entry.cobid) > 0)
     {
-        LOG(Log::ERR) << "The cobid " << entry.cobid << " cant be registered -- the slot is already taken";
+        throw_runtime_error_with_origin("The cobid [0x" + Utils::toHexString(entry.cobid) + "] cant be registered -- the slot is already taken"); 
     }
     m_cobids[entry.cobid] = entry;
 }

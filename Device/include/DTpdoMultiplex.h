@@ -70,6 +70,7 @@ public:
     void propagateNull ();
 
 private:
+    const std::string m_name;
 
 
 

@@ -84,6 +84,8 @@ public:
     void tick(); // periodic trigger, here mostly to trigger the periodic RTR feature.
 
 private:
+    const std::string m_name;
+
     // sends RTR corresponding to this TPDO
     void sendRtr();
     bool m_onSync;

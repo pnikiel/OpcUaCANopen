@@ -22,4 +22,5 @@ include_directories(/home/pnikiel/gitProjects/OpcUaNewCANopenServer/CalculatedVa
 
 set(DEVICE_CUSTOM_SOURCES
 	src/ValueMapper.cpp
+	src/PdoCobidMapper.cpp
 	)

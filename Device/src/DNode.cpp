@@ -337,24 +337,25 @@ void DNode::onTpdoReceived (const CanMessage& msg)
         }
     }
 
-    unsigned int functionCode = msg.c_id >> 7;
-    unsigned int pdoSelector = (functionCode-1) / 2;
+    // TODO : the code below need to go.
+    // unsigned int functionCode = msg.c_id >> 7;
+    // unsigned int pdoSelector = (functionCode-1) / 2;
 
-    DTpdo* tpdo = getTpdoBySelector(pdoSelector);
-    DTpdoMultiplex* multiplex = getTpdoMultiplexBySelector(pdoSelector);
-    if (!multiplex && !tpdo)
-    {
-        if (DRoot::getInstance()->warningss()[0]->unexpectedTpdo())
-        {
-            SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << 
-                " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. " << SPOOKY_ << "[WunexpectedTpdo]";
-        }
-        return;
-    }
-    if (tpdo)
-        tpdo->onReplyReceived(msg);
-    if (multiplex) 
-        multiplex->onReplyReceived(msg);
+    // DTpdo* tpdo = getTpdoBySelector(pdoSelector);
+    // DTpdoMultiplex* multiplex = getTpdoMultiplexBySelector(pdoSelector);
+    // if (!multiplex && !tpdo)
+    // {
+    //     if (DRoot::getInstance()->warningss()[0]->unexpectedTpdo())
+    //     {
+    //         SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << 
+    //             " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. " << SPOOKY_ << "[WunexpectedTpdo]";
+    //     }
+    //     return;
+    // }
+    // if (tpdo)
+    //     tpdo->onReplyReceived(msg);
+    // if (multiplex) 
+    //     multiplex->onReplyReceived(msg);
     
 
 }

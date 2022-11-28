@@ -30,6 +30,8 @@
 
 #include <DExtractedValue.h>
 
+#include <PdoCobidMapper.h>
+
 #include <Logging.hpp>
 #include <FrameFactory.hpp>
 
@@ -64,6 +66,7 @@ DTpdo::DTpdo (
     Parent_DTpdo* parent
 ):
     Base_DTpdo( config, parent),
+    m_name(config.name()),
     m_onSync( config.transportMechanism() == "sync" ), // TODO this is to be moved to tranpsport mechanism enum
     m_firstIteration(true),
     m_receivedCtrSinceLastSync (0),
@@ -138,9 +141,9 @@ UaStatus DTpdo::writeInvokeRtr (
 void DTpdo::initialize ()
 {
     getParent()->getParent()->cobidCoordinator().registerCobid(
-        0x380 + getParent()->id(),
+        PdoCobidMapper::tpdoSelectorToBaseCobid(selector()) + getParent()->id(),
         getParent()->getFullName(),
-        "TPDO XXX FIX ME");
+        m_name + " (TPDO non-mux)");
 }
 
 void DTpdo::onReplyReceived(const CanMessage& msg)

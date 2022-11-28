@@ -282,14 +282,9 @@
       <d:mutex/>
     </d:devicelogic>
     <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
-    <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
+    <d:configentry dataType="UaString" name="selector" isKey="true">
       <d:configRestriction>
-        <d:restrictionByEnumeration>
-          <d:enumerationValue value="1"/>
-          <d:enumerationValue value="2"/>
-          <d:enumerationValue value="3"/>
-          <d:enumerationValue value="4"/>
-        </d:restrictionByEnumeration>
+        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:[0-9A-F]{1,3}" />
       </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="transportMechanism">

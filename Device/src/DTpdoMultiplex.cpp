@@ -24,6 +24,8 @@
 #include <ASTpdoMultiplex.h>
 #include <DRoot.h>
 #include <DWarnings.h>
+#include <DNode.h>
+#include <DBus.h>
 
 #include <DMultiplexedChannel.h>
 
@@ -59,7 +61,8 @@ DTpdoMultiplex::DTpdoMultiplex (
     const Configuration::TpdoMultiplex& config,
     Parent_DTpdoMultiplex* parent
 ):
-    Base_DTpdoMultiplex( config, parent)
+    Base_DTpdoMultiplex( config, parent),
+    m_name(config.name())
 
     /* fill up constructor initialization list here */
 {
@@ -90,6 +93,10 @@ void DTpdoMultiplex::initialize()
         channel->setParentMultiplex(this);
         channel->initialize();
     }
+    getParent()->getParent()->cobidCoordinator().registerCobid(
+        0x380 + getParent()->id(), // TODO what is the cobid? need some generic mapper?
+        getParent()->getFullName(),
+        m_name + " (TPDO mux, " + std::to_string(multiplexedchannels().size()) + " channels)");
 }
 
 void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
