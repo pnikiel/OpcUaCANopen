@@ -284,7 +284,7 @@
     <d:hasobjects instantiateUsing="configuration" class="ExtractedValue"/>
     <d:configentry dataType="UaString" name="selector" isKey="true">
       <d:configRestriction>
-        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:[0-9A-F]{1,3}" />
+        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:0x[0-9A-F]{1,3}" />
       </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="transportMechanism">
@@ -319,7 +319,7 @@
   			etc.
   		</d:documentation>
       <d:configRestriction>
-        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:[0-9A-F]{1,3}" />
+        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:0x[0-9A-F]{1,3}" />
       </d:configRestriction>
     </d:configentry>
     <d:configentry dataType="UaString" name="transportMechanism" storedInDeviceObject="true">
