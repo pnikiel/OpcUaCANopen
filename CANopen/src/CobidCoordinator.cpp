@@ -9,10 +9,15 @@ using namespace Logging;
 namespace CANopen
 {
 
+// TODO universal cobid entry operator?
+
 void CobidCoordinator::addEntry(const CobidEntry& entry)
 {
     if (m_cobids.count(entry.cobid) > 0)
     {
+        LOG(Log::ERR) << "Registering hint: the pre-existing slot is " <<
+            m_cobids[entry.cobid].node << "," << m_cobids[entry.cobid].function << "   new is "
+            << entry.node << "," << entry.function;
         throw_runtime_error_with_origin("The cobid [0x" + Utils::toHexString(entry.cobid) + "] cant be registered -- the slot is already taken"); 
     }
     m_cobids[entry.cobid] = entry;

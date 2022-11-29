@@ -26,6 +26,8 @@
 #include <DNode.h>
 #include <DBus.h>
 
+#include <PdoCobidMapper.h>
+
 #include <CanMessage.h>
 
 namespace Device
@@ -56,12 +58,15 @@ DRpdo::DRpdo (
     const Configuration::Rpdo& config,
     Parent_DRpdo* parent
 ):
-    Base_DRpdo( config, parent)
+    Base_DRpdo( config, parent),
+    m_name(config.name()),
+    m_cobid(PdoCobidMapper::rpdoSelectorToBaseCobid(config.selector()) + getParent()->id())
 
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
     m_cache.assign(8, 0);
+
 }
 
 /* sample dtr */
@@ -80,6 +85,14 @@ DRpdo::~DRpdo ()
 // 3     Below you put bodies for custom methods defined for this class.   3
 // 3     You can do whatever you want, but please be decent.               3
 // 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DRpdo::initialize()
+{
+    getParent()->getParent()->cobidCoordinator().registerCobid(
+        m_cobid,
+        getParent()->getFullName(),
+        m_name + " (RPDO)");
+}
 
 //! sends and publishes to the address-space
 void DRpdo::propagateCache()
@@ -104,7 +117,7 @@ void DRpdo::propagateCache()
         rpdoMessage.c_data    
     );
 
-    rpdoMessage.c_id = 0x200 + getParent()->id();
+    rpdoMessage.c_id = m_cobid;
     rpdoMessage.c_dlc = m_cache.size();
     getParent()->getParent()->sendMessage(rpdoMessage);
 }

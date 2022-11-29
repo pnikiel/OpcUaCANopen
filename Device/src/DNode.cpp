@@ -30,6 +30,7 @@
 
 #include <DTpdoMultiplex.h>
 #include <DTpdo.h>
+#include <DRpdo.h>
 #include <DEmergencyParser.h>
 #include <DSdoSameIndexGroup.h>
 #include <DSdoVariable.h>
@@ -223,6 +224,9 @@ void DNode::initialize()
 
     for (DTpdoMultiplex* tpdoMultiplex : tpdomultiplexs())
         tpdoMultiplex->initialize();
+
+    for (DRpdo* rpdo : rpdos())
+        rpdo->initialize();
         
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {

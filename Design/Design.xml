@@ -338,19 +338,14 @@
     <d:devicelogic>
       <d:mutex/>
     </d:devicelogic>
-    <d:configentry dataType="OpcUa_Byte" name="selector" isKey="true">
+    <d:configentry dataType="UaString" name="selector" isKey="true">
+      <d:configRestriction>
+        <d:restrictionByPattern pattern="1|2|3|4|base_cobid:0x[0-9A-F]{1,3}" />
+      </d:configRestriction>
       <d:documentation>
             The selector code of the RPDO, for RPDO1 it should be 1,
             etc.
         </d:documentation>
-      <d:configRestriction>
-        <d:restrictionByEnumeration>
-          <d:enumerationValue value="1"/>
-          <d:enumerationValue value="2"/>
-          <d:enumerationValue value="3"/>
-          <d:enumerationValue value="4"/>
-        </d:restrictionByEnumeration>
-      </d:configRestriction>
     </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaByteString" name="cache" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_Good">
       <d:documentation>Presents current cached value of the Rpdo as the whole CANopen communication object. Primary use is debugging.</d:documentation>

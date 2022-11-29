@@ -57,12 +57,14 @@ private:
     // ----------------------------------------------------------------------- *
 
 public:
+    void initialize();
     std::vector<uint8_t>& getCache() { return m_cache; }
     void propagateCache();
 
 private:
+    const std::string m_name;
     std::vector<uint8_t> m_cache;
-
+    uint16_t m_cobid;
 
 
 };
