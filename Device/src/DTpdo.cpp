@@ -143,7 +143,8 @@ void DTpdo::initialize ()
     getParent()->getParent()->cobidCoordinator().registerCobid(
         PdoCobidMapper::tpdoSelectorToBaseCobid(selector()) + getParent()->id(),
         getParent()->getFullName(),
-        m_name + " (TPDO non-mux)");
+        m_name + " (TPDO non-mux)",
+        std::bind(&DTpdo::onReplyReceived, this, std::placeholders::_1));
 }
 
 void DTpdo::onReplyReceived(const CanMessage& msg)
