@@ -52,6 +52,10 @@ void CobidCoordinator::dispatch(const CanMessage& msg)
     try
     {
         CobidEntry& entry = m_cobids.at(msg.c_id);
+        if (entry.receiver)
+            entry.receiver(msg);
+        else
+            LOG(Log::INF) << "Leaking a Cobid receiver for cobid " << Utils::toHexString(msg.c_id);
     }
     catch (const std::out_of_range& ex)
     {

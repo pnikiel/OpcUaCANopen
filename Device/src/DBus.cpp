@@ -212,22 +212,22 @@ void DBus::onMessageReceived (const CanMessage& msg)
         return;
     }
 
-    m_cobidCoordinator.dispatch(msg);
+    m_cobidCoordinator.dispatch(msg); // TODO maybe it shall return a bool if this cobid was consumed or not?
 
-    unsigned int nodeId = msg.c_id & 0x7f;
-    // TODO shall everything be passed to specific node
-    DNode* node = getNodeById(nodeId);
-    if (node)
-        node->onMessageReceived(msg);
-    else
-    {
-        if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode()) // TODO: the model to study warnings must be invincible to the situation when the object structure is not entirely ready
-        {
-            SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
-                << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]" <<
-                " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
-        }
-    }
+    // unsigned int nodeId = msg.c_id & 0x7f;
+    // // TODO shall everything be passed to specific node
+    // DNode* node = getNodeById(nodeId);
+    // if (node)
+    //     node->onMessageReceived(msg);
+    // else
+    // {
+    //     if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode()) // TODO: the model to study warnings must be invincible to the situation when the object structure is not entirely ready
+    //     {
+    //         SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
+    //             << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]" <<
+    //             " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
+    //     }
+    // }
 }
 
 void DBus::sendMessage(const CanMessage& msg)

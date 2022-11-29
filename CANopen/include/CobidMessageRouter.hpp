@@ -6,7 +6,7 @@ namespace CANopen
 {
 
 typedef uint16_t Cobid;
-typedef std::function<void()> CobidReceiver; 
+typedef std::function<void(const CanMessage& msg)> CobidReceiver; 
 
 struct CobidEntry
 {

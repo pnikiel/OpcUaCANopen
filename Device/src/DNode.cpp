@@ -44,6 +44,7 @@
 #include <MyLogComponents.h>
 
 using namespace Logging;
+using namespace std::placeholders;
 
 namespace Device
 {
@@ -252,55 +253,65 @@ void DNode::initialize()
     // CANopen::CobidEntry receiveNgOrHb;
     // receiveNgOrHb.cobid = 0x700 + id(); // TODO nicer somehow ?
     // getParent()->cobidCoordinator().addEntry(receiveNgOrHb);
-    getParent()->cobidCoordinator().registerCobid(0x700 + id(), getFullName(), "StateInformation"); // TODO no receiver yet
+    
+    // register COBids for intrinsics --- this should go to a separate function
+    getParent()->cobidCoordinator().registerCobid(0x700 + id(), getFullName(), "StateInformation",
+        std::bind(&CANopen::NodeStateEngine::onNodeManagementReplyReceived, &m_nodeStateEngine, std::placeholders::_1));
+    getParent()->cobidCoordinator().registerCobid(0x80 + id(), getFullName(), "EmergencyObject",
+        std::bind(&DNode::onEmergencyReceived, this, std::placeholders::_1));
+
+    getParent()->cobidCoordinator().registerCobid(0x600 + id(), getFullName(), "SDO requests",
+        std::bind(&DNode::sdoRequestNotifier, this, std::placeholders::_1));  
+    getParent()->cobidCoordinator().registerCobid(0x580 + id(), getFullName(), "SDO replies",
+        std::bind(&DNode::sdoReplyWrapper, this, std::placeholders::_1));
+
 }
 
-void DNode::onMessageReceived (const CanMessage& msg)
-{
-    /* Doc: check table 4 in the Henk's document */
-    // TODO impl
-    unsigned int functionCode = msg.c_id >> 7;
-    switch (functionCode)
-    {
-        case 0x1:
-            onEmergencyReceived(msg); break;
+// void DNode::onMessageReceived (const CanMessage& msg)
+// {
+//     /* Doc: check table 4 in the Henk's document */
+//     // TODO impl
+//     unsigned int functionCode = msg.c_id >> 7;
+//     switch (functionCode)
+//     {
+//         case 0x1:
+//             // onEmergencyReceived(msg); 
+//             break;
 
-        // TPDOs
-        case 0x3: // TPDO1
-        case 0x5: // TPDO2
-        case 0x7: // TPDO3
-        case 0x9: // TPDO4
-            onTpdoReceived(msg); break; 
+//         // TPDOs
+//         case 0x3: // TPDO1
+//         case 0x5: // TPDO2
+//         case 0x7: // TPDO3
+//         case 0x9: // TPDO4
+//             onTpdoReceived(msg); break; 
 
-        case 0xb: // CobId 0x580...
-        {
-            if (getParent()->isInSpyMode())
-            {
-                LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
-            }
-            else
-                m_sdoEngine.replyCame(msg);
-        }
-            break;
+//         case 0xb: // CobId 0x580...
+//         {
+//             if (getParent()->isInSpyMode())
+//             {
+//                 LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+//             }
+//             else
+//                 m_sdoEngine.replyCame(msg);
+//         }
+//             break;
 
-        case 0xc: // CobId 0x600...
-        {
-            if (getParent()->isInSpyMode())
-            {
-                LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
-            }
-            else
-                SPOOKY(getFullName()) << " SDO request is seen ... hmm ... another host on the bus. It's BAD!";
-        }
-            break;
+//         case 0xc: // CobId 0x600...
+//         {
+//             if (getParent()->isInSpyMode())
+//             {
+//                 LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+//             }
+//             else
+//                 SPOOKY(getFullName()) << " SDO request is seen ... hmm ... another host on the bus. It's BAD!";
+//         }
+//             break;
 
-        // various NMts
-        case 0xe: m_nodeStateEngine.onNodeManagementReplyReceived(msg); break;
         
-        default:
-            SPOOKY(getFullName()) << "Received unintelligible message, fnc code " << wrapValue(std::to_string(functionCode)) << " " << msg.toString() << SPOOKY_;
-    }
-}
+//         default:
+//             SPOOKY(getFullName()) << "Received unintelligible message, fnc code " << wrapValue(std::to_string(functionCode)) << " " << msg.toString() << SPOOKY_;
+//     }
+// }
 
 void DNode::onBootupReceived ()
 {
@@ -400,6 +411,26 @@ void DNode::propagateNullToTpdos ()
         tpdo->propagateNull();
     for (DTpdoMultiplex* multiplex : tpdomultiplexs())
         multiplex->propagateNull();
+}
+
+void DNode::sdoReplyWrapper (const CanMessage& msg)
+{
+    if (getParent()->isInSpyMode())
+    {
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+    }
+    else
+        m_sdoEngine.replyCame(msg);   
+}
+
+void DNode::sdoRequestNotifier (const CanMessage& msg)
+{
+    if (getParent()->isInSpyMode())
+    {
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+    }
+    else
+        SPOOKY(getFullName()) << " SDO request is seen " << SPOOKY_ << " ... hmm ... another host on the bus. It's BAD!";
 }
 
 }

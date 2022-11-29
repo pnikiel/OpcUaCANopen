@@ -26,6 +26,7 @@
 #include <DWarnings.h>
 #include <DNode.h>
 #include <DBus.h>
+#include <PdoCobidMapper.h>
 
 #include <DMultiplexedChannel.h>
 
@@ -94,9 +95,10 @@ void DTpdoMultiplex::initialize()
         channel->initialize();
     }
     getParent()->getParent()->cobidCoordinator().registerCobid(
-        0x380 + getParent()->id(), // TODO what is the cobid? need some generic mapper?
+        PdoCobidMapper::tpdoSelectorToBaseCobid(selector()) + getParent()->id(),
         getParent()->getFullName(),
-        m_name + " (TPDO mux, " + std::to_string(multiplexedchannels().size()) + " channels)");
+        m_name + " (TPDO mux, " + std::to_string(multiplexedchannels().size()) + " channels)",
+        std::bind(&DTpdoMultiplex::onReplyReceived, this, std::placeholders::_1));
 }
 
 void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
