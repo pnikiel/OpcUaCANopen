@@ -249,10 +249,6 @@ void DNode::initialize()
     LOG(Log::TRC, "SdoValidator") << wrapId(getFullName()) << " SDO short-list established after initialize() is: ";
     for (auto& nameObjectPair : m_sdosByShortName)
         LOG(Log::TRC, "SdoValidator") << wrapValue(nameObjectPair.first);
-
-    // CANopen::CobidEntry receiveNgOrHb;
-    // receiveNgOrHb.cobid = 0x700 + id(); // TODO nicer somehow ?
-    // getParent()->cobidCoordinator().addEntry(receiveNgOrHb);
     
     // register COBids for intrinsics --- this should go to a separate function
     getParent()->cobidCoordinator().registerCobid(0x700 + id(), getFullName(), "StateInformation",
@@ -266,52 +262,6 @@ void DNode::initialize()
         std::bind(&DNode::sdoReplyWrapper, this, std::placeholders::_1));
 
 }
-
-// void DNode::onMessageReceived (const CanMessage& msg)
-// {
-//     /* Doc: check table 4 in the Henk's document */
-//     // TODO impl
-//     unsigned int functionCode = msg.c_id >> 7;
-//     switch (functionCode)
-//     {
-//         case 0x1:
-//             // onEmergencyReceived(msg); 
-//             break;
-
-//         // TPDOs
-//         case 0x3: // TPDO1
-//         case 0x5: // TPDO2
-//         case 0x7: // TPDO3
-//         case 0x9: // TPDO4
-//             onTpdoReceived(msg); break; 
-
-//         case 0xb: // CobId 0x580...
-//         {
-//             if (getParent()->isInSpyMode())
-//             {
-//                 LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
-//             }
-//             else
-//                 m_sdoEngine.replyCame(msg);
-//         }
-//             break;
-
-//         case 0xc: // CobId 0x600...
-//         {
-//             if (getParent()->isInSpyMode())
-//             {
-//                 LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
-//             }
-//             else
-//                 SPOOKY(getFullName()) << " SDO request is seen ... hmm ... another host on the bus. It's BAD!";
-//         }
-//             break;
-
-        
-//         default:
-//             SPOOKY(getFullName()) << "Received unintelligible message, fnc code " << wrapValue(std::to_string(functionCode)) << " " << msg.toString() << SPOOKY_;
-//     }
-// }
 
 void DNode::onBootupReceived ()
 {
@@ -328,8 +278,7 @@ void DNode::onEmergencyReceived (const CanMessage& msg)
     emergencyparsers()[0]->onEmergencyReceived(msg);
 }
 
-
-
+// TODO: the following maybe could get to the cobid router for diagnostics ?
 void DNode::onTpdoReceived (const CanMessage& msg)
 {
     if (msg.c_rtr)
@@ -346,29 +295,7 @@ void DNode::onTpdoReceived (const CanMessage& msg)
                     "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
             return;
         }
-    }
-
-    // TODO : the code below need to go.
-    // unsigned int functionCode = msg.c_id >> 7;
-    // unsigned int pdoSelector = (functionCode-1) / 2;
-
-    // DTpdo* tpdo = getTpdoBySelector(pdoSelector);
-    // DTpdoMultiplex* multiplex = getTpdoMultiplexBySelector(pdoSelector);
-    // if (!multiplex && !tpdo)
-    // {
-    //     if (DRoot::getInstance()->warningss()[0]->unexpectedTpdo())
-    //     {
-    //         SPOOKY(getFullName()) << "received TPDO" << wrapValue(std::to_string(pdoSelector)) << 
-    //             " however no such TPDOs are configured (neither Tpdo nor TpdoMultiplex). Fix your configuration. " << SPOOKY_ << "[WunexpectedTpdo]";
-    //     }
-    //     return;
-    // }
-    // if (tpdo)
-    //     tpdo->onReplyReceived(msg);
-    // if (multiplex) 
-    //     multiplex->onReplyReceived(msg);
-    
-
+    } 
 }
 
 void DNode::tick()
