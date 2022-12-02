@@ -271,9 +271,10 @@ void DBus::tickSync()
 }
 
 void DBus::onError (const int errorCode, const char* errorDescription, timeval&)
-{
+{ 
     // Feature clause FC1.3: Monitor CAN port state
-    getAddressSpaceLink()->setPortError(errorCode, OpcUa_Good);
+    // The cast int->uint is intentional as fwElmb expects an uint for port status, so we're moreless not losing any info.
+    getAddressSpaceLink()->setPortError(static_cast<unsigned int>(errorCode), OpcUa_Good);
     getAddressSpaceLink()->setPortErrorDescription(errorDescription, OpcUa_Good);
 
     if (errorCode != 0 && m_lastErrorCode == 0)

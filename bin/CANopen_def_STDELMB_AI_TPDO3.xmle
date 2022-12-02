@@ -24,4 +24,4 @@
   </MultiplexedChannelConfigurationGenerator>
 </TpdoMultiplex>
 
-<FreeVariable name="~model:STDELMB_AI_TPDO3.version" type="Int32" initialValue="1"/>
+<FreeVariable name="~model:STDELMB_AI_TPDO3.version" type="Int32" initialValue="1" accessLevel="R"/>

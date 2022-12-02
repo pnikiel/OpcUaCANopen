@@ -26,7 +26,7 @@ void printCtrlZTable ()
               << std::endl;
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
-        OpcUa_Int16 portError (0);
+        OpcUa_UInt32 portError (0);
         std::string portErrorStr;
         if (bus->getAddressSpaceLink()->getPortError(portError) == OpcUa_Good)
         {
