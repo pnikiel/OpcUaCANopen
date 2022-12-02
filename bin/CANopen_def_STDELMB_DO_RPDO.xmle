@@ -9,4 +9,4 @@
   <RpdoCachedVariable name="do_write" dataType="UInt16" offset="0"/>
 </Rpdo>
 
-<FreeVariable name="~model:STDELMB_DO_RPDO.version" type="Int32" initialValue="1"/>
+<FreeVariable name="~model:STDELMB_DO_RPDO.version" type="Int32" initialValue="1" accessLevel="R"/>

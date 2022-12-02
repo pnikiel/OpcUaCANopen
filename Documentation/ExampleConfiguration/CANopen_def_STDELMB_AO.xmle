@@ -70,4 +70,4 @@ object dictionary -->
 <SdoVariable index="6411" subIndex="63" name="ao_62" dataType="UInt16" access="RW" />
 <SdoVariable index="6411" subIndex="64" name="ao_63" dataType="UInt16" access="RW" />
 
-<FreeVariable name="~model:STDELMB_AO.version" type="Int32" initialValue="1"/>
+<FreeVariable name="~model:STDELMB_AO.version" type="Int32" initialValue="1" accessLevel="R"/>

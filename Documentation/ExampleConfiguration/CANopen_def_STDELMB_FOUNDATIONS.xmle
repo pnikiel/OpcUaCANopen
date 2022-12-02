@@ -26,4 +26,4 @@
   description="MA446 ELMBio firmware is necessary for having the lost-RTR firmware bug fixed">
 </SdoValidator>
 
-<FreeVariable name="~model:STDELMB_FOUNDATIONS.version" type="Int32" initialValue="1"/>
+<FreeVariable name="~model:STDELMB_FOUNDATIONS.version" type="Int32" initialValue="1" accessLevel="R"/>
