@@ -46,3 +46,5 @@
   <ExtractedValue booleanFromBit="6" dataType="Boolean" name="di_C_6" offset="2" />
   <ExtractedValue booleanFromBit="7" dataType="Boolean" name="di_C_7" offset="2" />
 </Tpdo>
+
+<FreeVariable name="~model:STDELMB_DI_TPDO1_CPR.version" type="Int32" initialValue="1"/>

@@ -125,6 +125,7 @@ DBus::~DBus ()
 
 UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
 {
+    // NEEDS CHECKING IF THE VALUE WRITTEN IS LARGER THEN THE TIMEOUT -> Fn1.1.4
     return OpcUa_BadNotImplemented; // TODO
 }
 
@@ -139,14 +140,17 @@ UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
 
 void DBus::initialize()
 {
-
+    // Feature clause FN1.1.4: Node guarding timing and timing constraints
+    if (getAddressSpaceLink()->getNodeGuardIntervalMs() <= 1000.0 * DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout())
+    {
+        throw std::runtime_error("Configuration error: clause FN1.1.4 not satisfied"); // TODO: change to config_error OPCUA-2894
+    }
 
 
     for (Device::DNode* node : nodes())
         node->initialize();
 
     if (QuasarServer::instance()->shouldPrintCobidsTables())
-    {}
         m_cobidCoordinator.printDiagnostics();
     
     m_canAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
