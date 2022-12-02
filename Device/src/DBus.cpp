@@ -71,7 +71,8 @@ DBus::DBus (
     Parent_DBus* parent
 ):
     Base_DBus( config, parent),
-    m_lastErrorCode(0)
+    m_lastErrorCode(0),
+    m_cobidCoordinator(config.name())
 
     /* fill up constructor initialization list here */
 {
@@ -144,7 +145,9 @@ void DBus::initialize()
     for (Device::DNode* node : nodes())
         node->initialize();
 
-    m_cobidCoordinator.printDiagnostics(); // TODO make it conditional ?
+    if (QuasarServer::instance()->shouldPrintCobidsTables())
+    {}
+        m_cobidCoordinator.printDiagnostics();
     
     m_canAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
     m_canAccess->canMessageError.connect(std::bind(&DBus::onError, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));

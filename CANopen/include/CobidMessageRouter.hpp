@@ -20,6 +20,7 @@ struct CobidEntry
 class CobidCoordinator
 {
 public:
+    CobidCoordinator(const std::string& busName);
 
     void addEntry(const CobidEntry& entry);
     void registerCobid (
@@ -31,6 +32,7 @@ public:
     void printDiagnostics();
     void dispatch(const CanMessage& msg);
 private:
+    const std::string m_loggingBusName;
     std::map<Cobid, CobidEntry> m_cobids;
 };
 

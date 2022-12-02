@@ -9,6 +9,11 @@ using namespace Logging;
 namespace CANopen
 {
 
+CobidCoordinator::CobidCoordinator (const std::string& busName) :
+    m_loggingBusName(busName)
+{
+}
+
 // TODO universal cobid entry operator?
 
 void CobidCoordinator::addEntry(const CobidEntry& entry)
@@ -49,7 +54,7 @@ void CobidCoordinator::printDiagnostics()
     {
         table << Utils::toHexString(x.first) << x.second.node << x.second.function << fort::endr;
     }
-    std::cout << table.to_string() << std::endl;
+    LOG(Log::INF) << "Cobid table for bus [" << m_loggingBusName << "]" << std::endl << table.to_string() << std::endl;
 }
 
 void CobidCoordinator::dispatch(const CanMessage& msg)
