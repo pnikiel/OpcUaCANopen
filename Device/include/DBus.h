@@ -27,7 +27,7 @@
 #include <CCanAccess.h>
 
 #include <NodeGuarding.hpp>
-#include <CobidMessageRouter.hpp>
+#include <CobidCoordinator.hpp>
 
 #include <Base_DBus.h>
 

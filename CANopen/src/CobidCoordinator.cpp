@@ -1,6 +1,6 @@
 #include <LogIt.h>
 #include <Utils.h>
-#include <CobidMessageRouter.hpp>
+#include <CobidCoordinator.hpp>
 #include <Logging.hpp>
 #include <fort.hpp>
 
