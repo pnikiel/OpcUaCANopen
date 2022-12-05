@@ -65,11 +65,11 @@ void CobidCoordinator::dispatch(const CanMessage& msg)
         if (entry.receiver)
             entry.receiver(msg);
         else
-            LOG(Log::INF) << "Leaking a Cobid receiver for cobid " << Utils::toHexString(msg.c_id);
+            LOG(Log::INF) << "Leaking a Cobid receiver for cobid " << Utils::toHexString(msg.c_id); // TODO spy mode fixes
     }
     catch (const std::out_of_range& ex)
     {
-        SPOOKY("TODO BUS NAME") << "Unknown cobid" << SPOOKY_ << " [0x" << Utils::toHexString(msg.c_id) << "]"; // TODO
+        SPOOKY(m_loggingBusName) << "Unknown cobid" << SPOOKY_ << " [0x" << Utils::toHexString(msg.c_id) << "]"; // TODO Educated guess on what's that when we have it
         return;
     }
 }
