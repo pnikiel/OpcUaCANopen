@@ -4,6 +4,8 @@
 #include <Logging.hpp>
 #include <fort.hpp>
 
+#include <PiotrsUtils.h>
+
 using namespace Logging;
 
 namespace CANopen
@@ -23,7 +25,7 @@ void CobidCoordinator::addEntry(const CobidEntry& entry)
         LOG(Log::ERR) << "Registering hint: the pre-existing slot is " <<
             m_cobids[entry.cobid].node << "," << m_cobids[entry.cobid].function << "   new is "
             << entry.node << "," << entry.function;
-        throw_runtime_error_with_origin("The cobid [0x" + Utils::toHexString(entry.cobid) + "] cant be registered -- the slot is already taken"); 
+        throw_config_error_with_origin("The cobid [0x" + Utils::toHexString(entry.cobid) + "] cant be registered -- the slot is already taken"); 
     }
     m_cobids[entry.cobid] = entry;
 }
