@@ -8,6 +8,9 @@
 #include <Logging.hpp>
 #include <Utils.h>
 #include <PiotrsUtils.h>
+#include <DNode.h>
+#include <DBus.h>
+#include <CobidCoordinator.hpp>
 
 using namespace Logging;
 
@@ -22,22 +25,28 @@ static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
     return dataAsStr.str(); 
 } 
 
-SdoEngine::SdoEngine (MessageSendFunction messageSendFunction, unsigned char nodeId):
+SdoEngine::SdoEngine (
+    Device::DNode* myNode,
+    MessageSendFunction messageSendFunction,
+    CobidCoordinator& cobidCoordinator):
+
+m_node(myNode),
 m_sendFunction(messageSendFunction),
-m_nodeId(nodeId),
 m_replyCame(false),
 m_replyExpected(false)
 {
-
+    cobidCoordinator.registerCobid(0x600 + m_node->id(), m_node->getFullName(), "SDO requests",
+        std::bind(&SdoEngine::sdoRequestNotifier, this, std::placeholders::_1));  
+    cobidCoordinator.registerCobid(0x580 + m_node->id(), m_node->getFullName(), "SDO replies",
+        std::bind(&SdoEngine::replyCame, this, std::placeholders::_1));
 }
 
 bool SdoEngine::readExpedited (
-    const std::string& where,
     uint16_t index, 
     uint8_t subIndex, 
     std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
 {
-    LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+    LOG(Log::TRC, "Sdo") <<wrapId(m_node->getFullName()) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex));
     // TODO: we need to synchronize access to SDOs, preferably at the level of the node. (quasar synchronization)??
 
@@ -48,7 +57,7 @@ bool SdoEngine::readExpedited (
 
     /* translates basically into Initiate Domain Upload */
     CanMessage initiateDomainUpload;
-    initiateDomainUpload.c_id = 0x600 + m_nodeId;
+    initiateDomainUpload.c_id = 0x600 + m_node->id();
     initiateDomainUpload.c_data[0] = 0x40;
     initiateDomainUpload.c_data[1] = index;
     initiateDomainUpload.c_data[2] = index >> 8;
@@ -62,7 +71,7 @@ bool SdoEngine::readExpedited (
     m_replyExpected = false;
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             ERROR << "SDO reply has not come in expected time (" << timeoutMs << "ms)" << ERROR_;
         return false;
@@ -70,7 +79,7 @@ bool SdoEngine::readExpedited (
 
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
-        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << ERROR_;
         return false;        
@@ -84,7 +93,7 @@ bool SdoEngine::readExpedited (
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (!deviceWantsExpeditedTransfer)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             Quasar::TermColors::ForeRed << "CANopen device wanted non-expedited transfer (" << timeoutMs << "ms)" << 
             Quasar::TermColors::StyleReset;
@@ -110,7 +119,7 @@ bool SdoEngine::readExpedited (
         output.begin());
 
     LOG(Log::TRC, "Sdo") << 
-        wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
 
     return true;
@@ -118,13 +127,12 @@ bool SdoEngine::readExpedited (
 }
 
 bool SdoEngine::writeExpedited (
-    const std::string& where, 
     uint16_t index, 
     uint8_t subIndex, 
     const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
 
-    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+    LOG(Log::TRC, "Sdo") << wrapId(m_node->getFullName()) << 
         " + SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
         " data=[" << wrapValue(bytesToHexString(data)) << "] ";
     if (data.size() < 1)
@@ -137,7 +145,7 @@ bool SdoEngine::writeExpedited (
     m_replyCame = false;
 
     CanMessage initiateDomainDownload;
-    initiateDomainDownload.c_id = 0x600 + m_nodeId;
+    initiateDomainDownload.c_id = 0x600 + m_node->id();
     unsigned char n = 4 - data.size();
     initiateDomainDownload.c_data[0] = 0x23 | ((n & 0x03) << 2); // E=1 S=1 N is dependent on data size
     initiateDomainDownload.c_data[1] = index;
@@ -157,7 +165,7 @@ bool SdoEngine::writeExpedited (
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
+        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
         return false;
     }
 
@@ -167,7 +175,7 @@ bool SdoEngine::writeExpedited (
         initiateDomainDownload.c_data + 4,
         m_lastSdoReply.c_data + 1).first != initiateDomainDownload.c_data + 4)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
             " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply was for another object(!)" << SPOOKY_;
         return false;
@@ -175,13 +183,13 @@ bool SdoEngine::writeExpedited (
 
     if (m_lastSdoReply.c_data[0] != 0x60)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
             " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << SPOOKY_;
         return false;
     } 
 
-    LOG(Log::TRC, "Sdo") << wrapId(where) << " - SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
+    LOG(Log::TRC, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
     return true;
 
     //throw std::runtime_error("not-implemented");
@@ -190,7 +198,11 @@ bool SdoEngine::writeExpedited (
 
 void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
 {
-    // TODO should have state here that say whether a reply was actually expected?
+    if (m_node->getParent()->isInSpyMode())
+    {
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_node->getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+        return;
+    }
     LOG(Log::TRC, "Sdo") << "Received SDO reply";
     std::lock_guard<std::mutex> lock (m_condVarChangeLock);
     if (m_replyExpected)
@@ -205,6 +217,16 @@ void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
         LOG(Log::ERR, "Sdo") << "Received unexpected SDO reply " << wrapValue(Common::CanMessageToString(msg));
     }
 
+}
+
+void SdoEngine::sdoRequestNotifier (const CanMessage& msg)
+{
+    if (m_node->getParent()->isInSpyMode())
+    {
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_node->getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+    }
+    else
+        SPOOKY(m_node->getFullName()) << " SDO request is seen " << SPOOKY_ << " ... hmm ... another host on the bus. It's BAD!";
 }
 
 }

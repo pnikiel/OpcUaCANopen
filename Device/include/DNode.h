@@ -89,7 +89,7 @@ public:
     void onTpdoReceived (const CanMessage& msg);
     void tick();
 
-    CANopen::SdoEngine& sdoEngine() { return m_sdoEngine; }
+    std::shared_ptr<CANopen::SdoEngine> sdoEngine() { return m_sdoEnginePtr; }
 
     void addNodeStateChangeCallBack(CANopen::NodeStateChangeCallBack callBack) { m_nodeStateEngine.addNodeStateChangeNotification(callBack); }
 
@@ -111,15 +111,14 @@ private:
 
     void propagateNullToTpdos ();
 
-    void sdoReplyWrapper (const CanMessage& msg);
-    //! This is just a helper for warning + spooky messages.
-    void sdoRequestNotifier (const CanMessage& msg);
-
     std::chrono::steady_clock::time_point m_lastNodeGuardingTimePoint;
     CANopen::NodeState m_previousState;
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
     CANopen::StateInfoModel m_stateInfoModel;
-    CANopen::SdoEngine m_sdoEngine;
+
+    // TODO: Piotr: learn how to make it boost-optional
+    // "Ptr" chunk is intended to clearly visualize the separation between sharedptr API and the SdoEngine API
+    std::shared_ptr<CANopen::SdoEngine> m_sdoEnginePtr; 
 
 
     CANopen::NodeStateEngine m_nodeStateEngine;

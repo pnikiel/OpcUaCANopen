@@ -1,6 +1,8 @@
 // @author Piotr Nikiel <piotr@nikiel.info>
 // @date 25-Nov-2022
 
+#pragma once
+
 #include <map>
 #include <functional>
 #include <CanMessage.h>

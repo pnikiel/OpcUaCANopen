@@ -252,6 +252,12 @@
     <d:sourcevariable dataType="OpcUa_UInt32" name="nmtPartialBackwardsCompat" addressSpaceRead="forbidden" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="of_containing_object">
       <d:documentation>This variable is for ensuring *partial compatibility* with the Slava's CANopen OPCUA server -- see FN4.1 in the Piotr's writeup for docs.</d:documentation>
     </d:sourcevariable>
+    <d:configentry name="hasSdoSupport" dataType="OpcUa_Boolean" defaultValue="true">
+      <d:documentation>
+        Some CANopen devices intentionally do not support SDO service. This is rare (and possibly breaks the standard)
+        but it happens. You can use this setting to flag such a node.
+      </d:documentation>
+    </d:configentry>
     <d:documentation>
       This class corresponds to a CANopen node. <i>Standard ELMB example: one object of this class corresponds to one ELMB.</i>
     </d:documentation>

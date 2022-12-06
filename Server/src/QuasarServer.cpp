@@ -254,12 +254,12 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("print_cobids_tables",    po::bool_switch(&m_printCobidsTables)->default_value(false), "Print cobid tables");
 }
 
-bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString, const std::string& fullname)
+bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
 {
     std::vector<uint8_t> output;
     try
     {
-        if (!engine.readExpedited(fullname, index, subIndex, output, 50))
+        if (!engine.readExpedited(index, subIndex, output, 50))
             return false;
         outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
@@ -302,9 +302,11 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
             {
                 if (bus->isInSpyMode())
                     info.result = "N/A: spy mode";
+                else if (!node->sdoEngine())
+                    info.result = "N/A: SDO switched off";
                 else
                 {
-                    if (!readSdoAsAscii(node->sdoEngine(), info.index, info.subIndex, info.result, node->getFullName()))
+                    if (!readSdoAsAscii(*node->sdoEngine(), info.index, info.subIndex, info.result))
                     {
                         assumeSuccessful = false;
                         break;

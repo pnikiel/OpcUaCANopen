@@ -79,7 +79,6 @@ DNode::DNode (
         m_previousState(CANopen::NodeState::UNKNOWN),
         m_nodeGuardingOperationsState(CANopen::NodeGuardingOperationsState::IDLE),
         m_stateInfoModel(CANopen::stateInfoModelFromText(config.stateInfoSource())),
-        m_sdoEngine(std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1), config.id()),
         m_nodeStateEngine(
             config.id(),
             m_stateInfoModel,
@@ -121,6 +120,13 @@ DNode::DNode (
             this->propagateNullToTpdos();
         }
     });
+
+    if (config.hasSdoSupport())
+        m_sdoEnginePtr.reset(
+            new CANopen::SdoEngine(
+                this,
+                std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1),
+                getParent()->cobidCoordinator()));
 
 }
 
@@ -241,7 +247,7 @@ void DNode::initialize()
     for (Device::DSdoVariable* variable : sdovariables())
     {
         if (variable->index() == Configuration::SdoVariable::index_default_value())
-            throw std::runtime_error("Stage2 Configuration error: Independent SDO variable needs exact SDO index. (at [" + variable->getFullName() + "]");
+            throw std::runtime_error("Stage2 Configuration error: Independent SDO variable needs exact SDO index. (at [" + variable->getFullName() + "]"); // TODO Config error
         registerSdoByShortName(variable->name(), variable);
         variable->initialize(getParent(), this);
     }
@@ -259,11 +265,6 @@ void DNode::initialize()
         std::bind(&CANopen::NodeStateEngine::onNodeManagementReplyReceived, &m_nodeStateEngine, std::placeholders::_1));
     getParent()->cobidCoordinator().registerCobid(0x80 + id(), getFullName(), "EmergencyObject",
         std::bind(&DNode::onEmergencyReceived, this, std::placeholders::_1));
-
-    getParent()->cobidCoordinator().registerCobid(0x600 + id(), getFullName(), "SDO requests",
-        std::bind(&DNode::sdoRequestNotifier, this, std::placeholders::_1));  
-    getParent()->cobidCoordinator().registerCobid(0x580 + id(), getFullName(), "SDO replies",
-        std::bind(&DNode::sdoReplyWrapper, this, std::placeholders::_1));
 
 }
 
@@ -342,26 +343,6 @@ void DNode::propagateNullToTpdos ()
         tpdo->propagateNull();
     for (DTpdoMultiplex* multiplex : tpdomultiplexs())
         multiplex->propagateNull();
-}
-
-void DNode::sdoReplyWrapper (const CanMessage& msg)
-{
-    if (getParent()->isInSpyMode())
-    {
-        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
-    }
-    else
-        m_sdoEngine.replyCame(msg);   
-}
-
-void DNode::sdoRequestNotifier (const CanMessage& msg)
-{
-    if (getParent()->isInSpyMode())
-    {
-        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
-    }
-    else
-        SPOOKY(getFullName()) << " SDO request is seen " << SPOOKY_ << " ... hmm ... another host on the bus. It's BAD!";
 }
 
 }

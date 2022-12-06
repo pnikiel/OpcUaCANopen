@@ -29,6 +29,7 @@
 #include <DGlobalSettings.h>
 #include <DBus.h>
 
+#include <PiotrsUtils.h>
 #include <ValueMapper.h>
 #include <Logging.hpp>
 
@@ -126,8 +127,7 @@ UaStatus DSdoVariable::readValue (
     unsigned int timeoutMs = m_expeditedReadTimeoutInheritsGlobal ? 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
         1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
-    bool status = m_node->sdoEngine().readExpedited(
-        getFullName(),
+    bool status = m_node->sdoEngine()->readExpedited(
         m_index, 
         m_subIndex, 
         readData, 
@@ -177,8 +177,7 @@ UaStatus DSdoVariable::writeValue (
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
         1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
 
-    bool status = m_node->sdoEngine().writeExpedited(
-        getFullName(),
+    bool status = m_node->sdoEngine()->writeExpedited(
         m_index, 
         m_subIndex, 
         bytes, 
@@ -198,6 +197,8 @@ void DSdoVariable::initialize (DBus* bus, DNode* node)
 {
     m_bus = bus;
     m_node = node;
+    if (!node->sdoEngine())
+        throw_config_error_with_origin("SDO declared with a node that explicitly has no SDO support");
 }
 
 void DSdoVariable::setIndex (uint16_t _index)
