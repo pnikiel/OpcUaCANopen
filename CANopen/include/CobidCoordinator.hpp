@@ -36,9 +36,12 @@ public:
 
     void printDiagnostics();
     void dispatch(const CanMessage& msg);
+
+    void setSpookyOnUnknownCobid(bool isOn) { m_spookyOnUnknownCobid=isOn; }
 private:
     const std::string m_loggingBusName;
     std::map<Cobid, CobidEntry> m_cobids;
+    bool m_spookyOnUnknownCobid;
 };
 
 }

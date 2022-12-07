@@ -153,6 +153,8 @@ void DBus::initialize()
     if (QuasarServer::instance()->shouldPrintCobidsTables())
         m_cobidCoordinator.printDiagnostics();
     
+    m_cobidCoordinator.setSpookyOnUnknownCobid(DRoot::getInstance()->warnings()->unknownCobid());
+
     m_canAccess->canMessageCame.connect(std::bind(&DBus::onMessageReceived, this, std::placeholders::_1));
     m_canAccess->canMessageError.connect(std::bind(&DBus::onError, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
