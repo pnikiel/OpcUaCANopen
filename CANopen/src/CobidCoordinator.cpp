@@ -99,6 +99,7 @@ void CobidCoordinator::dispatch(const CanMessage& msg)
     }
     catch (const std::out_of_range& ex)
     {
+        // Feature clause FCV1: Sanity of node’s CAN message space
         if (m_spookyOnUnknownCobid)
         {
             SPOOKY(m_loggingBusName) << "Unknown cobid" << SPOOKY_ << " [0x" << Utils::toHexString(msg.c_id) <<

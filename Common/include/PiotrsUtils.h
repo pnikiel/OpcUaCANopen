@@ -4,7 +4,7 @@
 #include <stdexcept>
 
 #include <CanMessage.h>
-
+#include <Utils.h>
 
 namespace Common
 {

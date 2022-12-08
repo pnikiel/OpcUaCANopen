@@ -121,6 +121,7 @@ DNode::DNode (
         }
     });
 
+    // Feature clause FS0.2: SDO engine deactivated for given node
     if (config.hasSdoSupport())
         m_sdoEnginePtr.reset(
             new CANopen::SdoEngine(

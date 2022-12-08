@@ -2,12 +2,14 @@
 
 #include <boost/regex.hpp>
 
+#include <PiotrsUtils.h>
 #include <PdoCobidMapper.h>
 
 static boost::regex baseCobidSpec ("^base_cobid:0x([0-9A-F]{1,4})$");
 
 uint16_t PdoCobidMapper::tpdoSelectorToBaseCobid(const std::string& tpdoSelector)
 {
+   
     if (tpdoSelector == "1")
         return 0x180;
     else if (tpdoSelector == "2")
@@ -18,7 +20,7 @@ uint16_t PdoCobidMapper::tpdoSelectorToBaseCobid(const std::string& tpdoSelector
         return 0x480;
     else
     {
-        // is it the generalized TPDO ?
+        // Feature clause FP1.1.1: Support for non-standard Cobid mappings
         boost::smatch matchResults;
         bool matched = boost::regex_match( tpdoSelector, matchResults, baseCobidSpec );
         if (matched)
@@ -27,7 +29,7 @@ uint16_t PdoCobidMapper::tpdoSelectorToBaseCobid(const std::string& tpdoSelector
             return baseCobid;
         }
         else /* no other option- God knows that that is */
-            throw std::runtime_error("unsupported specification of the TPDO selector ["+tpdoSelector+"]");
+            throw_config_error_with_origin("unsupported specification of the TPDO selector ["+tpdoSelector+"]");
     }
         
 }
@@ -45,7 +47,7 @@ uint16_t PdoCobidMapper::rpdoSelectorToBaseCobid(const std::string& rpdoSelector
     else
     {
         // TODO: merge that with the function above
-        // is it the generalized rpdo ?
+         // Feature clause FP1.1.1: Support for non-standard Cobid mappings
         boost::smatch matchResults;
         bool matched = boost::regex_match( rpdoSelector, matchResults, baseCobidSpec );
         if (matched)
