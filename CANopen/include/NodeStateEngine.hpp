@@ -80,8 +80,8 @@ namespace CANopen
         std::chrono::steady_clock::time_point m_heartBeatWindowStartTimePoint;
 
         // NG + HB
-        CANopen::NodeState m_previousState;
         CANopen::NodeState m_requestedStateEnum;
+        CANopen::NodeState m_previousState;
         CANopen::NodeState m_currentState;
 
         unsigned int m_nodeGuardingReplyTimeoutMs; // TODO move up

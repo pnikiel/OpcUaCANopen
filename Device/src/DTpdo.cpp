@@ -69,9 +69,10 @@ DTpdo::DTpdo (
     m_name(config.name()),
     m_onSync( config.transportMechanism() == "sync" ), // TODO this is to be moved to tranpsport mechanism enum
     m_firstIteration(true),
+    m_transportMechanism(Enumerator::Tpdo::transportMechanismFromString(config.transportMechanism())),
     m_receivedCtrSinceLastSync (0),
-    m_numRtrsInvokedAddressSpace (0),
-    m_transportMechanism(Enumerator::Tpdo::transportMechanismFromString(config.transportMechanism()))
+    m_numRtrsInvokedAddressSpace (0)
+    
 
     /* fill up constructor initialization list here */
 {

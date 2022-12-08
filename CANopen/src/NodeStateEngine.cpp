@@ -28,14 +28,15 @@ NodeStateEngine::NodeStateEngine(
         const std::string& nodeAddressForDebug,
         MessageSendFunction messageSendFunction):
     m_nodeId(nodeId),
-    m_requestedStateEnum(initialRequestedState),
-    m_currentState(NodeState::UNKNOWN),
-    m_nodeAddressForDebug(nodeAddressForDebug),
     m_stateInfoModel(stateInfoModel),
     m_currentStateInfoPeriod(10), // Expected to be overwritten 
-    m_heartBeatWindowStartTimePoint(std::chrono::steady_clock::now()), // some sane init even if HB not used.
+    m_nodeAddressForDebug(nodeAddressForDebug),
     m_nodeGuardingOperationsState(IDLE),
+    m_heartBeatWindowStartTimePoint(std::chrono::steady_clock::now()), // some sane init even if HB not used.
+
+    m_requestedStateEnum(initialRequestedState),
     m_previousState(CANopen::NodeState::UNKNOWN),
+    m_currentState(NodeState::UNKNOWN),
     m_nodeGuardingReplyTimeoutMs(1000),
     m_messageSendFunction(messageSendFunction),
     m_lastToggleBit(DUNNO),
