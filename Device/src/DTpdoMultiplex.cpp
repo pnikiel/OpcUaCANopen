@@ -125,8 +125,12 @@ void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
     DMultiplexedChannel* channel = this->getMultiplexedChannelById(channelNumber);
     if (!channel)
     {
-        // TODO: maybe configurable warning.
-        SPOOKY(getFullName()) << "Channel number " << wrapValue(std::to_string(channelNumber)) << " is not in the configuration, but we seem to be getting data from it. Fix the configuration of your ELMBs or fix your configuration" << SPOOKY_;
+        if (DRoot::getInstance()->warningss()[0]->unknownMultiplexedChannel())
+        {
+            SPOOKY(getFullName()) << "Channel number " << wrapValue(std::to_string(channelNumber))
+                << " is not in the configuration " << SPOOKY_ << 
+                ", but we seem to be getting data from it. Fix the configuration of your ELMBs or fix your configuration [WunknownMultiplexedChannel]" << SPOOKY_;
+        }
         return;
     }
     

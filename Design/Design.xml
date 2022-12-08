@@ -82,6 +82,11 @@
         Warn when seeing Cobids which are clearly unknown/unregistered.
       </d:documentation>
     </d:configentry>
+    <d:configentry name="unknownMultiplexedChannel" dataType="OpcUa_Boolean" defaultValue="true" storedInDeviceObject="true">
+      <d:documentation>
+        Warn when seeing data in a TPDO multiplexed that does not correspond to a configured channel.
+      </d:documentation>
+    </d:configentry>
   </d:class>
   <d:class name="Meta">
     <d:cachevariable name="productVersion" addressSpaceWrite="forbidden" dataType="UaString" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
