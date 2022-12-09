@@ -169,6 +169,8 @@ bool SdoEngine::writeExpedited (
         return false;
     }
 
+    // TODO need to check the size!
+
     // m_lastSdoReply is where we got the reply
     if (std::mismatch(
         initiateDomainDownload.c_data + 1,
@@ -179,6 +181,17 @@ bool SdoEngine::writeExpedited (
             " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply was for another object(!)" << SPOOKY_;
         return false;
+    }
+
+    if (m_lastSdoReply.c_data[0] == 0x80)
+    {
+        /* AbortDomainTransfer message */
+        /* We validated that the reply applies to the correct index/subindex above*/
+        // TODO necessary to guarantee size of 8!
+        uint32_t reasonCode = *reinterpret_cast<uint32_t*>(&m_lastSdoReply.c_data + 4);
+        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << "AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
+        return false;
+
     }
 
     if (m_lastSdoReply.c_data[0] != 0x60)
