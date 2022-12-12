@@ -77,6 +77,12 @@ bool SdoEngine::readExpedited (
         return false;
     }
 
+    if (m_lastSdoReply.c_data[0] == 0x80)
+    { /* Abort domain transfer*/
+        handleAbortDomainTransfer(m_lastSdoReply);
+        return false;
+    }    
+    
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
         LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
