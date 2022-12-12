@@ -132,7 +132,7 @@ bool SdoEngine::readExpedited (
 
 }
 
-bool SdoEngine::writeExpedited (
+SdoEngine::SdoResult SdoEngine::writeExpedited (
     uint16_t index, 
     uint8_t subIndex, 
     const std::vector<unsigned char>& data, unsigned int timeoutMs)
@@ -172,7 +172,7 @@ bool SdoEngine::writeExpedited (
     if (wait_status == std::cv_status::timeout)
     {
         LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
-        return false;
+        return SdoEngine::Timeout;
     }
 
     // TODO need to check the size!
@@ -186,13 +186,13 @@ bool SdoEngine::writeExpedited (
         LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
             " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply was for another object(!)" << SPOOKY_;
-        return false;
+        return SdoEngine::OtherFailure;
     }
 
     if (m_lastSdoReply.c_data[0] == 0x80)
     {
         handleAbortDomainTransfer(m_lastSdoReply);
-        return false;
+        return SdoEngine::AbortedDomainTransfer;
     }
 
     if (m_lastSdoReply.c_data[0] != 0x60)
@@ -200,13 +200,12 @@ bool SdoEngine::writeExpedited (
         LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
             " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << SPOOKY_;
-        return false;
+        return SdoEngine::OtherFailure;
     } 
 
     LOG(Log::TRC, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
-    return true;
+    return SdoEngine::Success;
 
-    //throw std::runtime_error("not-implemented");
 }
 
 

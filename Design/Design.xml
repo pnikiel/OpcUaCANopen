@@ -558,6 +558,12 @@
         The special value inheritGlobal (which is also the default) signifies that the value from globalSettings is to be used.
       </d:documentation>
     </d:configentry>
+    <d:configentry name="onAbortMaxRetries" dataType="OpcUa_UInt16" storedInDeviceObject="true" defaultValue="0">
+      <d:documentation>
+        Specifies the max number of retries that will be done when SDO write or read finished with AbortDomainTransfer.
+        0 means that no retries are done beyond the first attempt. 
+      </d:documentation>
+    </d:configentry>
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no"/>
     <d:documentation>A variable that corresponds to one object dictionary entry.</d:documentation>
   </d:class>

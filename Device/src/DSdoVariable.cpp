@@ -36,6 +36,7 @@
 
 
 using namespace Logging;
+using CANopen::SdoEngine;
 
 namespace Device
 {
@@ -177,12 +178,27 @@ UaStatus DSdoVariable::writeValue (
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
         1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
 
-    bool status = m_node->sdoEngine()->writeExpedited(
-        m_index, 
-        m_subIndex, 
-        bytes, 
-        timeoutMs);    
-    return status ? OpcUa_Good : OpcUa_Bad;
+    size_t initialTotalAttemps = onAbortMaxRetries() + 1;
+    size_t totalAttempts = initialTotalAttemps;
+    while (totalAttempts > 0)
+    {
+        SdoEngine::SdoResult result = m_node->sdoEngine()->writeExpedited(
+            m_index, 
+            m_subIndex, 
+            bytes, 
+            timeoutMs);  
+        if (result == SdoEngine::SdoResult::Success)
+            return OpcUa_Good;
+        else if (result != SdoEngine::AbortedDomainTransfer)
+            return OpcUa_Bad;
+        // so, there was the AbortedDomainTransfer for which we can support the retrying
+        totalAttempts--;
+        // TODO delay
+    }
+
+    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " all " << initialTotalAttemps << " done, all with AbortedDomainTransfer, giving up. (If that's due to device in use, consider raising the attempts number)"; 
+    return OpcUa_Bad;
+
 }
 
 /* delegators for methods */
