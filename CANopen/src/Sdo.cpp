@@ -231,9 +231,8 @@ void SdoEngine::handleAbortDomainTransfer (const CanMessage& msg)
 {
     /* AbortDomainTransfer message */
     /* We validated that the reply applies to the correct index/subindex above*/
-    // TODO necessary to guarantee size of 8!
-    uint32_t reasonCode = *reinterpret_cast<uint32_t*>(&m_lastSdoReply.c_data + 4);
-    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << "AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
+    uint32_t reasonCode = Common::bytesAsTypeNativeAlignSafeCast<uint32_t>(msg.c_data, msg.c_dlc, /*offset*/4);
+    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
 }
 
 void SdoEngine::sdoRequestNotifier (const CanMessage& msg)

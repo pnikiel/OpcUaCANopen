@@ -8,7 +8,7 @@ static T bytesAsTypePrimitiveCast(const uint8_t* bytes, size_t size, size_t offs
 {
     if (offset + sizeof (T) > size)
         throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
-    return *(T*)&bytes[offset];
+    return *(T*)&bytes[offset]; // TODO maybe improve it to prevent from alignment issues ?
 }
 
 template<typename T>
