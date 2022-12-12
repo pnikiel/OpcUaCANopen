@@ -40,6 +40,8 @@ class SdoEngine
         void sdoRequestNotifier (const CanMessage& msg);
 
         void handleAbortDomainTransfer (const CanMessage& msg);
+
+        std::string explainAbortCode (uint8_t errorClass, uint8_t errorCode);
 };
 
 }

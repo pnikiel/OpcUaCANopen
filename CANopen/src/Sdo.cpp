@@ -82,7 +82,7 @@ bool SdoEngine::readExpedited (
         handleAbortDomainTransfer(m_lastSdoReply);
         return false;
     }    
-    
+
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
         LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
@@ -233,12 +233,47 @@ void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
 
 }
 
+// Feature clause: FS0.3: Abort domain transfer support
 void SdoEngine::handleAbortDomainTransfer (const CanMessage& msg)
 {
     /* AbortDomainTransfer message */
     /* We validated that the reply applies to the correct index/subindex above*/
     uint32_t reasonCode = Common::bytesAsTypeNativeAlignSafeCast<uint32_t>(msg.c_data, msg.c_dlc, /*offset*/4);
-    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
+    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " AbortDomainTransfer! Reason code is "
+        << ERROR << explainAbortCode(reasonCode>>24, (reasonCode>>16)&0xff) << ERROR_ 
+        << " (full abort code was " << wrapValue(Utils::toHexString(reasonCode)) << ")";
+}
+
+std::string SdoEngine::explainAbortCode (uint8_t errorClass, uint8_t errorCode)
+{
+    /* ELMBio has incomplete support to these fields so not everything can be analyzed... */
+    switch (errorClass)
+    {
+        case 0x05:
+            switch (errorCode)
+            {
+                case 0x03: return "(Toggle not alternated) or (CRC error) or (Out of mem)";
+                case 0x04: return "(Protocol Timed out) or (Client/Server command invalid/unknown) or (Invalid block size) or (Invalid seq number)";
+                default: return "SDO Protocol issue (generic)";
+            }
+            break;
+        case 0x06:
+            switch (errorCode)
+            {
+                case 0x01: return "Unsupported access (Read-Write definition mismatch?)";
+                case 0x02: return "Object does not exist";
+                case 0x03: return "Inconsistent parameter";
+                case 0x04: return "Illegal parameter";
+                case 0x06: return "Hardware error (generic or data type does not match the device)";
+                case 0x07: return "Type conflict";
+                case 0x09: return "Attribute issues: (sub-index not existing) or (value not in allowed range range) or (peripheral in use)";
+                default: return "Access issue (generic)";
+            }
+            break;
+        case 0x08: 
+            return "General error (data can not be transferred/stored)";
+        default: return "Error class unknown (can't decode)";
+    }
 }
 
 void SdoEngine::sdoRequestNotifier (const CanMessage& msg)
