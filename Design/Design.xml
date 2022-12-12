@@ -564,6 +564,12 @@
         0 means that no retries are done beyond the first attempt. 
       </d:documentation>
     </d:configentry>
+    <d:configentry name="onAbortRetryPauseSeconds" dataType="OpcUa_Float" storedInDeviceObject="true" defaultValue="0.5">
+      <d:documentation>
+        When retrying, specifies the time to wait between attempts.
+      </d:documentation>
+    </d:configentry>
+
     <d:sourcevariable dataType="UaVariant" name="value" addressSpaceRead="asynchronous" addressSpaceReadUseMutex="no" addressSpaceWrite="asynchronous" addressSpaceWriteUseMutex="no"/>
     <d:documentation>A variable that corresponds to one object dictionary entry.</d:documentation>
   </d:class>

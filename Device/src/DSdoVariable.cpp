@@ -193,7 +193,7 @@ UaStatus DSdoVariable::writeValue (
             return OpcUa_Bad;
         // so, there was the AbortedDomainTransfer for which we can support the retrying
         totalAttempts--;
-        // TODO delay
+        std::this_thread::sleep_for(std::chrono::milliseconds(int(1000.0 * onAbortRetryPauseSeconds())));
     }
 
     LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " all " << initialTotalAttemps << " done, all with AbortedDomainTransfer, giving up. (If that's due to device in use, consider raising the attempts number)"; 
