@@ -1,1 +1,1 @@
-#define VERSION_STR "v0.7.0-rc0"
+#define VERSION_STR "v0.7.0-rc0-1-geec162b"

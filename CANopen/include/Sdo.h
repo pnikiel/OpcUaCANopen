@@ -38,6 +38,8 @@ class SdoEngine
 
         //! This is just a helper for warning + spooky messages.
         void sdoRequestNotifier (const CanMessage& msg);
+
+        void handleAbortDomainTransfer (const CanMessage& msg);
 };
 
 }

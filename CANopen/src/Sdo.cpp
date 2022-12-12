@@ -185,13 +185,8 @@ bool SdoEngine::writeExpedited (
 
     if (m_lastSdoReply.c_data[0] == 0x80)
     {
-        /* AbortDomainTransfer message */
-        /* We validated that the reply applies to the correct index/subindex above*/
-        // TODO necessary to guarantee size of 8!
-        uint32_t reasonCode = *reinterpret_cast<uint32_t*>(&m_lastSdoReply.c_data + 4);
-        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << "AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
+        handleAbortDomainTransfer(m_lastSdoReply);
         return false;
-
     }
 
     if (m_lastSdoReply.c_data[0] != 0x60)
@@ -230,6 +225,15 @@ void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
         LOG(Log::ERR, "Sdo") << "Received unexpected SDO reply " << wrapValue(Common::CanMessageToString(msg));
     }
 
+}
+
+void SdoEngine::handleAbortDomainTransfer (const CanMessage& msg)
+{
+    /* AbortDomainTransfer message */
+    /* We validated that the reply applies to the correct index/subindex above*/
+    // TODO necessary to guarantee size of 8!
+    uint32_t reasonCode = *reinterpret_cast<uint32_t*>(&m_lastSdoReply.c_data + 4);
+    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << "AbortDomainTransfer! Reason code is " << Utils::toHexString(reasonCode);
 }
 
 void SdoEngine::sdoRequestNotifier (const CanMessage& msg)
