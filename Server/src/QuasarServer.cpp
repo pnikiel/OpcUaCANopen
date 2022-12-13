@@ -254,12 +254,12 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("print_cobids_tables",    po::bool_switch(&m_printCobidsTables)->default_value(false), "Print cobid tables");
 }
 
-bool readSdoAsAscii(CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
+bool readSdoAsAscii(const std::string& where, CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
 {
     std::vector<uint8_t> output;
     try
     {
-        if (!engine.readExpedited(index, subIndex, output, 50))
+        if (!engine.readExpedited(where, index, subIndex, output, 50))
             return false;
         outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
@@ -291,12 +291,13 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 uint16_t index;
                 uint8_t subIndex;
                 std::string result;
+                std::string where;
             };
             std::vector<SdoBasedInfo> sdoBasedInfos = 
             {
-                {0x100A, 0x00, "?"},  /* swVersion */
-                {0x100A, 0x01, "?"},  /* swVersionMinor */
-                {0x3100, 0x00, "?"}   /* serialNumber */
+                {0x100A, 0x00, "?", "swVersion" },
+                {0x100A, 0x01, "?", "swVersionMinor"},
+                {0x3100, 0x00, "?", "serialNumber"}
             };
             for (SdoBasedInfo& info : sdoBasedInfos)
             {
@@ -306,7 +307,7 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                     info.result = "N/A: SDO switched off";
                 else
                 {
-                    if (!readSdoAsAscii(*node->sdoEngine(), info.index, info.subIndex, info.result))
+                    if (!readSdoAsAscii(node->getFullName() + "." + info.where, *node->sdoEngine(), info.index, info.subIndex, info.result))
                     {
                         assumeSuccessful = false;
                         break;

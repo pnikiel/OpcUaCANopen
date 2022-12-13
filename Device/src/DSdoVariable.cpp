@@ -128,6 +128,7 @@ UaStatus DSdoVariable::readValue (
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
         1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
     bool status = m_node->sdoEngine()->readExpedited(
+        getFullName(),
         m_index, 
         m_subIndex, 
         readData, 
@@ -142,7 +143,7 @@ UaStatus DSdoVariable::readValue (
     }
     catch(const std::exception& e)
     {
-        LOG(Log::ERR) << e.what() << "(note: dataType was " << dataType() << ")";
+        LOG(Log::ERR) << wrapId(getFullName()) << e.what() << "(note: dataType was " << dataType() << ")";
         return OpcUa_Bad;
     }
     return OpcUa_Good;

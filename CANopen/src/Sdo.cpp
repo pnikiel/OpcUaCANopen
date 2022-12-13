@@ -42,11 +42,12 @@ m_replyExpected(false)
 }
 
 bool SdoEngine::readExpedited (
+    const std::string& where,
     uint16_t index, 
     uint8_t subIndex, 
     std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
 {
-    LOG(Log::TRC, "Sdo") <<wrapId(m_node->getFullName()) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+    LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex));
     // TODO: we need to synchronize access to SDOs, preferably at the level of the node. (quasar synchronization)??
 
@@ -71,7 +72,7 @@ bool SdoEngine::readExpedited (
     m_replyExpected = false;
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             ERROR << "SDO reply has not come in expected time (" << timeoutMs << "ms)" << ERROR_;
         return false;
@@ -85,7 +86,7 @@ bool SdoEngine::readExpedited (
 
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
-        LOG(Log::ERR, "Sdo") <<wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << ERROR_;
         return false;        
@@ -99,20 +100,20 @@ bool SdoEngine::readExpedited (
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (!deviceWantsExpeditedTransfer)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
             Quasar::TermColors::ForeRed << "CANopen device wanted non-expedited transfer (" << timeoutMs << "ms)" << 
             Quasar::TermColors::StyleReset;
         return false;
     }
 
-    // TODO: is the index and subIndex correct wrt was supposed to be done
+    // TODO: is the index and subIndex correct wrt was supposed to be done -- port the mismatch algorithm from the writing code
 
     // how do I know how many bytes are returned?
     bool dataSetSizeIndicated = m_lastSdoReply.c_data[0] & 0x01;
     if (!dataSetSizeIndicated)
     {
-        LOG(Log::ERR, "Sdo") << "Data size set was not indicated!";
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Data size set was not indicated - can't parse the SDO reply!";
         return false;
     }
     unsigned char sizeOfDataSet = 4 - ((m_lastSdoReply.c_data[0] & 0x0c) >> 2);
@@ -125,7 +126,7 @@ bool SdoEngine::readExpedited (
         output.begin());
 
     LOG(Log::TRC, "Sdo") << 
-        wrapId(m_node->getFullName()) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+        wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
 
     return true;
