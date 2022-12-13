@@ -134,18 +134,19 @@ bool SdoEngine::readExpedited (
 }
 
 bool SdoEngine::writeExpedited (
+    const std::string& where,
     uint16_t index, 
     uint8_t subIndex, 
     const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
 
-    LOG(Log::TRC, "Sdo") << wrapId(m_node->getFullName()) << 
-        " + SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+        " --> SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
         " data=[" << wrapValue(bytesToHexString(data)) << "] ";
     if (data.size() < 1)
-        throw std::runtime_error("Empty data was given");
+        throw_runtime_error_with_origin(where + " Empty data was given");
     if (data.size() > 4)
-        throw std::runtime_error("Too much data [" + std::to_string(data.size()) + "] for expedited SDO");
+        throw_runtime_error_with_origin(where + "Too much data [" + std::to_string(data.size()) + "] for expedited SDO");
 
     std::unique_lock<std::mutex> lock (m_condVarChangeLock);
 

@@ -23,7 +23,7 @@ class SdoEngine
             );
 
         bool readExpedited (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMs=1000);
-        bool writeExpedited (uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
+        bool writeExpedited (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
 
         void replyCame (const CanMessage& msg);
 

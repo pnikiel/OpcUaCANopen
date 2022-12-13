@@ -133,7 +133,7 @@ UaStatus DSdoVariable::readValue (
         m_subIndex, 
         readData, 
         timeoutMs);
-    if (!status)
+    if (!status)    
         return OpcUa_BadOutOfService; // maybe we should return uastatus right away
     sourceTime = UaDateTime::now();
     LOG(Log::TRC) << wrapId(getFullName()) << "SDO transaction finished, performing value mapping now";
@@ -179,6 +179,7 @@ UaStatus DSdoVariable::writeValue (
         1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
 
     bool status = m_node->sdoEngine()->writeExpedited(
+        getFullName(),
         m_index, 
         m_subIndex, 
         bytes, 
