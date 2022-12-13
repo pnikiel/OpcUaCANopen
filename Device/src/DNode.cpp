@@ -125,7 +125,8 @@ DNode::DNode (
     if (config.hasSdoSupport())
         m_sdoEnginePtr.reset(
             new CANopen::SdoEngine(
-                this,
+                this->getFullName(),
+                this->id(),
                 std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1),
                 getParent()->cobidCoordinator()));
 
@@ -234,7 +235,10 @@ void DNode::initialize()
 
     for (DRpdo* rpdo : rpdos())
         rpdo->initialize();
-        
+
+    if (m_sdoEnginePtr)
+        m_sdoEnginePtr->setInSpyMode(getParent()->isInSpyMode()); 
+
     for (Device::DSdoSameIndexGroup* sdogroup : sdosameindexgroups())
     {
         sdogroup->propagateIndex();

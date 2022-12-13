@@ -26,18 +26,21 @@ static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
 } 
 
 SdoEngine::SdoEngine (
-    Device::DNode* myNode,
+    const std::string& nodeFullName,
+    uint8_t nodeId,
     MessageSendFunction messageSendFunction,
     CobidCoordinator& cobidCoordinator):
 
-m_node(myNode),
+m_nodeFullName(nodeFullName),
+m_nodeId(nodeId),
+m_isInSpyMode (true), /* safe init */
 m_sendFunction(messageSendFunction),
 m_replyCame(false),
 m_replyExpected(false)
 {
-    cobidCoordinator.registerCobid(0x600 + m_node->id(), m_node->getFullName(), "SDO requests",
+    cobidCoordinator.registerCobid(0x600 + nodeId, nodeFullName, "SDO requests",
         std::bind(&SdoEngine::sdoRequestNotifier, this, std::placeholders::_1));  
-    cobidCoordinator.registerCobid(0x580 + m_node->id(), m_node->getFullName(), "SDO replies",
+    cobidCoordinator.registerCobid(0x580 + nodeId, nodeFullName, "SDO replies",
         std::bind(&SdoEngine::replyCame, this, std::placeholders::_1));
 }
 
@@ -58,7 +61,7 @@ bool SdoEngine::readExpedited (
 
     /* translates basically into Initiate Domain Upload */
     CanMessage initiateDomainUpload;
-    initiateDomainUpload.c_id = 0x600 + m_node->id();
+    initiateDomainUpload.c_id = 0x600 + m_nodeId;
     initiateDomainUpload.c_data[0] = 0x40;
     initiateDomainUpload.c_data[1] = index;
     initiateDomainUpload.c_data[2] = index >> 8;
@@ -80,7 +83,7 @@ bool SdoEngine::readExpedited (
 
     if (m_lastSdoReply.c_data[0] == 0x80)
     { /* Abort domain transfer*/
-        handleAbortDomainTransfer(m_lastSdoReply);
+        handleAbortDomainTransfer(where, m_lastSdoReply);
         return false;
     }    
 
@@ -153,7 +156,7 @@ bool SdoEngine::writeExpedited (
     m_replyCame = false;
 
     CanMessage initiateDomainDownload;
-    initiateDomainDownload.c_id = 0x600 + m_node->id();
+    initiateDomainDownload.c_id = 0x600 + m_nodeId;
     unsigned char n = 4 - data.size();
     initiateDomainDownload.c_data[0] = 0x23 | ((n & 0x03) << 2); // E=1 S=1 N is dependent on data size
     initiateDomainDownload.c_data[1] = index;
@@ -173,7 +176,7 @@ bool SdoEngine::writeExpedited (
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
         return false;
     }
 
@@ -185,27 +188,27 @@ bool SdoEngine::writeExpedited (
         initiateDomainDownload.c_data + 4,
         m_lastSdoReply.c_data + 1).first != initiateDomainDownload.c_data + 4)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
-            " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " <-- SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply was for another object(!)" << SPOOKY_;
         return false;
     }
 
     if (m_lastSdoReply.c_data[0] == 0x80)
     {
-        handleAbortDomainTransfer(m_lastSdoReply);
+        handleAbortDomainTransfer(where, m_lastSdoReply);
         return false;
     }
 
     if (m_lastSdoReply.c_data[0] != 0x60)
     {
-        LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << 
-            " - SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " <-- SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << SPOOKY_;
         return false;
     } 
 
-    LOG(Log::TRC, "Sdo") << wrapId(m_node->getFullName()) << " - SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
+    LOG(Log::TRC, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
     return true;
 
     //throw std::runtime_error("not-implemented");
@@ -214,12 +217,12 @@ bool SdoEngine::writeExpedited (
 
 void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
 {
-    if (m_node->getParent()->isInSpyMode())
+    if (m_isInSpyMode)
     {
-        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_node->getFullName()) << " seeing SDO reply (not parsing - bus in spy mode)";
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_nodeFullName) << " seeing SDO reply (not parsing - bus in spy mode)";
         return;
     }
-    LOG(Log::TRC, "Sdo") << "Received SDO reply";
+    LOG(Log::TRC, "Sdo") << wrapId(m_nodeFullName) << " Received SDO reply";
     std::lock_guard<std::mutex> lock (m_condVarChangeLock);
     if (m_replyExpected)
     {
@@ -230,18 +233,18 @@ void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
     }
     else
     {
-        LOG(Log::ERR, "Sdo") << "Received unexpected SDO reply " << wrapValue(Common::CanMessageToString(msg));
+        LOG(Log::ERR, "Sdo") << wrapId(m_nodeFullName) << " Received unexpected SDO reply " << wrapValue(Common::CanMessageToString(msg));
     }
 
 }
 
 // Feature clause: FS0.3: Abort domain transfer support
-void SdoEngine::handleAbortDomainTransfer (const CanMessage& msg)
+void SdoEngine::handleAbortDomainTransfer (const std::string& where, const CanMessage& msg)
 {
     /* AbortDomainTransfer message */
     /* We validated that the reply applies to the correct index/subindex above*/
     uint32_t reasonCode = Common::bytesAsTypeNativeAlignSafeCast<uint32_t>(msg.c_data, msg.c_dlc, /*offset*/4);
-    LOG(Log::ERR, "Sdo") << wrapId(m_node->getFullName()) << " AbortDomainTransfer! Reason code is "
+    LOG(Log::ERR, "Sdo") << wrapId(where) << " AbortDomainTransfer! Reason code is "
         << ERROR << explainAbortCode(reasonCode>>24, (reasonCode>>16)&0xff) << ERROR_ 
         << " (full abort code was " << wrapValue(Utils::toHexString(reasonCode)) << ")";
 }
@@ -280,12 +283,12 @@ std::string SdoEngine::explainAbortCode (uint8_t errorClass, uint8_t errorCode)
 
 void SdoEngine::sdoRequestNotifier (const CanMessage& msg)
 {
-    if (m_node->getParent()->isInSpyMode())
+    if (m_isInSpyMode)
     {
-        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_node->getFullName()) << " seeing SDO request (not parsing - bus in spy mode)";
+        LOG(Log::TRC, MyLogComponents::spy()) << wrapId(m_nodeFullName) << " seeing SDO request (not parsing - bus in spy mode)";
     }
     else
-        SPOOKY(m_node->getFullName()) << " SDO request is seen " << SPOOKY_ << " ... hmm ... another host on the bus. It's BAD!";
+        SPOOKY(m_nodeFullName) << " SDO request is seen " << SPOOKY_ << " ... hmm ... another host on the bus. It's BAD!";
 }
 
 }

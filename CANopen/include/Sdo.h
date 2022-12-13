@@ -17,7 +17,8 @@ class SdoEngine
 {
     public:
         SdoEngine (
-            Device::DNode* myNode,
+            const std::string& nodeFullName,
+            uint8_t nodeId,
             MessageSendFunction messageSendFunction,
             CobidCoordinator& cobidCoordinator
             );
@@ -26,9 +27,13 @@ class SdoEngine
         bool writeExpedited (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
 
         void replyCame (const CanMessage& msg);
+        void setInSpyMode (bool spyMode) { m_isInSpyMode=spyMode; }
 
     private:
+        const std::string m_nodeFullName;
+        const uint8_t m_nodeId;
         Device::DNode* m_node;
+        bool m_isInSpyMode;
         MessageSendFunction m_sendFunction;
         std::mutex m_condVarChangeLock;
         std::condition_variable m_condVarForReply;
@@ -39,7 +44,7 @@ class SdoEngine
         //! This is just a helper for warning + spooky messages.
         void sdoRequestNotifier (const CanMessage& msg);
 
-        void handleAbortDomainTransfer (const CanMessage& msg);
+        void handleAbortDomainTransfer (const std::string& where, const CanMessage& msg);
 
         std::string explainAbortCode (uint8_t errorClass, uint8_t errorCode);
 };
