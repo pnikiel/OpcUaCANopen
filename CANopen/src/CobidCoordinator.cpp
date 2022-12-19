@@ -103,7 +103,7 @@ void CobidCoordinator::dispatch(const CanMessage& msg)
         if (m_spookyOnUnknownCobid)
         {
             SPOOKY(m_loggingBusName) << "Unknown cobid" << SPOOKY_ << " [0x" << Utils::toHexString(msg.c_id) <<
-                "], hint: " << describeCobid(msg.c_id) << "?";
+                "], hint: " << describeCobid(msg.c_id) << "? [WunknownCobid]";
         }
         return;
     }
