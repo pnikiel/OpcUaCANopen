@@ -147,7 +147,10 @@
       <d:documentation>Textual description of the port status; might be provider-dependent.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="regular">
-      <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000. 0 indicates that SYNC is disabled.</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="1000"/>
+      </d:configRestriction>
+      <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000.</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="nodeGuardIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
       <d:configRestriction>
