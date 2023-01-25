@@ -8,8 +8,6 @@
 #include <Logging.hpp>
 #include <Utils.h>
 #include <PiotrsUtils.h>
-#include <DNode.h>
-#include <DBus.h>
 #include <CobidCoordinator.hpp>
 
 using namespace Logging;

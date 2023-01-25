@@ -1,4 +1,5 @@
 set_property(TARGET ${EXECUTABLE} PROPERTY ENABLE_EXPORTS TRUE)
+add_dependencies (Device Enumerator)
 
 project(CanOpenOpcUa HOMEPAGE_URL "https://gitlab.cern.ch/atlas-dcs-opcua-servers/CanOpenOpcUa")
 cmake_minimum_required(VERSION 3.10)
