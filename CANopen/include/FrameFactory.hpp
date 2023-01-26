@@ -12,4 +12,6 @@ namespace CANopen
     CanMessage makeNodeManagementServiceRequest (uint8_t targetId, uint8_t commandSpecifier);
     CanMessage makeSyncRequest ();
     CanMessage makeTpdoRtr (uint8_t targetId, uint16_t cobid);
+
+    CanMessage makeInitiateDomainDownloadSegmented(uint8_t targetId, uint16_t index, uint8_t subIndex, uint32_t indicatedSize);
 }

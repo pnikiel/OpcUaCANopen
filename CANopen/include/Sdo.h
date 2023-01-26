@@ -50,6 +50,9 @@ class SdoEngine
         void handleAbortDomainTransfer (const std::string& where, const CanMessage& msg);
 
         std::string explainAbortCode (uint8_t errorClass, uint8_t errorCode);
+
+        bool writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
+        bool writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
 };
 
 }

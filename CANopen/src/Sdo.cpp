@@ -9,6 +9,7 @@
 #include <Utils.h>
 #include <PiotrsUtils.h>
 #include <CobidCoordinator.hpp>
+#include <FrameFactory.hpp>
 
 using namespace Logging;
 
@@ -153,7 +154,7 @@ bool SdoEngine::writeExpedited (
 {
 
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
-        " --> SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+        " --> SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
         " data=[" << wrapValue(bytesToHexString(data)) << "] ";
     if (data.size() < 1)
         throw_runtime_error_with_origin(where + " Empty data was given");
@@ -178,9 +179,9 @@ bool SdoEngine::writeExpedited (
         data.end(),
         initiateDomainDownload.c_data + 4);
 
+    m_replyExpected = true;
     m_sendFunction(initiateDomainDownload);
 
-    m_replyExpected = true;
     // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
     auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
     if (wait_status == std::cv_status::timeout)
@@ -225,8 +226,55 @@ bool SdoEngine::writeExpedited (
 
 bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
 {
+    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+        " --> Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+        " data=[" << wrapValue(bytesToHexString(data)) << "] ";
     if (data.size() < 1)
-        throw_runtime_error_with_origin(where + " Empty data was given");    
+        throw_runtime_error_with_origin(where + " Empty data was given");
+
+    if (!this->writeSegmentedInitialize(where, index, subIndex, data, timeoutMsPerPair))
+        return false;
+
+    return this->writeSegmentedStream(where, index, subIndex, data, timeoutMsPerPair);
+
+}
+
+bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
+{
+    CanMessage initiateDomainDownload = CANopen::makeInitiateDomainDownloadSegmented(m_nodeId, index, subIndex, data.size());
+    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+    m_replyCame = false;
+    m_replyExpected = true;
+    m_sendFunction(initiateDomainDownload);
+    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
+    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMsPerPair));
+    if (wait_status == std::cv_status::timeout)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO write index=" <<
+            wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << " no reply to initiateDomainDownload Segmented SDO request! (timeout was "  << timeoutMsPerPair << "ms)";
+        return false;
+    }
+    if (m_lastSdoReply.c_data[0] != 0x60)
+    {
+        handleAbortDomainTransfer(where, m_lastSdoReply);
+        return false;
+    }    
+    if (std::mismatch(
+        initiateDomainDownload.c_data + 1,
+        initiateDomainDownload.c_data + 4,
+        m_lastSdoReply.c_data + 1).first != initiateDomainDownload.c_data + 4)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " <-- Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << " \033[41;37m"
+ << " SDO reply was for another object(!)" << SPOOKY_; // TODO fix the terminal codes?
+        return false;
+    }
+    return true;
+}
+
+bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs)
+{
+    return false;
 }
 
 void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
