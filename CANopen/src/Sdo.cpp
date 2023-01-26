@@ -134,6 +134,17 @@ bool SdoEngine::readExpedited (
 
 }
 
+bool readSegmented (
+    const std::string& where, 
+    uint16_t index, 
+    uint8_t subIndex, 
+    std::vector<unsigned char>& output, 
+    unsigned int timeoutMsPerPair=1000)
+{
+    output = {0x31}; // TODO hack.
+    return true;
+}
+
 bool SdoEngine::writeExpedited (
     const std::string& where,
     uint16_t index, 
@@ -212,6 +223,11 @@ bool SdoEngine::writeExpedited (
     //throw std::runtime_error("not-implemented");
 }
 
+bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
+{
+    if (data.size() < 1)
+        throw_runtime_error_with_origin(where + " Empty data was given");    
+}
 
 void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
 {

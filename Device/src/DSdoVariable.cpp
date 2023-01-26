@@ -123,6 +123,14 @@ UaStatus DSdoVariable::readValue (
     // Synchronization: use quasar's made mutex:
     std::lock_guard<boost::mutex> lock (m_node->getLock());
 
+    if (dataType() == "ByteString")
+    {
+        char shit[] {"shit"};
+        UaByteString bs (strlen(shit), (OpcUa_Byte*)shit);
+        value.setByteString(bs, false);
+        return OpcUa_Good;
+    }
+
     std::vector<unsigned char> readData;
     unsigned int timeoutMs = m_expeditedReadTimeoutInheritsGlobal ? 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
@@ -157,14 +165,14 @@ UaStatus DSdoVariable::writeValue (
     /* Is it actually allowed to write this SDO? */
     if (access().find("W") == std::string::npos)
     {
-        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO write was denied because it is denied in the configuration.";
+        LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << ": SDO write was denied because it is denied in the configuration.";
         return OpcUa_BadUserAccessDenied;
     }
 
     /* Not in spy mode? */
     if (m_bus->isInSpyMode())
     {
-        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
+        LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
         return OpcUa_BadOutOfService;
     }
 
@@ -172,19 +180,46 @@ UaStatus DSdoVariable::writeValue (
     // Synchronization: use quasar's made mutex:
     std::lock_guard<boost::mutex> lock (m_node->getLock());
 
-    std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+    // Expedited SDO or Segmented SDO?
+    if (dataType() != "ByteString") /* Expedited SDO */
+    {
+        /* Anything not declared as ByteString goes as Expedited SDO */
+        std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
 
-    unsigned int timeoutMs = m_expeditedWriteTimeoutInheritsGlobal ? 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
-        1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
+        unsigned int timeoutMs = m_expeditedWriteTimeoutInheritsGlobal ? 
+            1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
+            1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
 
-    bool status = m_node->sdoEngine()->writeExpedited(
-        getFullName(),
-        m_index, 
-        m_subIndex, 
-        bytes, 
-        timeoutMs);    
-    return status ? OpcUa_Good : OpcUa_Bad;
+        bool status = m_node->sdoEngine()->writeExpedited(
+            getFullName(),
+            m_index, 
+            m_subIndex, 
+            bytes, 
+            timeoutMs);    
+        return status ? OpcUa_Good : OpcUa_Bad;
+    }
+    else
+    {
+        if (value.dataType() != UaNodeId(OpcUaType_ByteString))
+        {
+            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "Segmented SDO is supported only for ByteString input data. Given encoding type was [" << wrapValue(value.dataType().toString().toUtf8()) << "]";
+            return OpcUa_BadDataEncodingInvalid;
+        }
+        UaByteString bs;
+        if (value.toByteString(bs) != OpcUa_Good)
+        {
+            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "ByteString decoding error";
+            return OpcUa_BadDataEncodingInvalid;
+        }
+        m_node->sdoEngine()->writeSegmented(
+            getFullName(),
+            m_index,
+            m_subIndex,
+            std::vector<unsigned char>(bs.data(), bs.data() + bs.length()),
+            1000); // TODO TIMEOUT CONDITION
+        
+    }
+
 }
 
 /* delegators for methods */

@@ -525,6 +525,9 @@
           <d:enumerationValue value="UInt16"/>
           <d:enumerationValue value="UInt32"/>
           <d:enumerationValue value="Int32"/>
+          <d:enumerationValue value="ByteString">
+            <d:documentation>A sequence of octets. ByteStrings are by convention transmitted to a node by segmented SDO protocol.</d:documentation>
+          </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>
