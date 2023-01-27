@@ -1,6 +1,7 @@
 #include <condition_variable>
 #include <chrono>
 #include <iomanip>
+#include <algorithm>
 
 #include <LogIt.h>
 
@@ -233,10 +234,17 @@ bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_
         throw_runtime_error_with_origin(where + " Empty data was given");
 
     if (!this->writeSegmentedInitialize(where, index, subIndex, data, timeoutMsPerPair))
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " <-- Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+            " initialize of segment transfered failed";
         return false;
-
-    return this->writeSegmentedStream(where, index, subIndex, data, timeoutMsPerPair);
-
+    }
+    bool success = this->writeSegmentedStream(where, index, subIndex, data, timeoutMsPerPair);
+    LOG(Log::INF, "Sdo") << wrapId(where) << 
+            " <-- Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+            " segments transfer success: " << success;
+    return success;
 }
 
 bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
@@ -272,9 +280,61 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
     return true;
 }
 
+
+
 bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
-    return false;
+    size_t octetsTransferred = 0;
+    unsigned int segmentNumber = 0;
+    bool nextSegmentToggle = false;
+    while (octetsTransferred < data.size())
+    {
+        size_t octetsLeft = data.size() - octetsTransferred;
+        size_t octetsInThisSegment = std::min(octetsLeft, 7UL);
+        bool lastSegment = octetsLeft <= 7;
+        CanMessage downloadDomainSegment = CANopen::makeDownloadDomainSegment(
+            m_nodeId, index, subIndex, 
+            octetsInThisSegment, lastSegment, nextSegmentToggle, &data[octetsTransferred]);
+        
+        LOG(Log::TRC, "Sdo") << wrapId(where) << " segmented SDO: will send next segment #" <<
+            wrapValue(std::to_string(segmentNumber)) << " w/ " << octetsInThisSegment << " octets, togglebit [" << nextSegmentToggle << "]";
+        
+        {
+            std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+            m_replyCame = false;
+            m_replyExpected = true;
+            m_sendFunction(downloadDomainSegment);
+            // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
+            auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
+            if (wait_status == std::cv_status::timeout)
+            {
+                LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO write index=" <<
+                    wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
+                    " for segment #" << wrapValue(std::to_string(segmentNumber)) <<
+                    ": no reply to download domain segment request! (timeout was "  << timeoutMs << "ms)";
+                return false;
+            }
+            if (m_lastSdoReply.c_data[0] == 0x80)
+            {
+                handleAbortDomainTransfer(where, m_lastSdoReply);
+                return false;    
+            }
+            if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
+            {
+                LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
+                return false;
+            }
+        }
+        
+
+        // prep for next segment, if any.
+        octetsTransferred += octetsInThisSegment;
+        nextSegmentToggle = !nextSegmentToggle;
+        segmentNumber++;
+    }
+    
+    
+    return true;
 }
 
 void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field

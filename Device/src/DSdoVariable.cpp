@@ -125,8 +125,11 @@ UaStatus DSdoVariable::readValue (
 
     if (dataType() == "ByteString")
     {
-        char shit[] {"shit"};
-        UaByteString bs (strlen(shit), (OpcUa_Byte*)shit);
+        char shit[70];
+        for (size_t i=0; i < sizeof(shit); i++)
+            shit[i] = i;
+        UaByteString bs (sizeof(shit), (OpcUa_Byte*)shit);
+        
         value.setByteString(bs, false);
         return OpcUa_Good;
     }

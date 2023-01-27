@@ -91,7 +91,7 @@ void printLogo()
     "  ████████     ██▌    ▐██▌     ▐███████▌   ▀▀▀▀██▄   ▐██▌ ▐██▌  ██▌         ▀▀▀███  ",
     "  ███  ███     ██▌    ▐███▄▄▄  ▐██▌ ▐██▌  ▀██▄▄██▀   ▐███▄▄█▀▀  ▀██▄▄██▀  ▀██▄▄██▀  ",
     "                                                                                    ",
-    "  The CANopen NG OPCUA server by Piotr P. Nikiel et al., 2021-2022                  ",
+    "  The CANopen NG OPCUA server by Piotr P. Nikiel et al., 2021-2023                  ",
     "  The CanModule for device-independent CAN support by V. Filimonov, P.P. Nikiel,    ",
     "    D. Abalo, M. Ludwig, 2012-2022                                                  ",
     "                                                                                    ",

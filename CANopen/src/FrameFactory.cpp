@@ -1,3 +1,5 @@
+#include <stdexcept>
+
 #include <FrameFactory.hpp>
 
 namespace CANopen
@@ -52,6 +54,26 @@ CanMessage makeInitiateDomainDownloadSegmented(uint8_t targetId, uint16_t index,
     initiateDomainDownload.c_data[7] = (indicatedSize >> 24) & 0xff;
     initiateDomainDownload.c_dlc = 8;
     return initiateDomainDownload;
+}
+
+CanMessage makeDownloadDomainSegment(uint8_t targetId, uint16_t index, uint8_t subIndex, uint8_t dataSize, bool isLastSegment, bool toggleBit, const uint8_t* data)
+{
+    if (dataSize < 1)
+        throw std::logic_error("Can't have an empty segment");
+    if (dataSize > 7) // TODO: is that correct?
+        throw std::logic_error("Can't have more than 7 octets for one segment");
+
+    CanMessage downloadDomainSegment;
+    downloadDomainSegment.c_id = 0x600 + targetId;
+    downloadDomainSegment.c_data[0] = 0x00 | (toggleBit? 0x10 : 0x00) | ((8-dataSize) << 1) | (isLastSegment? 0x01 : 0x00); // TODO: not sure about the data size.
+    std::copy(
+        data,
+        data + dataSize,
+        &downloadDomainSegment.c_data[1]
+    );
+    downloadDomainSegment.c_dlc = 8;
+    return downloadDomainSegment;
+
 }
 
 }
