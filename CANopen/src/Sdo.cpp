@@ -26,21 +26,26 @@ static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
 } 
 
 SdoEngine::SdoEngine (
-    const std::string& nodeFullName,
     uint8_t nodeId,
     MessageSendFunction messageSendFunction,
     CobidCoordinator& cobidCoordinator):
 
-m_nodeFullName(nodeFullName),
+m_nodeFullName("(not configured)"),
 m_nodeId(nodeId),
 m_isInSpyMode (true), /* safe init */
 m_sendFunction(messageSendFunction),
 m_replyCame(false),
-m_replyExpected(false)
+m_replyExpected(false),
+m_cobidCoordinator(cobidCoordinator)
 {
-    cobidCoordinator.registerCobid(0x600 + nodeId, nodeFullName, "SDO requests",
+
+}
+
+void SdoEngine::initialize()
+{
+    m_cobidCoordinator.registerCobid(0x600 + m_nodeId, m_nodeFullName, "SDO requests",
         std::bind(&SdoEngine::sdoRequestNotifier, this, std::placeholders::_1));  
-    cobidCoordinator.registerCobid(0x580 + nodeId, nodeFullName, "SDO replies",
+    m_cobidCoordinator.registerCobid(0x580 + m_nodeId, m_nodeFullName, "SDO replies",
         std::bind(&SdoEngine::replyCame, this, std::placeholders::_1));
 }
 

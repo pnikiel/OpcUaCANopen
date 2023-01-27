@@ -17,11 +17,12 @@ class SdoEngine
 {
     public:
         SdoEngine (
-            const std::string& nodeFullName,
             uint8_t nodeId,
             MessageSendFunction messageSendFunction,
             CobidCoordinator& cobidCoordinator
             );
+
+        void initialize();
 
         bool readExpedited (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMs=1000);
         bool readSegmented (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMsPerPair=1000);
@@ -31,9 +32,10 @@ class SdoEngine
 
         void replyCame (const CanMessage& msg);
         void setInSpyMode (bool spyMode) { m_isInSpyMode=spyMode; }
+        void setNodeFullName (const std::string& name) { m_nodeFullName=name; }
 
     private:
-        const std::string m_nodeFullName;
+        std::string m_nodeFullName;
         const uint8_t m_nodeId;
         Device::DNode* m_node;
         bool m_isInSpyMode;
@@ -43,6 +45,7 @@ class SdoEngine
         bool m_replyCame;
         bool m_replyExpected;
         CanMessage m_lastSdoReply;
+        CobidCoordinator& m_cobidCoordinator;
 
         //! This is just a helper for warning + spooky messages.
         void sdoRequestNotifier (const CanMessage& msg);
