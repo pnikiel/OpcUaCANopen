@@ -125,7 +125,6 @@ DNode::DNode (
     if (config.hasSdoSupport())
         m_sdoEnginePtr.reset(
             new CANopen::SdoEngine(
-                this->getFullName(),
                 this->id(),
                 std::bind(&DBus::sendMessage, getParent(), std::placeholders::_1),
                 getParent()->cobidCoordinator()));
@@ -270,6 +269,12 @@ void DNode::initialize()
         std::bind(&CANopen::NodeStateEngine::onNodeManagementReplyReceived, &m_nodeStateEngine, std::placeholders::_1));
     getParent()->cobidCoordinator().registerCobid(0x80 + id(), getFullName(), "EmergencyObject",
         std::bind(&DNode::onEmergencyReceived, this, std::placeholders::_1));
+
+    if (m_sdoEnginePtr)
+    {
+        m_sdoEnginePtr->setNodeFullName(getFullName());
+        m_sdoEnginePtr->initialize();
+    }
 
 }
 
