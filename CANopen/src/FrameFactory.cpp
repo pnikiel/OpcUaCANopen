@@ -76,4 +76,18 @@ CanMessage makeDownloadDomainSegment(uint8_t targetId, uint16_t index, uint8_t s
 
 }
 
+CanMessage makeInitiateDomainUpload(uint8_t targetId, uint16_t index, uint8_t subIndex)
+{
+    CanMessage initiateDomainUpload;
+    initiateDomainUpload.c_id = 0x600 + targetId;
+    initiateDomainUpload.c_data[0] = 0x40;
+    initiateDomainUpload.c_data[1] = index;
+    initiateDomainUpload.c_data[2] = index >> 8;
+    initiateDomainUpload.c_data[3] = subIndex;
+    initiateDomainUpload.c_dlc = 8;
+    return initiateDomainUpload;
+
+
+}
+
 }

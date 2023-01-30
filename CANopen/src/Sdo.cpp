@@ -141,14 +141,56 @@ bool SdoEngine::readExpedited (
 
 }
 
-bool readSegmented (
+bool SdoEngine::readSegmented (
     const std::string& where, 
     uint16_t index, 
     uint8_t subIndex, 
     std::vector<unsigned char>& output, 
-    unsigned int timeoutMsPerPair=1000)
+    unsigned int timeoutMsPerPair)
 {
-    output = {0x31}; // TODO hack.
+    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+        " --> SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
+
+    output.clear();
+    output.reserve(1024);
+
+    CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
+    
+    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+
+    m_replyCame = false;
+    m_replyExpected = true;
+
+    m_sendFunction(initiateDomainUpload);
+
+    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
+    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMsPerPair));
+    if (wait_status == std::cv_status::timeout)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMsPerPair << "ms)";
+        return false;
+    }
+
+    if (m_lastSdoReply.c_data[0] == 0x80)
+    { /* Abort domain transfer*/
+        handleAbortDomainTransfer(where, m_lastSdoReply);
+        return false;
+    }        
+
+    bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
+    if (deviceWantsExpeditedTransfer)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+            Quasar::TermColors::ForeRed << "CANopen device wanted expedited transfer instead of segmented. Looks like configuration issue." << 
+            Quasar::TermColors::StyleReset;
+        return false;
+    }
+
+    // Note: we do not care about data size fields.
+
+    // Okay now we can deal with update download segments....
+
     return true;
 }
 
@@ -227,7 +269,6 @@ bool SdoEngine::writeExpedited (
     LOG(Log::TRC, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << std::dec << " subIndex=" << wrapValue(std::to_string(subIndex)) <<  " OK";
     return true;
 
-    //throw std::runtime_error("not-implemented");
 }
 
 bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)

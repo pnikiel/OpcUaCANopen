@@ -122,9 +122,15 @@ UaStatus DSdoVariable::readValue (
     // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
     // Synchronization: use quasar's made mutex:
     std::lock_guard<boost::mutex> lock (m_node->getLock());
-
+    std::vector<unsigned char> readData;
     if (dataType() == "ByteString")
     {
+        bool status = m_node->sdoEngine()->readSegmented(
+            getFullName(),
+            m_index, 
+            m_subIndex, 
+            readData, 
+            /*timeout TODO*/ 1000);    
         char shit[70];
         for (size_t i=0; i < sizeof(shit); i++)
             shit[i] = i;
@@ -134,7 +140,6 @@ UaStatus DSdoVariable::readValue (
         return OpcUa_Good;
     }
 
-    std::vector<unsigned char> readData;
     unsigned int timeoutMs = m_expeditedReadTimeoutInheritsGlobal ? 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
         1000.0 * m_expeditedReadTimeoutSecondsFromConfig;

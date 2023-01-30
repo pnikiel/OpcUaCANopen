@@ -15,4 +15,6 @@ namespace CANopen
 
     CanMessage makeInitiateDomainDownloadSegmented(uint8_t targetId, uint16_t index, uint8_t subIndex, uint32_t indicatedSize);
     CanMessage makeDownloadDomainSegment(uint8_t targetId, uint16_t index, uint8_t subIndex, uint8_t dataSize, bool isLastSegment, bool toggleBit, const uint8_t* data);
+
+    CanMessage makeInitiateDomainUpload(uint8_t targetId, uint16_t index, uint8_t subIndex);
 }
