@@ -57,12 +57,6 @@ bool SdoEngine::readExpedited (
 {
     LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex));
-    // TODO: we need to synchronize access to SDOs, preferably at the level of the node. (quasar synchronization)??
-
-    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
-
-    m_replyCame = false;
-    // TODO also something indicating that the answer is now expected.
 
     /* translates basically into Initiate Domain Upload */
     CanMessage initiateDomainUpload;
@@ -72,19 +66,9 @@ bool SdoEngine::readExpedited (
     initiateDomainUpload.c_data[2] = index >> 8;
     initiateDomainUpload.c_data[3] = subIndex;
     initiateDomainUpload.c_dlc = 8; // TODO this is to be checked!!  Was checked and 4 did not work. Trying ;-)
-    m_sendFunction(initiateDomainUpload);
 
-    m_replyExpected = true;
-
-    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
-    m_replyExpected = false;
-    if (wait_status == std::cv_status::timeout)
-    {
-        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            ERROR << "SDO reply has not come in expected time (" << timeoutMs << "ms)" << ERROR_;
-        return false;
-    }
+    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
+        initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
 
     if (m_lastSdoReply.c_data[0] == 0x80)
     { /* Abort domain transfer*/
@@ -141,6 +125,33 @@ bool SdoEngine::readExpedited (
 
 }
 
+CanMessage SdoEngine::invokeTransactionAndThrowOnNoReply(
+    const CanMessage& request,
+    const std::string& where,
+    const std::string& what,
+    uint16_t index,
+    uint8_t subIndex,
+    unsigned int timeoutMs)
+{
+    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+
+    m_replyCame = false;
+    m_replyExpected = true;
+
+    m_sendFunction(request);
+
+    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
+    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
+    if (wait_status == std::cv_status::timeout)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- " << what <<
+            " index=0x" << wrapValue(Utils::toHexString(index)) <<
+            " subIndex=" << wrapValue(Utils::toString((unsigned int)subIndex)) << ERROR << " no reply to SDO request! " << ERROR_ << "(timeout was "  << timeoutMs << "ms)";
+        throw std::runtime_error(what + " timeout (detailed error logged)");
+    }
+    return m_lastSdoReply;
+}
+
 bool SdoEngine::readSegmented (
     const std::string& where, 
     uint16_t index, 
@@ -155,23 +166,9 @@ bool SdoEngine::readSegmented (
     output.reserve(1024);
 
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
-    
-    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
 
-    m_replyCame = false;
-    m_replyExpected = true;
-
-    m_sendFunction(initiateDomainUpload);
-
-    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
-    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMsPerPair));
-    if (wait_status == std::cv_status::timeout)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMsPerPair << "ms)";
-        return false;
-    }
-
-    if (m_lastSdoReply.c_data[0] == 0x80)
+    if (reply.c_data[0] == 0x80)
     { /* Abort domain transfer*/
         handleAbortDomainTransfer(where, m_lastSdoReply);
         return false;
@@ -209,10 +206,6 @@ bool SdoEngine::writeExpedited (
     if (data.size() > 4)
         throw_runtime_error_with_origin(where + "Too much data [" + std::to_string(data.size()) + "] for expedited SDO");
 
-    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
-
-    m_replyCame = false;
-
     CanMessage initiateDomainDownload;
     initiateDomainDownload.c_id = 0x600 + m_nodeId;
     unsigned char n = 4 - data.size();
@@ -227,16 +220,8 @@ bool SdoEngine::writeExpedited (
         data.end(),
         initiateDomainDownload.c_data + 4);
 
-    m_replyExpected = true;
-    m_sendFunction(initiateDomainDownload);
-
-    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
-    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
-    if (wait_status == std::cv_status::timeout)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO write index=" << std::hex << index << " subIndex=" << subIndex << std::dec << " no reply to SDO request! (timeout was "  << timeoutMs << "ms)";
-        return false;
-    }
+    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
+        initiateDomainDownload, where, "expedited SDO write", index, subIndex, timeoutMs);
 
     // TODO need to check the size!
 
@@ -296,19 +281,11 @@ bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_
 bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
 {
     CanMessage initiateDomainDownload = CANopen::makeInitiateDomainDownloadSegmented(m_nodeId, index, subIndex, data.size());
-    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
-    m_replyCame = false;
-    m_replyExpected = true;
-    m_sendFunction(initiateDomainDownload);
-    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
-    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMsPerPair));
-    if (wait_status == std::cv_status::timeout)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO write index=" <<
-            wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << " no reply to initiateDomainDownload Segmented SDO request! (timeout was "  << timeoutMsPerPair << "ms)";
-        return false;
-    }
-    if (m_lastSdoReply.c_data[0] != 0x60)
+    
+    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
+        initiateDomainDownload, where, "segmented SDO write", index, subIndex, timeoutMsPerPair);
+
+    if (m_lastSdoReply.c_data[0] != 0x60) // TODO this is wrong! abort domain has another code.
     {
         handleAbortDomainTransfer(where, m_lastSdoReply);
         return false;
@@ -345,34 +322,21 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         LOG(Log::TRC, "Sdo") << wrapId(where) << " segmented SDO: will send next segment #" <<
             wrapValue(std::to_string(segmentNumber)) << " w/ " << octetsInThisSegment << " octets, togglebit [" << nextSegmentToggle << "]";
         
+        
+        CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
+            downloadDomainSegment, where, "segmented SDO write", index, subIndex, timeoutMs);
+
+        if (m_lastSdoReply.c_data[0] == 0x80)
         {
-            std::unique_lock<std::mutex> lock (m_condVarChangeLock);
-            m_replyCame = false;
-            m_replyExpected = true;
-            m_sendFunction(downloadDomainSegment);
-            // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
-            auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
-            if (wait_status == std::cv_status::timeout)
-            {
-                LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO write index=" <<
-                    wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
-                    " for segment #" << wrapValue(std::to_string(segmentNumber)) <<
-                    ": no reply to download domain segment request! (timeout was "  << timeoutMs << "ms)";
-                return false;
-            }
-            if (m_lastSdoReply.c_data[0] == 0x80)
-            {
-                handleAbortDomainTransfer(where, m_lastSdoReply);
-                return false;    
-            }
-            if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
-            {
-                LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
-                return false;
-            }
+            handleAbortDomainTransfer(where, m_lastSdoReply);
+            return false;    
+        }
+        if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
+        {
+            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
+            return false;
         }
         
-
         // prep for next segment, if any.
         octetsTransferred += octetsInThisSegment;
         nextSegmentToggle = !nextSegmentToggle;

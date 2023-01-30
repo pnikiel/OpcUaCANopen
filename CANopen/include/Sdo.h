@@ -56,6 +56,15 @@ class SdoEngine
 
         bool writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
         bool writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
+
+        CanMessage invokeTransactionAndThrowOnNoReply(
+            const CanMessage& request,
+            const std::string& where,
+            const std::string& what,
+            uint16_t index,
+            uint8_t subIndex,
+            unsigned int timeoutMs);
+
 };
 
 }
