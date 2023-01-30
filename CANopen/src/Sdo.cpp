@@ -69,12 +69,7 @@ bool SdoEngine::readExpedited (
 
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
-
-    if (m_lastSdoReply.c_data[0] == 0x80)
-    { /* Abort domain transfer*/
-        handleAbortDomainTransfer(where, m_lastSdoReply);
-        return false;
-    }    
+    throwIfAbortDomainTransfer(reply, where);  
 
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
@@ -167,12 +162,7 @@ bool SdoEngine::readSegmented (
 
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
-
-    if (reply.c_data[0] == 0x80)
-    { /* Abort domain transfer*/
-        handleAbortDomainTransfer(where, m_lastSdoReply);
-        return false;
-    }        
+    throwIfAbortDomainTransfer(reply, where);      
 
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (deviceWantsExpeditedTransfer)
@@ -222,6 +212,7 @@ bool SdoEngine::writeExpedited (
 
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainDownload, where, "expedited SDO write", index, subIndex, timeoutMs);
+    throwIfAbortDomainTransfer(reply, where);
 
     // TODO need to check the size!
 
@@ -234,12 +225,6 @@ bool SdoEngine::writeExpedited (
         LOG(Log::ERR, "Sdo") << wrapId(where) << 
             " <-- SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
  << " SDO reply was for another object(!)" << SPOOKY_;
-        return false;
-    }
-
-    if (m_lastSdoReply.c_data[0] == 0x80)
-    {
-        handleAbortDomainTransfer(where, m_lastSdoReply);
         return false;
     }
 
@@ -284,6 +269,7 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
     
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainDownload, where, "segmented SDO write", index, subIndex, timeoutMsPerPair);
+    throwIfAbortDomainTransfer(reply, where);
 
     if (m_lastSdoReply.c_data[0] != 0x60) // TODO this is wrong! abort domain has another code.
     {
@@ -325,12 +311,7 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         
         CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
             downloadDomainSegment, where, "segmented SDO write", index, subIndex, timeoutMs);
-
-        if (m_lastSdoReply.c_data[0] == 0x80)
-        {
-            handleAbortDomainTransfer(where, m_lastSdoReply);
-            return false;    
-        }
+        throwIfAbortDomainTransfer(reply, where);
         if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
         {
             LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
@@ -379,6 +360,15 @@ void SdoEngine::handleAbortDomainTransfer (const std::string& where, const CanMe
     LOG(Log::ERR, "Sdo") << wrapId(where) << " AbortDomainTransfer! Reason code is "
         << ERROR << explainAbortCode(reasonCode>>24, (reasonCode>>16)&0xff) << ERROR_ 
         << " (full abort code was " << wrapValue(Utils::toHexString(reasonCode)) << ")";
+}
+
+void SdoEngine::throwIfAbortDomainTransfer(const CanMessage& reply, const std::string& where)
+{
+    if (reply.c_data[0] == 0x80)
+    {
+        handleAbortDomainTransfer(where, reply);
+        throw std::runtime_error("abort domain transfer (detailed error was logged)");
+    }
 }
 
 std::string SdoEngine::explainAbortCode (uint8_t errorClass, uint8_t errorCode)

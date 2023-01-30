@@ -65,6 +65,8 @@ class SdoEngine
             uint8_t subIndex,
             unsigned int timeoutMs);
 
+        void throwIfAbortDomainTransfer(const CanMessage& reply, const std::string& where);
+
 };
 
 }
