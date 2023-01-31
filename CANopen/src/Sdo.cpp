@@ -49,6 +49,33 @@ void SdoEngine::initialize()
         std::bind(&SdoEngine::replyCame, this, std::placeholders::_1));
 }
 
+CanMessage SdoEngine::invokeTransactionAndThrowOnNoReply(
+    const CanMessage& request,
+    const std::string& where,
+    const std::string& what,
+    uint16_t index,
+    uint8_t subIndex,
+    unsigned int timeoutMs)
+{
+    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
+
+    m_replyCame = false;
+    m_replyExpected = true;
+
+    m_sendFunction(request);
+
+    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
+    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
+    if (wait_status == std::cv_status::timeout)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- " << what <<
+            " index=0x" << wrapValue(Utils::toHexString(index)) <<
+            " subIndex=" << wrapValue(Utils::toString((unsigned int)subIndex)) << ERROR << " no reply to SDO request! " << ERROR_ << "(timeout was "  << timeoutMs << "ms)";
+        throw std::runtime_error(what + " timeout (detailed error logged)");
+    }
+    return m_lastSdoReply;
+}
+
 bool SdoEngine::readExpedited (
     const std::string& where,
     uint16_t index, 
@@ -59,17 +86,11 @@ bool SdoEngine::readExpedited (
         " subIndex=" << wrapValue(std::to_string(subIndex));
 
     /* translates basically into Initiate Domain Upload */
-    CanMessage initiateDomainUpload;
-    initiateDomainUpload.c_id = 0x600 + m_nodeId;
-    initiateDomainUpload.c_data[0] = 0x40;
-    initiateDomainUpload.c_data[1] = index;
-    initiateDomainUpload.c_data[2] = index >> 8;
-    initiateDomainUpload.c_data[3] = subIndex;
-    initiateDomainUpload.c_dlc = 8; // TODO this is to be checked!!  Was checked and 4 did not work. Trying ;-)
-
+    CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
     throwIfAbortDomainTransfer(reply, where);  
+    throwIfQuestionableSize(reply);
 
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
@@ -78,9 +99,6 @@ bool SdoEngine::readExpedited (
             ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << ERROR_;
         return false;        
     }
-
-    // parse the SDO reply message
-    // TODO: is the size of the message correct to take further assumptions? it should be 8 bytes precisely,
 
     // TODO: is the header correct ?
 
@@ -120,33 +138,6 @@ bool SdoEngine::readExpedited (
 
 }
 
-CanMessage SdoEngine::invokeTransactionAndThrowOnNoReply(
-    const CanMessage& request,
-    const std::string& where,
-    const std::string& what,
-    uint16_t index,
-    uint8_t subIndex,
-    unsigned int timeoutMs)
-{
-    std::unique_lock<std::mutex> lock (m_condVarChangeLock);
-
-    m_replyCame = false;
-    m_replyExpected = true;
-
-    m_sendFunction(request);
-
-    // Feature clause FS0.1: Features common to any mode of SDO usage: timeout detection
-    auto wait_status = m_condVarForReply.wait_for(lock, std::chrono::milliseconds(timeoutMs));
-    if (wait_status == std::cv_status::timeout)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- " << what <<
-            " index=0x" << wrapValue(Utils::toHexString(index)) <<
-            " subIndex=" << wrapValue(Utils::toString((unsigned int)subIndex)) << ERROR << " no reply to SDO request! " << ERROR_ << "(timeout was "  << timeoutMs << "ms)";
-        throw std::runtime_error(what + " timeout (detailed error logged)");
-    }
-    return m_lastSdoReply;
-}
-
 bool SdoEngine::readSegmented (
     const std::string& where, 
     uint16_t index, 
@@ -162,7 +153,8 @@ bool SdoEngine::readSegmented (
 
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
-    throwIfAbortDomainTransfer(reply, where);      
+    throwIfAbortDomainTransfer(reply, where);
+    throwIfQuestionableSize(reply);    
 
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (deviceWantsExpeditedTransfer)
@@ -213,6 +205,7 @@ bool SdoEngine::writeExpedited (
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainDownload, where, "expedited SDO write", index, subIndex, timeoutMs);
     throwIfAbortDomainTransfer(reply, where);
+    throwIfQuestionableSize(reply);
 
     // TODO need to check the size!
 
@@ -270,6 +263,7 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainDownload, where, "segmented SDO write", index, subIndex, timeoutMsPerPair);
     throwIfAbortDomainTransfer(reply, where);
+    throwIfQuestionableSize(reply);
 
     if (m_lastSdoReply.c_data[0] != 0x60) // TODO this is wrong! abort domain has another code.
     {
@@ -312,6 +306,7 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
             downloadDomainSegment, where, "segmented SDO write", index, subIndex, timeoutMs);
         throwIfAbortDomainTransfer(reply, where);
+        throwIfQuestionableSize(reply);
         if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
         {
             LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
@@ -369,6 +364,12 @@ void SdoEngine::throwIfAbortDomainTransfer(const CanMessage& reply, const std::s
         handleAbortDomainTransfer(where, reply);
         throw std::runtime_error("abort domain transfer (detailed error was logged)");
     }
+}
+
+void SdoEngine::throwIfQuestionableSize(const CanMessage& reply)
+{
+    if (reply.c_dlc != 8)
+        throw std::runtime_error("SDO reply size is "+Utils::toString((unsigned int)reply.c_dlc)+" expected is 8");
 }
 
 std::string SdoEngine::explainAbortCode (uint8_t errorClass, uint8_t errorCode)

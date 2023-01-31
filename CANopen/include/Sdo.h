@@ -66,6 +66,7 @@ class SdoEngine
             unsigned int timeoutMs);
 
         void throwIfAbortDomainTransfer(const CanMessage& reply, const std::string& where);
+        void throwIfQuestionableSize(const CanMessage& reply);
 
 };
 
