@@ -1,6 +1,7 @@
 #include <stdexcept>
 
 #include <FrameFactory.hpp>
+#include <Utils.h>
 
 namespace CANopen
 {
@@ -86,8 +87,29 @@ CanMessage makeInitiateDomainUpload(uint8_t targetId, uint16_t index, uint8_t su
     initiateDomainUpload.c_data[3] = subIndex;
     initiateDomainUpload.c_dlc = 8;
     return initiateDomainUpload;
+}
 
+CanMessage makeInitiateDomainDownload(uint8_t targetId, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, const std::string& where)
+{
+    if (data.size() < 1)
+        throw_runtime_error_with_origin(where + " Empty data was given");
+    if (data.size() > 4)
+        throw_runtime_error_with_origin(where + "Too much data [" + std::to_string(data.size()) + "] for expedited SDO");
+    CanMessage initiateDomainDownload;
+    initiateDomainDownload.c_id = 0x600 + targetId;
+    unsigned char n = 4 - data.size();
+    initiateDomainDownload.c_data[0] = 0x23 | ((n & 0x03) << 2); // E=1 S=1 N is dependent on data size
+    initiateDomainDownload.c_data[1] = index;
+    initiateDomainDownload.c_data[2] = index >> 8;
+    initiateDomainDownload.c_data[3] = subIndex;
+    initiateDomainDownload.c_dlc = 8;
 
+    std::copy(
+        data.begin(),
+        data.end(),
+        initiateDomainDownload.c_data + 4);
+
+    return initiateDomainDownload;
 }
 
 }

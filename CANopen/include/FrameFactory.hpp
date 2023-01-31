@@ -4,6 +4,8 @@
 // according to Henk's doc, the frame formats.
 
 #include <cstdint>
+#include <vector>
+
 #include <CanMessage.h>
 
 namespace CANopen
@@ -17,4 +19,5 @@ namespace CANopen
     CanMessage makeDownloadDomainSegment(uint8_t targetId, uint16_t index, uint8_t subIndex, uint8_t dataSize, bool isLastSegment, bool toggleBit, const uint8_t* data);
 
     CanMessage makeInitiateDomainUpload(uint8_t targetId, uint16_t index, uint8_t subIndex);
+    CanMessage makeInitiateDomainDownload(uint8_t targetId, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, const std::string& where);
 }

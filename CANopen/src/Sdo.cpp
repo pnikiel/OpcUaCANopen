@@ -176,25 +176,9 @@ bool SdoEngine::writeExpedited (
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
         " --> SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
         " data=[" << wrapValue(bytesToHexString(data)) << "] ";
-    if (data.size() < 1)
-        throw_runtime_error_with_origin(where + " Empty data was given");
-    if (data.size() > 4)
-        throw_runtime_error_with_origin(where + "Too much data [" + std::to_string(data.size()) + "] for expedited SDO");
 
-    CanMessage initiateDomainDownload;
-    initiateDomainDownload.c_id = 0x600 + m_nodeId;
-    unsigned char n = 4 - data.size();
-    initiateDomainDownload.c_data[0] = 0x23 | ((n & 0x03) << 2); // E=1 S=1 N is dependent on data size
-    initiateDomainDownload.c_data[1] = index;
-    initiateDomainDownload.c_data[2] = index >> 8;
-    initiateDomainDownload.c_data[3] = subIndex;
-    initiateDomainDownload.c_dlc = 8;
 
-    std::copy(
-        data.begin(),
-        data.end(),
-        initiateDomainDownload.c_data + 4);
-
+    CanMessage initiateDomainDownload = CANopen::makeInitiateDomainDownload(m_nodeId, index, subIndex, data, where);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainDownload, where, "expedited SDO write", index, subIndex, timeoutMs);
     throwIfAbortDomainTransfer(reply, where);
@@ -245,26 +229,8 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
     throwIfAbortDomainTransfer(reply, where);
     throwIfQuestionableSize(reply);
     throwIfSdoObjectMismatch(initiateDomainDownload, reply, where);
-
-    if (m_lastSdoReply.c_data[0] != 0x60) // TODO this is wrong! abort domain has another code.
-    {
-        handleAbortDomainTransfer(where, m_lastSdoReply);
-        return false;
-    }    
-    if (std::mismatch(
-        initiateDomainDownload.c_data + 1,
-        initiateDomainDownload.c_data + 4,
-        m_lastSdoReply.c_data + 1).first != initiateDomainDownload.c_data + 4)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << 
-            " <-- Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << " \033[41;37m"
- << " SDO reply was for another object(!)" << SPOOKY_; // TODO fix the terminal codes?
-        return false;
-    }
     return true;
 }
-
-
 
 bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
@@ -283,14 +249,13 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         LOG(Log::TRC, "Sdo") << wrapId(where) << " segmented SDO: will send next segment #" <<
             wrapValue(std::to_string(segmentNumber)) << " w/ " << octetsInThisSegment << " octets, togglebit [" << nextSegmentToggle << "]";
         
-        
         CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
             downloadDomainSegment, where, "segmented SDO write", index, subIndex, timeoutMs);
         throwIfAbortDomainTransfer(reply, where);
         throwIfQuestionableSize(reply);
         if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
         {
-            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0]));
+            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0])) << ", might be a toggle bit issue?";
             return false;
         }
         
@@ -299,12 +264,10 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         nextSegmentToggle = !nextSegmentToggle;
         segmentNumber++;
     }
-    
-    
     return true;
 }
 
-void SdoEngine::replyCame (const CanMessage& msg) // TODO: add where field
+void SdoEngine::replyCame (const CanMessage& msg)
 {
     if (m_isInSpyMode)
     {
