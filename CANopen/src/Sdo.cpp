@@ -85,12 +85,12 @@ bool SdoEngine::readExpedited (
     LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
         " subIndex=" << wrapValue(std::to_string(subIndex));
 
-    /* translates basically into Initiate Domain Upload */
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
         initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
     throwIfAbortDomainTransfer(reply, where);  
     throwIfQuestionableSize(reply);
+    throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);
 
     if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
     {
@@ -100,19 +100,14 @@ bool SdoEngine::readExpedited (
         return false;        
     }
 
-    // TODO: is the header correct ?
-
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (!deviceWantsExpeditedTransfer)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            Quasar::TermColors::ForeRed << "CANopen device wanted non-expedited transfer (" << timeoutMs << "ms)" << 
-            Quasar::TermColors::StyleReset;
+            ERROR << "CANopen device wanted non-expedited transfer" << ERROR_ << " (" << timeoutMs << "ms)";
         return false;
     }
-
-    // TODO: is the index and subIndex correct wrt was supposed to be done -- port the mismatch algorithm from the writing code
 
     // how do I know how many bytes are returned?
     bool dataSetSizeIndicated = m_lastSdoReply.c_data[0] & 0x01;
@@ -135,7 +130,6 @@ bool SdoEngine::readExpedited (
         " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
 
     return true;
-
 }
 
 bool SdoEngine::readSegmented (
@@ -154,15 +148,15 @@ bool SdoEngine::readSegmented (
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
     throwIfAbortDomainTransfer(reply, where);
-    throwIfQuestionableSize(reply);    
+    throwIfQuestionableSize(reply); 
+    throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);   
 
     bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
     if (deviceWantsExpeditedTransfer)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            Quasar::TermColors::ForeRed << "CANopen device wanted expedited transfer instead of segmented. Looks like configuration issue." << 
-            Quasar::TermColors::StyleReset;
+            ERROR << "CANopen device wanted expedited transfer instead of segmented. Looks like configuration issue." << ERROR_;
         return false;
     }
 
@@ -179,7 +173,6 @@ bool SdoEngine::writeExpedited (
     uint8_t subIndex, 
     const std::vector<unsigned char>& data, unsigned int timeoutMs)
 {
-
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
         " --> SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
         " data=[" << wrapValue(bytesToHexString(data)) << "] ";
@@ -206,20 +199,7 @@ bool SdoEngine::writeExpedited (
         initiateDomainDownload, where, "expedited SDO write", index, subIndex, timeoutMs);
     throwIfAbortDomainTransfer(reply, where);
     throwIfQuestionableSize(reply);
-
-    // TODO need to check the size!
-
-    // m_lastSdoReply is where we got the reply
-    if (std::mismatch(
-        initiateDomainDownload.c_data + 1,
-        initiateDomainDownload.c_data + 4,
-        m_lastSdoReply.c_data + 1).first != initiateDomainDownload.c_data + 4)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << 
-            " <-- SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
- << " SDO reply was for another object(!)" << SPOOKY_;
-        return false;
-    }
+    throwIfSdoObjectMismatch(initiateDomainDownload, reply, where);
 
     if (m_lastSdoReply.c_data[0] != 0x60)
     {
@@ -264,6 +244,7 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
         initiateDomainDownload, where, "segmented SDO write", index, subIndex, timeoutMsPerPair);
     throwIfAbortDomainTransfer(reply, where);
     throwIfQuestionableSize(reply);
+    throwIfSdoObjectMismatch(initiateDomainDownload, reply, where);
 
     if (m_lastSdoReply.c_data[0] != 0x60) // TODO this is wrong! abort domain has another code.
     {
@@ -370,6 +351,19 @@ void SdoEngine::throwIfQuestionableSize(const CanMessage& reply)
 {
     if (reply.c_dlc != 8)
         throw std::runtime_error("SDO reply size is "+Utils::toString((unsigned int)reply.c_dlc)+" expected is 8");
+}
+
+void SdoEngine::throwIfSdoObjectMismatch(const CanMessage& request, const CanMessage& reply, const std::string& where)
+{
+    if (std::mismatch(
+        request.c_data + 1,
+        request.c_data + 4,
+        reply.c_data + 1).first != request.c_data + 4)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(where) << 
+            " <-- " << ERROR << "SDO request-reply object ID mismatch" << ERROR_; // TODO details?
+        throw std::runtime_error("SDO request-reply object ID mismatch (detailed error was logged)");
+    }
 }
 
 std::string SdoEngine::explainAbortCode (uint8_t errorClass, uint8_t errorCode)

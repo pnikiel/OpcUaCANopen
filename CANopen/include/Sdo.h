@@ -67,6 +67,7 @@ class SdoEngine
 
         void throwIfAbortDomainTransfer(const CanMessage& reply, const std::string& where);
         void throwIfQuestionableSize(const CanMessage& reply);
+        void throwIfSdoObjectMismatch(const CanMessage& request, const CanMessage& reply, const std::string& where);
 
 };
 
