@@ -29,6 +29,30 @@
         <d:restrictionByBounds minInclusive="0.001"/>
       </d:configRestriction>
     </d:configentry>
+    <d:configentry dataType="OpcUa_Double" name="segmentedSdoReadPairTimeoutSeconds" defaultValue="1" storedInDeviceObject="true">
+      <d:documentation>
+  			Max time between a pair of request and reply of <b>segmented SDO read</b> that is allowed; otherwise a timeout condition is raised.
+  		</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="0.001"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_Double" name="segmentedSdoWritePairTimeoutSeconds" defaultValue="1" storedInDeviceObject="true">
+      <d:documentation>
+  			Max time between a pair of request and reply of <b>segmented SDO write</b> that is allowed; otherwise a timeout condition is raised.
+  		</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="0.001"/>
+      </d:configRestriction>
+    </d:configentry>
+    <d:configentry dataType="OpcUa_UInt16" name="segmentedSdoMaxNumSegments" defaultValue="300" storedInDeviceObject="true">
+      <d:documentation>
+  			Max number of segments before the transaction is aborted.
+  		</d:documentation>
+      <d:configRestriction>
+        <d:restrictionByBounds minInclusive="1"/>
+      </d:configRestriction>
+    </d:configentry>
     <d:configentry dataType="OpcUa_Float" name="nodeGuardingReplyTimeout" defaultValue="1" storedInDeviceObject="true">
       <d:documentation>
     		Max wait time (in seconds) for NodeGuarding reply after NodeGuarding request, when passed

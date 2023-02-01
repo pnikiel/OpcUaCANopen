@@ -92,15 +92,15 @@ bool SdoEngine::readExpedited (
     throwIfQuestionableSize(reply);
     throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);
 
-    if ((m_lastSdoReply.c_data[0] & 0xf0) != 0x40)
+    if ((reply.c_data[0] & 0xf0) != 0x40)
     {
         LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << ERROR_;
+            ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)reply.c_data[0] << "]" << ERROR_;
         return false;        
     }
 
-    bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
+    bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
     if (!deviceWantsExpeditedTransfer)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
@@ -110,19 +110,19 @@ bool SdoEngine::readExpedited (
     }
 
     // how do I know how many bytes are returned?
-    bool dataSetSizeIndicated = m_lastSdoReply.c_data[0] & 0x01;
+    bool dataSetSizeIndicated = reply.c_data[0] & 0x01;
     if (!dataSetSizeIndicated)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Data size set was not indicated - can't parse the SDO reply!";
         return false;
     }
-    unsigned char sizeOfDataSet = 4 - ((m_lastSdoReply.c_data[0] & 0x0c) >> 2);
+    unsigned char sizeOfDataSet = 4 - ((reply.c_data[0] & 0x0c) >> 2);
 
     output.assign(sizeOfDataSet, 0);
 
     std::copy(
-        m_lastSdoReply.c_data + 4,
-        m_lastSdoReply.c_data + 4 + sizeOfDataSet,
+        reply.c_data + 4,
+        reply.c_data + 4 + sizeOfDataSet,
         output.begin());
 
     LOG(Log::TRC, "Sdo") << 
@@ -152,7 +152,7 @@ bool SdoEngine::readSegmented (
     throwIfQuestionableSize(reply); 
     throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);   
 
-    bool deviceWantsExpeditedTransfer = m_lastSdoReply.c_data[0] & 0x02;
+    bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
     if (deviceWantsExpeditedTransfer)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
@@ -223,11 +223,11 @@ bool SdoEngine::writeExpedited (
     throwIfQuestionableSize(reply);
     throwIfSdoObjectMismatch(initiateDomainDownload, reply, where);
 
-    if (m_lastSdoReply.c_data[0] != 0x60)
+    if (reply.c_data[0] != 0x60)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << 
             " <-- SDO write index=" << std::hex << index << " subIndex=" << wrapValue(std::to_string(subIndex)) << std::dec << " \033[41;37m"
- << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)m_lastSdoReply.c_data[0] << "]" << SPOOKY_;
+ << " SDO reply header is invalid, expected 0x60 got ["  << std::hex << (unsigned int)reply.c_data[0] << "]" << SPOOKY_;
         return false;
     } 
 
@@ -291,9 +291,9 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
             downloadDomainSegment, where, "segmented SDO write", index, subIndex, timeoutMs);
         throwIfAbortDomainTransfer(reply, where);
         throwIfQuestionableSize(reply);
-        if (m_lastSdoReply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
+        if (reply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
         {
-            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(m_lastSdoReply.c_data[0])) << ", might be a toggle bit issue?";
+            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(reply.c_data[0])) << ", might be a toggle bit issue?";
             return false;
         }
         
