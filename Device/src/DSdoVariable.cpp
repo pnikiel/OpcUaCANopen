@@ -130,12 +130,15 @@ UaStatus DSdoVariable::readValue (
             m_index, 
             m_subIndex, 
             readData, 
-            /*timeout TODO*/ 1000);    
-        char shit[70];
-        for (size_t i=0; i < sizeof(shit); i++)
-            shit[i] = i;
-        UaByteString bs (sizeof(shit), (OpcUa_Byte*)shit);
-        
+            /*timeout TODO*/ 1000); // control the timeout   
+        // char shit[70];
+        // for (size_t i=0; i < sizeof(shit); i++)
+        //     shit[i] = i;
+        // UaByteString bs (sizeof(shit), (OpcUa_Byte*)shit);
+        if (!status)
+            return OpcUa_Bad;
+        UaByteString bs (readData.size(), &readData[0]);
+
         value.setByteString(bs, false);
         return OpcUa_Good;
     }

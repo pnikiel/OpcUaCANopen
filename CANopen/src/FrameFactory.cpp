@@ -112,4 +112,13 @@ CanMessage makeInitiateDomainDownload(uint8_t targetId, uint16_t index, uint8_t 
     return initiateDomainDownload;
 }
 
+CanMessage makeUploadDomainSegment(uint8_t targetId, uint16_t index, uint8_t subIndex, bool toggleBit)
+{
+    CanMessage uploadDomainSegment;
+    uploadDomainSegment.c_id = 0x600 + targetId;
+    uploadDomainSegment.c_data[0] = 0x60 | (toggleBit? 0x10 : 0x00);
+    uploadDomainSegment.c_dlc = 8;
+    return uploadDomainSegment;
+}
+
 }

@@ -132,6 +132,7 @@ bool SdoEngine::readExpedited (
     return true;
 }
 
+// TODO: protection for too long interaction.
 bool SdoEngine::readSegmented (
     const std::string& where, 
     uint16_t index, 
@@ -143,7 +144,7 @@ bool SdoEngine::readSegmented (
         " --> SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
 
     output.clear();
-    output.reserve(1024);
+    output.reserve(2048); /* Knowledge from the field that biggest transfers are like 1500B long */
 
     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
@@ -160,9 +161,46 @@ bool SdoEngine::readSegmented (
         return false;
     }
 
-    // Note: we do not care about data size fields.
+    bool nextSegmentToggle = false;
+    bool lastSegment;
+    size_t segmentsReceived(0);
+    do
+    {
+        CanMessage uploadDomainSegment = makeUploadDomainSegment(m_nodeId, index, subIndex, nextSegmentToggle);
+        CanMessage reply = this->invokeTransactionAndThrowOnNoReply(uploadDomainSegment, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
+        throwIfAbortDomainTransfer(reply, where);
+        throwIfQuestionableSize(reply); 
+        bool receivedToggleBit = reply.c_data[0] & 0x10;
+        /* Refer to Henk's CANopen writeup for understanding what is n */
+        uint8_t n = (reply.c_data[0] >> 1) & 0x07;
+        uint8_t dataInThisSegment = 7-n;
 
-    // Okay now we can deal with update download segments....
+        LOG(Log::TRC, "Sdo") << wrapId(where) << " Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " received segment #" << wrapValue(Utils::toString(segmentsReceived)) << 
+            " toggleBit " << receivedToggleBit << " size in this segment:" << wrapValue(Utils::toString((unsigned int)dataInThisSegment));
+
+        /* check toggle bit? */
+        if (receivedToggleBit != nextSegmentToggle)
+        {
+            LOG(Log::ERR, "Sdo") << wrapId(where) << " Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+                " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+                ERROR << "Toggle bit mismatch." << ERROR_;
+            throw std::runtime_error("Toggle bit mismatch (detailed error was logged)");
+        }
+        /* insert useful data */
+        output.insert(std::end(output), &reply.c_data[1], &reply.c_data[1+dataInThisSegment]);
+
+        /* next segment ? */
+        nextSegmentToggle = !nextSegmentToggle;
+        segmentsReceived++;
+        /* is it the last segment? */
+        lastSegment = reply.c_data[0] & 0x01;
+    }
+    while (!lastSegment); // TODO should we have some protection in case this is really taking too long?
+
+    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+        " <-- SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) <<
+        " OK received " << wrapValue(Utils::toString(output.size())) << " octets " << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
 
     return true;
 }

@@ -20,4 +20,6 @@ namespace CANopen
 
     CanMessage makeInitiateDomainUpload(uint8_t targetId, uint16_t index, uint8_t subIndex);
     CanMessage makeInitiateDomainDownload(uint8_t targetId, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, const std::string& where);
+
+    CanMessage makeUploadDomainSegment(uint8_t targetId, uint16_t index, uint8_t subIndex, bool toggleBit);
 }
