@@ -111,12 +111,11 @@ void DEmergencyParser::onEmergencyReceived (const CanMessage& msg)
     const std::string humanReadableDescription (CANopen::decodeEmergencyHumanFriendly(msg, getParent()->emergencyMappingModel()));
     getAddressSpaceLink()->setLastErrorDescription( humanReadableDescription.c_str(), OpcUa_Good );
 
-    //TODO: we should print that we received emergency messages with error severity ERR
-    // do it!
     LOG(Log::ERR, "Emergency") << wrapId(getFullName()) << 
         ": received emergency msg, code 0x" << wrapValue(Utils::toHexString(errorCode)) << 
         ", counter for this node is " << wrapValue(std::to_string(getAddressSpaceLink()->getEmergencyErrorCounter())) << 
-        ", description is " <<  wrapValue(humanReadableDescription);
+        ", description is " <<  wrapValue(humanReadableDescription) <<
+        ", full frame was [" << msg.toString() << "]";
 
 }
 
