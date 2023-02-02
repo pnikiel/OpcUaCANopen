@@ -222,13 +222,13 @@ UaStatus DSdoVariable::writeValue (
             LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "ByteString decoding error";
             return OpcUa_BadDataEncodingInvalid;
         }
-        m_node->sdoEngine()->writeSegmented(
+        bool status = m_node->sdoEngine()->writeSegmented(
             getFullName(),
             m_index,
             m_subIndex,
             std::vector<unsigned char>(bs.data(), bs.data() + bs.length()),
             1000); // TODO TIMEOUT CONDITION
-        
+        return status ? OpcUa_Good : OpcUa_Bad;
     }
 
 }

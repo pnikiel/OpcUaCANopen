@@ -66,7 +66,7 @@ CanMessage makeDownloadDomainSegment(uint8_t targetId, uint16_t index, uint8_t s
 
     CanMessage downloadDomainSegment;
     downloadDomainSegment.c_id = 0x600 + targetId;
-    downloadDomainSegment.c_data[0] = 0x00 | (toggleBit? 0x10 : 0x00) | ((8-dataSize) << 1) | (isLastSegment? 0x01 : 0x00); // TODO: not sure about the data size.
+    downloadDomainSegment.c_data[0] = 0x00 | (toggleBit? 0x10 : 0x00) | ((7-dataSize) << 1) | (isLastSegment? 0x01 : 0x00);
     std::copy(
         data,
         data + dataSize,
