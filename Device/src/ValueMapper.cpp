@@ -71,6 +71,26 @@ UaVariant ValueMapper::extractFromBytesIntoVariant (
         case UInt16:
             output.setUInt16(bytesAsTypePrimitiveCast<uint16_t>(bytes, size, offset));
             break;
+        case Int24:
+            {
+                if (offset + 3 > size)
+                    throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
+                OpcUa_Int32 x (0);
+                x = bytes[offset] | (bytes[offset+1] << 8) | (bytes[offset+2] << 16); // LSB first
+                // below: twos-complement decoding. Shitty software engineers think they can remove this line with no consequences. Greetings from Piotr.
+                x = (x << 8) >> 8; 
+                output.setInt32(x);
+            };
+            break;
+        case UInt24:
+            {
+                if (offset + 3 > size)
+                    throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
+                OpcUa_UInt32 x(0);
+                x = bytes[offset] | (bytes[offset+1] << 8) | (bytes[offset+2] << 16); // LSB first
+                output.setUInt32(x);
+            }
+            break;
         case Int32:
             output.setInt32(bytesAsTypePrimitiveCast<int32_t>(bytes, size, offset));
             break;

@@ -447,8 +447,10 @@
           <d:enumerationValue value="Boolean"/>
           <d:enumerationValue value="Byte"/>
           <d:enumerationValue value="UInt16"/>
+          <d:enumerationValue value="UInt24"/>
           <d:enumerationValue value="UInt32"/>
           <d:enumerationValue value="Int16"/>
+          <d:enumerationValue value="Int24"/>
           <d:enumerationValue value="Int32"/>
           <d:enumerationValue value="Float"/>
         </d:restrictionByEnumeration>
@@ -463,7 +465,9 @@
       </d:configRestriction>
       <d:documentation>
   			At which octet in the data of the received TPDO frame this
-  			value starts?
+  			value starts? Note that the offset always refers to the first octet of a TPDO frame
+        no matter if it is a non-multiplexed PDO or a multiplexed PDO.
+        Thus, in case of a multiplexed PDO, an offset of zero would include the multiplexor byte in the value extraction. 
   		</d:documentation>
     </d:configentry>
     <d:configentry dataType="UaString" name="booleanFromBit" defaultValue="-" storedInDeviceObject="true">

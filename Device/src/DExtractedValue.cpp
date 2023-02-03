@@ -93,8 +93,7 @@ void DExtractedValue::onReplyReceived(const CanMessage& msg)
     }
     catch (const std::exception& ex)
     {
-        // TODO Log component and log level wrong
-        LOG(Log::INF) << "For node " << wrapId(getFullName()) << " value mapping failed: " << ex.what();
+        LOG(Log::ERR) << "For node " << wrapId(getFullName()) << " value mapping failed: " << ex.what();
     }
     
 
