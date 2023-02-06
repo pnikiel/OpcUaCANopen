@@ -130,11 +130,8 @@ UaStatus DSdoVariable::readValue (
             m_index, 
             m_subIndex, 
             readData, 
-            /*timeout TODO*/ 1000); // control the timeout   
-        // char shit[70];
-        // for (size_t i=0; i < sizeof(shit); i++)
-        //     shit[i] = i;
-        // UaByteString bs (sizeof(shit), (OpcUa_Byte*)shit);
+            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds()); // control the timeout   
+
         if (!status)
             return OpcUa_Bad;
         UaByteString bs (readData.size(), &readData[0]);
@@ -227,7 +224,7 @@ UaStatus DSdoVariable::writeValue (
             m_index,
             m_subIndex,
             std::vector<unsigned char>(bs.data(), bs.data() + bs.length()),
-            1000); // TODO TIMEOUT CONDITION
+            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoWritePairTimeoutSeconds());
         return status ? OpcUa_Good : OpcUa_Bad;
     }
 
