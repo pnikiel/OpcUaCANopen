@@ -61,7 +61,6 @@ DMultiplexedChannel::DMultiplexedChannel (
     Parent_DMultiplexedChannel* parent
 ):
     Base_DMultiplexedChannel( config, parent),
-    m_onSync(false), // to be initialized later
     m_parentMultiplex(nullptr), // to be initialized later
     m_firstIteration(true),
     m_receivedCtrSinceLastSync(0)
@@ -90,7 +89,6 @@ DMultiplexedChannel::~DMultiplexedChannel ()
 
 void DMultiplexedChannel::initialize()
 {
-    m_onSync = m_parentMultiplex->transportMechanism() == "sync";
 }
 
 void DMultiplexedChannel::onReplyReceived(const CanMessage& msg)
@@ -104,7 +102,7 @@ void DMultiplexedChannel::onReplyReceived(const CanMessage& msg)
 void DMultiplexedChannel::notifySync ()
 {
 
-    if (m_onSync)
+    if (m_parentMultiplex->transportMechanismEnum() == Enumerator::TpdoMultiplex::sync)
     {
         // Feature clause FP2.1.1: Warning of missing data between SYNCs
         if (!m_firstIteration && 

@@ -74,7 +74,6 @@ public:
     void notifyBusError ();
 
 private:
-    bool m_onSync;
     DTpdoMultiplex* m_parentMultiplex;
     bool m_firstIteration;
     unsigned int m_receivedCtrSinceLastSync;

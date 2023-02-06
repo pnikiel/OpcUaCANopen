@@ -67,7 +67,6 @@ DTpdo::DTpdo (
 ):
     Base_DTpdo( config, parent),
     m_name(config.name()),
-    m_onSync( config.transportMechanism() == "sync" ), // TODO this is to be moved to tranpsport mechanism enum
     m_firstIteration(true),
     m_transportMechanism(Enumerator::Tpdo::transportMechanismFromString(config.transportMechanism())),
     m_receivedCtrSinceLastSync (0),
@@ -176,7 +175,7 @@ void DTpdo::notifySync ()
 {
     std::lock_guard<std::mutex> lock (m_accessLock);
 
-    if (m_onSync)
+    if (m_transportMechanism == Enumerator::Tpdo::TransportMechanism::sync)
     {
         // Feature clause FP2.1.1: Warning of missing data between SYNCs
         if (!m_firstIteration &&
