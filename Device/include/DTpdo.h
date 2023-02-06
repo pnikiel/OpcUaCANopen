@@ -88,7 +88,6 @@ private:
 
     // sends RTR corresponding to this TPDO
     void sendRtr();
-    bool m_onSync;
     bool m_firstIteration;
     Enumerator::Tpdo::TransportMechanism m_transportMechanism;
 

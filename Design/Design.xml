@@ -322,8 +322,8 @@
           <d:enumerationValue value="asyncPeriodicRtrWithRequests">
             <d:documentation>Node emits a PDO when it wants. RTR is emitted periodically by the server (see GlobalSettings) and it can also be requested from the address space.</d:documentation>
           </d:enumerationValue>
-          <d:enumerationValue value="publieCommeRecu">
-            <d:documentation>Not implemented.</d:documentation>
+          <d:enumerationValue value="asyncNoRtr">
+            <d:documentation>Pure async, node emits a PDO whenever it wants and the server should not try to request it. </d:documentation>
           </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
@@ -348,9 +348,15 @@
     <d:configentry dataType="UaString" name="transportMechanism" storedInDeviceObject="true">
       <d:configRestriction>
         <d:restrictionByEnumeration>
-          <d:enumerationValue value="sync"/>
-          <d:enumerationValue value="asyncWithRtr"/>
-          <d:enumerationValue value="publieCommeRecu"/>
+          <d:enumerationValue value="sync">
+            <d:documentation>Node emits a PDO after every SYNC request.</d:documentation>
+          </d:enumerationValue>
+          <d:enumerationValue value="asyncSupportsRtr">
+            <d:documentation>Node emits a PDO when it wants. RTR can be requested from the address space to provoke it.</d:documentation>
+          </d:enumerationValue>
+          <d:enumerationValue value="asyncNoRtr">
+            <d:documentation>Pure async, node emits a PDO whenever it wants and the server should not try to request it. </d:documentation>
+          </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
     </d:configentry>

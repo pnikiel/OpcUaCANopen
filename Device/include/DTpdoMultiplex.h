@@ -23,6 +23,7 @@
 
 #include <Base_DTpdoMultiplex.h>
 
+#include <Enumerator.hpp>
 #include <CanMessage.h>
 
 namespace Device
@@ -69,8 +70,11 @@ public:
     //! To be called when the bus goes down
     void propagateNull ();
 
+    Enumerator::TpdoMultiplex::TransportMechanism transportMechanismEnum() const { return m_transportMechanism; }
+
 private:
     const std::string m_name;
+    Enumerator::TpdoMultiplex::TransportMechanism m_transportMechanism;
 
 
 

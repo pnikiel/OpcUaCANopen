@@ -63,7 +63,8 @@ DTpdoMultiplex::DTpdoMultiplex (
     Parent_DTpdoMultiplex* parent
 ):
     Base_DTpdoMultiplex( config, parent),
-    m_name(config.name())
+    m_name(config.name()),
+    m_transportMechanism(Enumerator::TpdoMultiplex::transportMechanismFromString(config.transportMechanism()))
 
     /* fill up constructor initialization list here */
 {
@@ -105,7 +106,7 @@ void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
 {
     // Feature clause FP3.1: MPDO: multiplexing of TPDOs
 
-    // FP2.1.1 is missing here.
+    // FP2.1.1 is missing here. TODO?
 
     LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
     // getting the channel number ...
