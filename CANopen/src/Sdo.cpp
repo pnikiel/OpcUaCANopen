@@ -76,45 +76,154 @@ CanMessage SdoEngine::invokeTransactionAndThrowOnNoReply(
     return m_lastSdoReply;
 }
 
-bool SdoEngine::readExpedited (
+// bool SdoEngine::readExpedited (
+//     const std::string& where,
+//     uint16_t index, 
+//     uint8_t subIndex, 
+//     std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
+// {
+//     LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//         " subIndex=" << wrapValue(std::to_string(subIndex));
+
+//     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
+//     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
+//         initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
+//     throwIfAbortDomainTransfer(reply, where);  
+//     throwIfQuestionableSize(reply);
+//     throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);
+
+//     if ((reply.c_data[0] & 0xf0) != 0x40)
+//     {
+//         LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+//             ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)reply.c_data[0] << "]" << ERROR_;
+//         return false;        
+//     }
+
+//     bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
+//     if (!deviceWantsExpeditedTransfer)
+//     {
+//         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+//             ERROR << "CANopen device wanted non-expedited transfer" << ERROR_ << " (" << timeoutMs << "ms)";
+//         return false;
+//     }
+
+//     // how do I know how many bytes are returned?
+//     bool dataSetSizeIndicated = reply.c_data[0] & 0x01;
+//     if (!dataSetSizeIndicated)
+//     {
+//         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Data size set was not indicated - can't parse the SDO reply!";
+//         return false;
+//     }
+//     unsigned char sizeOfDataSet = 4 - ((reply.c_data[0] & 0x0c) >> 2);
+
+//     output.assign(sizeOfDataSet, 0);
+
+//     std::copy(
+//         reply.c_data + 4,
+//         reply.c_data + 4 + sizeOfDataSet,
+//         output.begin());
+
+//     LOG(Log::TRC, "Sdo") << 
+//         wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//         " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
+
+//     return true;
+// }
+
+// TODO: protection for too long interaction.
+// bool SdoEngine::readSegmented (
+//     const std::string& where, 
+//     uint16_t index, 
+//     uint8_t subIndex, 
+//     std::vector<unsigned char>& output, 
+//     unsigned int timeoutMsPerPair,
+//     unsigned int maxSegments)
+// {
+//     LOG(Log::TRC, "Sdo") << wrapId(where) << 
+//         " --> SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
+
+//     output.clear();
+//     output.reserve(2048); /* Knowledge from the field that biggest transfers are like 1500B long */
+
+//     CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
+//     CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
+//     throwIfAbortDomainTransfer(reply, where);
+//     throwIfQuestionableSize(reply); 
+//     throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);   
+
+//     bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
+//     if (deviceWantsExpeditedTransfer)
+//     {
+//         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//             " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+//             ERROR << "CANopen device wanted expedited transfer instead of segmented. Looks like configuration issue." << ERROR_;
+//         return false;
+//     }
+
+//     bool nextSegmentToggle = false;
+//     bool lastSegment;
+//     size_t segmentsReceived(0);
+//     do
+//     {
+//         CanMessage uploadDomainSegment = makeUploadDomainSegment(m_nodeId, index, subIndex, nextSegmentToggle);
+//         CanMessage reply = this->invokeTransactionAndThrowOnNoReply(uploadDomainSegment, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
+//         throwIfAbortDomainTransfer(reply, where);
+//         throwIfQuestionableSize(reply); 
+//         bool receivedToggleBit = reply.c_data[0] & 0x10;
+//         /* Refer to Henk's CANopen writeup for understanding what is n */
+//         uint8_t n = (reply.c_data[0] >> 1) & 0x07;
+//         uint8_t dataInThisSegment = 7-n;
+
+//         LOG(Log::TRC, "Sdo") << wrapId(where) << " Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//             " subIndex=" << wrapValue(std::to_string(subIndex)) << " received segment #" << wrapValue(Utils::toString(segmentsReceived)) << 
+//             " toggleBit " << receivedToggleBit << " size in this segment:" << wrapValue(Utils::toString((unsigned int)dataInThisSegment));
+
+//         /* check toggle bit? */
+//         if (receivedToggleBit != nextSegmentToggle)
+//         {
+//             LOG(Log::ERR, "Sdo") << wrapId(where) << " Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+//                 " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
+//                 ERROR << "Toggle bit mismatch." << ERROR_;
+//             throw std::runtime_error("Toggle bit mismatch (detailed error was logged)");
+//         }
+//         /* insert useful data */
+//         output.insert(std::end(output), &reply.c_data[1], &reply.c_data[1+dataInThisSegment]);
+
+//         /* next segment ? */
+//         nextSegmentToggle = !nextSegmentToggle;
+//         segmentsReceived++;
+//         if (segmentsReceived >= maxSegments)
+//         {
+//             LOG(Log::ERR, "Sdo") << "Segmented SDO read " << ERROR << "Too many segments" << ERROR_ << ", hit the configured limit of " << wrapValue(std::to_string(maxSegments));
+//             return false;
+//         }
+//         /* is it the last segment? */
+//         lastSegment = reply.c_data[0] & 0x01;
+//     }
+//     while (!lastSegment); // TODO should we have some protection in case this is really taking too long?
+
+//     LOG(Log::TRC, "Sdo") << wrapId(where) << 
+//         " <-- SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) <<
+//         " OK received " << wrapValue(Utils::toString(output.size())) << " octets " << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
+
+//     return true;
+// }
+
+void SdoEngine::extractExpeditedReadData(
+    const CanMessage& reply,
     const std::string& where,
-    uint16_t index, 
-    uint8_t subIndex, 
-    std::vector<unsigned char>& output, unsigned int timeoutMs) // TODO: subIndex is uint8 !
+    uint16_t index,
+    uint8_t subIndex,
+    std::vector<unsigned char>& output
+)
 {
-    LOG(Log::TRC, "Sdo") <<wrapId(where) << " --> SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-        " subIndex=" << wrapValue(std::to_string(subIndex));
-
-    CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
-    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(
-        initiateDomainUpload, where, "expedited SDO read", index, subIndex, timeoutMs);
-    throwIfAbortDomainTransfer(reply, where);  
-    throwIfQuestionableSize(reply);
-    throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);
-
-    if ((reply.c_data[0] & 0xf0) != 0x40)
-    {
-        LOG(Log::ERR, "Sdo") <<wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            ERROR << "SDO reply indicates invalid reply, expected 0x4X got [" << std::hex << (unsigned int)reply.c_data[0] << "]" << ERROR_;
-        return false;        
-    }
-
-    bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
-    if (!deviceWantsExpeditedTransfer)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            ERROR << "CANopen device wanted non-expedited transfer" << ERROR_ << " (" << timeoutMs << "ms)";
-        return false;
-    }
-
-    // how do I know how many bytes are returned?
     bool dataSetSizeIndicated = reply.c_data[0] & 0x01;
     if (!dataSetSizeIndicated)
     {
         LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Data size set was not indicated - can't parse the SDO reply!";
-        return false;
+        throw std::runtime_error("Data set size was not indicated (detailed error was logged)");
     }
     unsigned char sizeOfDataSet = 4 - ((reply.c_data[0] & 0x0c) >> 2);
 
@@ -124,44 +233,18 @@ bool SdoEngine::readExpedited (
         reply.c_data + 4,
         reply.c_data + 4 + sizeOfDataSet,
         output.begin());
-
-    LOG(Log::TRC, "Sdo") << 
-        wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-        " subIndex=" << wrapValue(std::to_string(subIndex)) << " data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
-
-    return true;
 }
 
-// TODO: protection for too long interaction.
-bool SdoEngine::readSegmented (
-    const std::string& where, 
-    uint16_t index, 
-    uint8_t subIndex, 
-    std::vector<unsigned char>& output, 
-    unsigned int timeoutMsPerPair,
-    unsigned int maxSegments)
+bool SdoEngine::readSegments(
+    const std::string& where,
+    uint16_t index,
+    uint8_t subIndex,
+    std::vector<unsigned char>& output,
+    unsigned int timeoutMsPerPair, /* Each segment req-rep pair when using segmented SDO */
+    unsigned int maxSegments) /* Max segments when segmented SDO */
 {
-    LOG(Log::TRC, "Sdo") << wrapId(where) << 
-        " --> SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
-
     output.clear();
-    output.reserve(2048); /* Knowledge from the field that biggest transfers are like 1500B long */
-
-    CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
-    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segmented SDO read", index, subIndex, timeoutMsPerPair);
-    throwIfAbortDomainTransfer(reply, where);
-    throwIfQuestionableSize(reply); 
-    throwIfSdoObjectMismatch(initiateDomainUpload, reply, where);   
-
-    bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
-    if (deviceWantsExpeditedTransfer)
-    {
-        LOG(Log::ERR, "Sdo") << wrapId(where) << " <-- Segmented SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
-            " subIndex=" << wrapValue(std::to_string(subIndex)) << " " << 
-            ERROR << "CANopen device wanted expedited transfer instead of segmented. Looks like configuration issue." << ERROR_;
-        return false;
-    }
-
+    output.reserve(2048);
     bool nextSegmentToggle = false;
     bool lastSegment;
     size_t segmentsReceived(0);
@@ -202,13 +285,43 @@ bool SdoEngine::readSegmented (
         /* is it the last segment? */
         lastSegment = reply.c_data[0] & 0x01;
     }
-    while (!lastSegment); // TODO should we have some protection in case this is really taking too long?
+    while (!lastSegment);
 
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
         " <-- SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) <<
         " OK received " << wrapValue(Utils::toString(output.size())) << " octets " << " data=[" << wrapValue(bytesToHexString(output)) << "] ";
 
-    return true;
+    return true;    
+}
+
+bool SdoEngine::readExpeditedOrSegmented(
+    const std::string& where,
+    uint16_t index,
+    uint8_t subIndex,
+    std::vector<unsigned char>& output,
+    unsigned int timeoutMsExpedited, /* Init req */
+    unsigned int timeoutMsPerPair, /* Each segment req-rep pair when using segmented SDO */
+    unsigned int maxSegments) /* Max segments when segmented SDO */
+{
+    LOG(Log::TRC, "Sdo") << wrapId(where) << 
+        " --> SDO segm?/exp? read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)); 
+    CanMessage initiateDomainUpload = CANopen::makeInitiateDomainUpload(m_nodeId, index, subIndex);
+    CanMessage reply = this->invokeTransactionAndThrowOnNoReply(initiateDomainUpload, where, "segm?exp? SDO read", index, subIndex, timeoutMsExpedited);
+    throwIfAbortDomainTransfer(reply, where);
+    throwIfQuestionableSize(reply); 
+    throwIfSdoObjectMismatch(initiateDomainUpload, reply, where); 
+    bool deviceWantsExpeditedTransfer = reply.c_data[0] & 0x02;
+    if (deviceWantsExpeditedTransfer)
+    {
+        extractExpeditedReadData(reply, where, index, subIndex, output);
+        LOG(Log::TRC, "Sdo") << 
+            wrapId(where) << " <-- SDO read index=0x" << wrapValue(Utils::toHexString(index)) << 
+            " subIndex=" << wrapValue(std::to_string(subIndex)) << " exp.SDO, data(hex)=[" << wrapValue(bytesToHexString(output)) << "] SUCCESS";
+
+        return true;    
+    }
+    /* So, we have segmented SDO for sure */
+    return readSegments(where, index, subIndex, output, timeoutMsPerPair, maxSegments);
 }
 
 bool SdoEngine::writeExpedited (
@@ -299,7 +412,7 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         throwIfQuestionableSize(reply);
         if (reply.c_data[0] != (0x20 | (nextSegmentToggle? 0x10: 0x00)))
         {
-            LOG(Log::ERR, "Sdo") << "Wrong reply received: " << wrapValue(Utils::toHexString(reply.c_data[0])) << ", might be a toggle bit issue?";
+            LOG(Log::ERR, "Sdo") << wrapId(where) << ERROR << "Wrong reply received" << ERROR_ << ": " << wrapValue(Utils::toHexString(reply.c_data[0])) << ", might be a toggle bit issue?";
             return false;
         }
         

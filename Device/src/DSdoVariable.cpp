@@ -123,46 +123,41 @@ UaStatus DSdoVariable::readValue (
     // Synchronization: use quasar's made mutex:
     std::lock_guard<boost::mutex> lock (m_node->getLock());
     std::vector<unsigned char> readData;
-    if (dataType() == "ByteString")
-    {
-        bool status = m_node->sdoEngine()->readSegmented(
-            getFullName(),
-            m_index, 
-            m_subIndex, 
-            readData, 
-            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds(),
-            DRoot::getInstance()->globalsettings()->segmentedSdoMaxNumSegments());
 
-        if (!status)
-            return OpcUa_Bad;
-        UaByteString bs (readData.size(), &readData[0]);
-
-        value.setByteString(bs, false);
-        return OpcUa_Good;
-    }
-
-    unsigned int timeoutMs = m_expeditedReadTimeoutInheritsGlobal ? 
+    unsigned int timeoutMsInit = m_expeditedReadTimeoutInheritsGlobal ? 
         1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
         1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
-    bool status = m_node->sdoEngine()->readExpedited(
+
+    bool status = m_node->sdoEngine()->readExpeditedOrSegmented(
         getFullName(),
-        m_index, 
-        m_subIndex, 
-        readData, 
-        timeoutMs);
-    if (!status)    
-        return OpcUa_BadOutOfService; // maybe we should return uastatus right away
-    sourceTime = UaDateTime::now();
-    LOG(Log::TRC) << wrapId(getFullName()) << "SDO transaction finished, performing value mapping now";
-    try
-    {
-        value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, booleanFromBit());
-    }
-    catch(const std::exception& e)
-    {
-        LOG(Log::ERR) << wrapId(getFullName()) << e.what() << "(note: dataType was " << dataType() << ")";
+        m_index,
+        m_subIndex,
+        readData,
+        timeoutMsInit,
+        1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds(),
+        DRoot::getInstance()->globalsettings()->segmentedSdoMaxNumSegments());
+
+    if (!status)
         return OpcUa_Bad;
+
+    if (dataType() == "ByteString")
+    {
+        UaByteString bs (readData.size(), &readData[0]);
+        value.setByteString(bs, false);
     }
+    else
+    {
+        try
+        {
+            value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, booleanFromBit());
+        }
+        catch(const std::exception& e)
+        {
+            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << e.what() << "(note: dataType was " << dataType() << ")";
+            return OpcUa_Bad;
+        }
+    }
+    sourceTime = UaDateTime::now();
     return OpcUa_Good;
 }
 /* ASYNCHRONOUS !! */

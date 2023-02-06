@@ -24,8 +24,16 @@ class SdoEngine
 
         void initialize();
 
-        bool readExpedited (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMs=1000);
-        bool readSegmented (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMsPerPair=1000, unsigned int maxSegments=300);
+
+        /* This method does both, as it is not us, but the node, deciding which protocol to use. */
+        bool readExpeditedOrSegmented(
+            const std::string& where,
+            uint16_t index,
+            uint8_t subIndex,
+            std::vector<unsigned char>& output,
+            unsigned int timeoutMsExpedited=1000, /* Init req */
+            unsigned int timeoutMsPerPair=1000, /* Each segment req-rep pair when using segmented SDO */
+            unsigned int maxSegments=300); /* Max segments when segmented SDO */
 
         bool writeExpedited (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
         bool writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair=1000, unsigned int maxSegments=300);
@@ -56,6 +64,22 @@ class SdoEngine
 
         bool writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
         bool writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs, unsigned int maxSegments);
+
+        bool readSegments(
+            const std::string& where,
+            uint16_t index,
+            uint8_t subIndex,
+            std::vector<unsigned char>& output,
+            unsigned int timeoutMsPerPair=1000, /* Each segment req-rep pair when using segmented SDO */
+            unsigned int maxSegments=300); /* Max segments when segmented SDO */
+
+        void extractExpeditedReadData(
+            const CanMessage& reply,
+            const std::string& where,
+            uint16_t index,
+            uint8_t subIndex,
+            std::vector<unsigned char>& output
+        );
 
         CanMessage invokeTransactionAndThrowOnNoReply(
             const CanMessage& request,

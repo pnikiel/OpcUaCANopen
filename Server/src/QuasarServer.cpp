@@ -259,7 +259,7 @@ bool readSdoAsAscii(const std::string& where, CANopen::SdoEngine &engine, uint16
     std::vector<uint8_t> output;
     try
     {
-        if (!engine.readExpedited(where, index, subIndex, output, 50))
+        if (!engine.readExpeditedOrSegmented(where, index, subIndex, output, 50/*ms*/))
             return false;
         outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
