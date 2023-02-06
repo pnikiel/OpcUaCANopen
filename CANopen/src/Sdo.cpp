@@ -138,7 +138,8 @@ bool SdoEngine::readSegmented (
     uint16_t index, 
     uint8_t subIndex, 
     std::vector<unsigned char>& output, 
-    unsigned int timeoutMsPerPair)
+    unsigned int timeoutMsPerPair,
+    unsigned int maxSegments)
 {
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
         " --> SDO segmented read index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex));
@@ -193,6 +194,11 @@ bool SdoEngine::readSegmented (
         /* next segment ? */
         nextSegmentToggle = !nextSegmentToggle;
         segmentsReceived++;
+        if (segmentsReceived >= maxSegments)
+        {
+            LOG(Log::ERR, "Sdo") << "Segmented SDO read " << ERROR << "Too many segments" << ERROR_ << ", hit the configured limit of " << wrapValue(std::to_string(maxSegments));
+            return false;
+        }
         /* is it the last segment? */
         lastSegment = reply.c_data[0] & 0x01;
     }
@@ -236,7 +242,7 @@ bool SdoEngine::writeExpedited (
 
 }
 
-bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair)
+bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair, unsigned int maxSegments)
 {
     LOG(Log::TRC, "Sdo") << wrapId(where) << 
         " --> Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
@@ -251,7 +257,7 @@ bool SdoEngine::writeSegmented (const std::string& where, uint16_t index, uint8_
             " initialize of segment transfered failed";
         return false;
     }
-    bool success = this->writeSegmentedStream(where, index, subIndex, data, timeoutMsPerPair);
+    bool success = this->writeSegmentedStream(where, index, subIndex, data, timeoutMsPerPair, maxSegments);
     LOG(Log::INF, "Sdo") << wrapId(where) << 
             " <-- Segmented SDO write index=" << wrapValue(Utils::toHexString(index)) << " subIndex=" << wrapValue(std::to_string(subIndex)) << 
             " segments transfer success: " << success;
@@ -270,7 +276,7 @@ bool SdoEngine::writeSegmentedInitialize (const std::string& where, uint16_t ind
     return true;
 }
 
-bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs)
+bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs, unsigned int maxSegments)
 {
     size_t octetsTransferred = 0;
     unsigned int segmentNumber = 0;
@@ -301,6 +307,11 @@ bool SdoEngine::writeSegmentedStream (const std::string& where, uint16_t index, 
         octetsTransferred += octetsInThisSegment;
         nextSegmentToggle = !nextSegmentToggle;
         segmentNumber++;
+        if (segmentNumber >= maxSegments)
+        {
+            LOG(Log::ERR, "Sdo") << "Segmented SDO write " << ERROR << "Too many segments" << ERROR_ << ", hit the configured limit of " << wrapValue(std::to_string(maxSegments));
+            return false;
+        }
     }
     return true;
 }

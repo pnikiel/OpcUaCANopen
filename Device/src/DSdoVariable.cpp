@@ -130,7 +130,8 @@ UaStatus DSdoVariable::readValue (
             m_index, 
             m_subIndex, 
             readData, 
-            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds()); // control the timeout   
+            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds(),
+            DRoot::getInstance()->globalsettings()->segmentedSdoMaxNumSegments());
 
         if (!status)
             return OpcUa_Bad;

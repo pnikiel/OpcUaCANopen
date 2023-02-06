@@ -25,10 +25,10 @@ class SdoEngine
         void initialize();
 
         bool readExpedited (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMs=1000);
-        bool readSegmented (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMsPerPair=1000);
+        bool readSegmented (const std::string& where, uint16_t index, uint8_t subIndex, std::vector<unsigned char>& output, unsigned int timeoutMsPerPair=1000, unsigned int maxSegments=300);
 
         bool writeExpedited (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs=1000);
-        bool writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair=1000);
+        bool writeSegmented (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMsPerPair=1000, unsigned int maxSegments=300);
 
         void replyCame (const CanMessage& msg);
         void setInSpyMode (bool spyMode) { m_isInSpyMode=spyMode; }
@@ -55,7 +55,7 @@ class SdoEngine
         std::string explainAbortCode (uint8_t errorClass, uint8_t errorCode);
 
         bool writeSegmentedInitialize (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
-        bool writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs);
+        bool writeSegmentedStream (const std::string& where, uint16_t index, uint8_t subIndex, const std::vector<unsigned char>& data, unsigned int timeoutMs, unsigned int maxSegments);
 
         CanMessage invokeTransactionAndThrowOnNoReply(
             const CanMessage& request,
