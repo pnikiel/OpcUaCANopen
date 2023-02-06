@@ -359,6 +359,7 @@
           </d:enumerationValue>
         </d:restrictionByEnumeration>
       </d:configRestriction>
+      <d:documentation>What triggers the PDO?</d:documentation>
     </d:configentry>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannel"/>
     <d:hasobjects instantiateUsing="configuration" class="MultiplexedChannelConfigurationGenerator"/>
