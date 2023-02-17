@@ -121,7 +121,9 @@ UaStatus DSdoVariable::readValue (
 
     // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
     // Synchronization: use quasar's made mutex:
-    std::lock_guard<boost::mutex> lock (m_node->getLock());
+    // std::lock_guard<boost::mutex> lock (m_node->getLock());
+    // TODO!
+
     std::vector<unsigned char> readData;
 
     unsigned int timeoutMsInit = m_expeditedReadTimeoutInheritsGlobal ? 
@@ -182,7 +184,7 @@ UaStatus DSdoVariable::writeValue (
 
     // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
     // Synchronization: use quasar's made mutex:
-    std::lock_guard<boost::mutex> lock (m_node->getLock());
+    // std::lock_guard<std::mutex> lock (m_node->getLock());
 
     // Expedited SDO or Segmented SDO?
     if (dataType() != "ByteString") /* Expedited SDO */
@@ -240,6 +242,9 @@ void DSdoVariable::initialize (DBus* bus, DNode* node)
     m_node = node;
     if (!node->sdoEngine())
         throw_config_error_with_origin("SDO declared with a node that explicitly has no SDO support");
+    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
+    // Synchronization: always use node's (e.g. ELMB's) mutex for SDO (cause assume there is at most one SDO transaction of any kind at any time per node)
+    getAddressSpaceLink()->configureWriteMutexOfValue(&node->getLock());
 }
 
 void DSdoVariable::setIndex (uint16_t _index)

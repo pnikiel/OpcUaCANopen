@@ -1,1 +1,1 @@
-#define VERSION_STR "Unofficial developer version. This software wasn't build using official release build script."
+#define VERSION_STR "v0.8.0-1-g4806e91"
