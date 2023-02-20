@@ -99,9 +99,9 @@ void DMultiplexedChannel::onReplyReceived(const CanMessage& msg)
         extractedValue->onReplyReceived(msg);
 }
 
-void DMultiplexedChannel::notifySync ()
+bool DMultiplexedChannel::notifySyncAndCheckMismatch ()
 {
-
+    bool syncMismatch = false;
     if (m_parentMultiplex->transportMechanismEnum() == Enumerator::TpdoMultiplex::sync)
     {
         // Feature clause FP2.1.1: Warning of missing data between SYNCs
@@ -109,15 +109,12 @@ void DMultiplexedChannel::notifySync ()
             m_receivedCtrSinceLastSync != 1 && // 1 per sync is a valid number for non-MPDO traffic.
             m_parentMultiplex->getParent()->nodeStateEngine().currentState() == CANopen::NodeState::OPERATIONAL) 
         {
-            if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
-            {
-                SPOOKY(getFullName()) << "expected 1 M-TPDO in the previous SYNC cycle but got " << wrapValue(std::to_string(m_receivedCtrSinceLastSync)) << 
-                    ". Likely a grave configuration issue or the node shut down unexpectdly. " << SPOOKY_ << "[WtpdoSyncMismatch]";
-            }
+            syncMismatch = true;
         }
         m_receivedCtrSinceLastSync = 0;
         m_firstIteration = false;
     }
+    return syncMismatch;
 }
 
 void DMultiplexedChannel::notifyBusError ()

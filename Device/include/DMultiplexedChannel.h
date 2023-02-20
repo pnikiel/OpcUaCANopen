@@ -66,7 +66,7 @@ public:
     void onReplyReceived(const CanMessage& msg);
 
     //! To be called just before the server emits sync
-    void notifySync ();
+    bool notifySyncAndCheckMismatch ();
 
     void setParentMultiplex(DTpdoMultiplex* parent) { m_parentMultiplex = parent; }
 

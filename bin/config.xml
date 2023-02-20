@@ -15,7 +15,7 @@
 		</Log>
 	</StandardMetaData>
 	<GlobalSettings name="GlobalSettings" />
-	<Warnings name="Warnings" rxFromUnknownNode="false" tpdoSyncMismatch="false" unexpectedTpdo="false"/>
+	<Warnings name="Warnings" rxFromUnknownNode="false" tpdoSyncMismatch="true" unexpectedTpdo="false"/>
 	<Bus name="bus1" provider="sock" port="vcan0" syncIntervalMs="10000" settings="DontConfigure" spyMode="inheritFromGlobalSettings" nodeGuardIntervalMs="10000">
 		<Node name="elmb1" requestedState="OPERATIONAL" id="1" stateInfoSource="NodeGuard">
 			&STDELMB_FOUNDATIONS;

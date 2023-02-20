@@ -141,8 +141,23 @@ void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
 
 void DTpdoMultiplex::notifySync ()
 {
+    //! FP2.1.1: Warning of missing data between SYNCs
+    //! Aggregation: Before, the per-channel version, was really generating too much of info.
+    size_t mismatchCtr = 0;
     for (DMultiplexedChannel* channel : multiplexedchannels())
-        channel->notifySync();
+    {
+        bool mismatch = channel->notifySyncAndCheckMismatch();
+        if (mismatch)
+            mismatchCtr++;
+    }
+    if (mismatchCtr > 0)
+    {
+        if (DRoot::getInstance()->warningss()[0]->tpdoSyncMismatch())
+        {
+            SPOOKY(getFullName()) << "expected 1 M-TPDO per channel in the previous SYNC cycle but the expectation failed for "
+                << mismatchCtr << " channels out of " << multiplexedchannels().size() << " in this multiplex" << SPOOKY_;
+        }
+    }
 }
 
 void DTpdoMultiplex::propagateNull ()
