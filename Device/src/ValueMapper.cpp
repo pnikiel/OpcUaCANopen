@@ -46,7 +46,7 @@ UaVariant ValueMapper::extractFromBytesIntoVariant (
     {
         case Boolean:
             {
-                if (offset > size)
+                if (offset >= size)
                 throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
                 unsigned char byte = bytes[offset];
                 if (booleanFromBit == "-") // whole word
@@ -60,7 +60,7 @@ UaVariant ValueMapper::extractFromBytesIntoVariant (
             break;
         case Byte:
             {
-                if (offset > size)
+                if (offset >= size)
                     throw std::runtime_error("message too short [" + std::to_string(size) + "] to perform value extraction");
                 output.setByte(bytes[offset]);
             }

@@ -151,6 +151,20 @@ void DTpdo::initialize ()
 
 void DTpdo::onReplyReceived(const CanMessage& msg)
 {
+    if (msg.c_rtr)
+    {
+        if (getParent()->getParent()->isInSpyMode())
+        {
+            // Feature clause FC4.1: Spy mode
+            LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing TPDO with RTR from another master.";
+        }
+        else
+        {
+            SPOOKY(getFullName()) << "Seeing unexpected TPDO RTR" << SPOOKY_ << 
+                    " This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
+        }
+        return;
+    }
     std::lock_guard<std::mutex> lock (m_accessLock); // operating on shared data, e.g. m_receivedCtrSinceLastSync
 
     LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO: Wrong log component

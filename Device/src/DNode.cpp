@@ -293,25 +293,6 @@ void DNode::onEmergencyReceived (const CanMessage& msg)
     emergencyparsers()[0]->onEmergencyReceived(msg);
 }
 
-// TODO: the following maybe could get to the cobid router for diagnostics ?
-void DNode::onTpdoReceived (const CanMessage& msg)
-{
-    if (msg.c_rtr)
-    {
-        // if in spy mode that is fine, otherwise it's fucked up.
-        if (getParent()->isInSpyMode())
-        {
-            // Feature clause FC4.1: Spy mode
-            LOG(Log::TRC, MyLogComponents::spy()) << wrapId(getFullName()) << " seeing TPDO RTR from another master.";
-        }
-        else
-        {
-            SPOOKY(getFullName()) << "Seeing unexpected TPDO RTR " << SPOOKY_ << 
-                    "This is only expected for the server in the spy mode. Someone is messing badly with your CAN bus!";
-            return;
-        }
-    } 
-}
 
 void DNode::tick()
 {
