@@ -67,6 +67,7 @@ DTpdo::DTpdo (
 ):
     Base_DTpdo( config, parent),
     m_name(config.name()),
+    m_baseCobid(0),
     m_firstIteration(true),
     m_transportMechanism(Enumerator::Tpdo::transportMechanismFromString(config.transportMechanism())),
     m_receivedCtrSinceLastSync (0),
@@ -140,8 +141,9 @@ UaStatus DTpdo::writeInvokeRtr (
 
 void DTpdo::initialize ()
 {
+    m_baseCobid = PdoCobidMapper::tpdoSelectorToBaseCobid(selector());
     getParent()->getParent()->cobidCoordinator().registerCobid(
-        PdoCobidMapper::tpdoSelectorToBaseCobid(selector()) + getParent()->id(),
+        m_baseCobid + getParent()->id(),
         getParent()->getFullName(),
         m_name + " (TPDO non-mux)",
         std::bind(&DTpdo::onReplyReceived, this, std::placeholders::_1));
@@ -164,10 +166,8 @@ void DTpdo::onReplyReceived(const CanMessage& msg)
 
 void DTpdo::sendRtr()
 {
-    // only when in non spy mode!!!! --> also complete the documentation
-    // TODO: send this fucking RTR.
     getParent()->getParent()->sendMessage(
-        CANopen::makeTpdoRtr(getParent()->id(), 0x180/*TODO*/));
+        CANopen::makeTpdoRtr(getParent()->id(), m_baseCobid));
 }
 
     

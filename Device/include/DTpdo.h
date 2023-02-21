@@ -85,6 +85,7 @@ public:
 
 private:
     const std::string m_name;
+    uint16_t m_baseCobid;
 
     // sends RTR corresponding to this TPDO
     void sendRtr();
@@ -98,6 +99,7 @@ private:
     unsigned int m_numRtrsInvokedAddressSpace;
 
     std::chrono::steady_clock::time_point m_lastPeriodicRtr;
+
 
 };
 
