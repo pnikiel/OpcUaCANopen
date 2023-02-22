@@ -108,7 +108,11 @@ UaStatus DRpdoCachedVariable::writeValue (
             LOG(Log::ERR, "Sdo") << wrapId (getFullName()) << " Received value can't be casted to boolean.";
             throw std::runtime_error("Received value can't be casted to boolean.");
         }
-        getParent()->getCache()[offset()] |= (b ? 0x01 : 0x00) << 3;
+        uint8_t byte = getParent()->getCache()[offset()];
+        byte &= ~(1 << booleanToBit());
+        if (b)
+            byte |= (1 << booleanToBit());
+        getParent()->getCache()[offset()] = byte;
     }
     else
     {
@@ -119,13 +123,7 @@ UaStatus DRpdoCachedVariable::writeValue (
             getParent()->getCache().begin()); // TODO: we're missiing cache there!
     }
        
-
-    // and send out cache to the device
-
-
-
     getParent()->propagateCache();
-    //getParent()->getParent()->getParent()->sendMessage(rpdoMessage);
     return OpcUa_Good;
 }
 
