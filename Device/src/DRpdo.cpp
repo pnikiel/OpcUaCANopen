@@ -92,6 +92,7 @@ void DRpdo::initialize()
         m_cobid,
         getParent()->getFullName(),
         m_name + " (RPDO)");
+    propagateCache();
 }
 
 //! sends and publishes to the address-space
