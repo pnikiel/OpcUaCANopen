@@ -148,7 +148,6 @@ namespace AddressSpace
     void configureWriteMutexOf{{sv.get('name')|capFirst}} (std::mutex* mutex) { m_sourceVariableWriteMutex{{sv.get('name')|capFirst}} = mutex; }
   {% endfor %}
   
-
   private:
   UaNodeId m_typeNodeId;
   const UaNodeId m_effectiveParentNodeIdForChildren;
