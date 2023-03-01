@@ -92,11 +92,11 @@ void DRpdo::initialize()
         m_cobid,
         getParent()->getFullName(),
         m_name + " (RPDO)");
-    propagateCache();
+    propagateCache(false); /* Do not automatically send out the cache at startup */
 }
 
 //! sends and publishes to the address-space
-void DRpdo::propagateCache()
+void DRpdo::propagateCache(bool sendRpdo)
 {
     // this can certainly be done better!!
     UaVariant out;
@@ -105,22 +105,25 @@ void DRpdo::propagateCache()
     out.toByteString(bs);
     getAddressSpaceLink()->setCache(bs, OpcUa_Good);
 
-    CanMessage rpdoMessage;
-
-    if (getCache().size() > sizeof(rpdoMessage.c_data))
+    if (sendRpdo)
     {
-        throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
+        CanMessage rpdoMessage;
+
+        if (getCache().size() > sizeof(rpdoMessage.c_data))
+        {
+            throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
+        }
+
+        std::copy(
+            getCache().begin(),
+            getCache().end(),
+            rpdoMessage.c_data    
+        );
+
+        rpdoMessage.c_id = m_cobid;
+        rpdoMessage.c_dlc = m_cache.size();
+        getParent()->getParent()->sendMessage(rpdoMessage);
     }
-
-    std::copy(
-        getCache().begin(),
-        getCache().end(),
-        rpdoMessage.c_data    
-    );
-
-    rpdoMessage.c_id = m_cobid;
-    rpdoMessage.c_dlc = m_cache.size();
-    getParent()->getParent()->sendMessage(rpdoMessage);
 }
 
 }
