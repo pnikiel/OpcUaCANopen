@@ -119,46 +119,51 @@ UaStatus DSdoVariable::readValue (
         return OpcUa_BadOutOfService;
     }
 
-    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
-    // Synchronization: use quasar's made mutex:
-    std::lock_guard<boost::mutex> lock (m_node->getLock());
-    std::vector<unsigned char> readData;
+    try
+    {        
+        std::vector<unsigned char> readData;
 
-    unsigned int timeoutMsInit = m_expeditedReadTimeoutInheritsGlobal ? 
-        1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
-        1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
+        unsigned int timeoutMsInit = m_expeditedReadTimeoutInheritsGlobal ? 
+            1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoReadTimeoutSeconds() :
+            1000.0 * m_expeditedReadTimeoutSecondsFromConfig;
 
-    bool status = m_node->sdoEngine()->readExpeditedOrSegmented(
-        getFullName(),
-        m_index,
-        m_subIndex,
-        readData,
-        timeoutMsInit,
-        1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds(),
-        DRoot::getInstance()->globalsettings()->segmentedSdoMaxNumSegments());
+        bool status = m_node->sdoEngine()->readExpeditedOrSegmented(
+            getFullName(),
+            m_index,
+            m_subIndex,
+            readData,
+            timeoutMsInit,
+            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoReadPairTimeoutSeconds(),
+            DRoot::getInstance()->globalsettings()->segmentedSdoMaxNumSegments());
 
-    if (!status)
-        return OpcUa_Bad;
-
-    if (dataType() == "ByteString")
-    {
-        UaByteString bs (readData.size(), &readData[0]);
-        value.setByteString(bs, false);
-    }
-    else
-    {
-        try
-        {
-            value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, booleanFromBit());
-        }
-        catch(const std::exception& e)
-        {
-            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << e.what() << "(note: dataType was " << dataType() << ")";
+        if (!status)
             return OpcUa_Bad;
+
+        if (dataType() == "ByteString")
+        {
+            UaByteString bs (readData.size(), &readData[0]);
+            value.setByteString(bs, false);
         }
+        else
+        {
+            try
+            {
+                value = ValueMapper::extractFromBytesIntoVariant(&readData[0], readData.size(), dataType(), 0, booleanFromBit());
+            }
+            catch(const std::exception& e)
+            {
+                LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << e.what() << "(note: dataType was " << dataType() << ")";
+                return OpcUa_Bad;
+            }
+        }
+        sourceTime = UaDateTime::now();
+        return OpcUa_Good;
     }
-    sourceTime = UaDateTime::now();
-    return OpcUa_Good;
+    catch (const std::exception& e)
+    {
+        LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << " Exception in SDO read caught, exact error should have been logged";
+        return OpcUa_Bad; 
+    }
 }
 /* ASYNCHRONOUS !! */
 UaStatus DSdoVariable::writeValue (
@@ -180,50 +185,53 @@ UaStatus DSdoVariable::writeValue (
         return OpcUa_BadOutOfService;
     }
 
-    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
-    // Synchronization: use quasar's made mutex:
-    std::lock_guard<boost::mutex> lock (m_node->getLock());
-
-    // Expedited SDO or Segmented SDO?
-    if (dataType() != "ByteString") /* Expedited SDO */
+    try
     {
-        /* Anything not declared as ByteString goes as Expedited SDO */
-        std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+        // Expedited SDO or Segmented SDO?
+        if (dataType() != "ByteString") /* Expedited SDO */
+        {
+            /* Anything not declared as ByteString goes as Expedited SDO */
+            std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
 
-        unsigned int timeoutMs = m_expeditedWriteTimeoutInheritsGlobal ? 
-            1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
-            1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
+            unsigned int timeoutMs = m_expeditedWriteTimeoutInheritsGlobal ? 
+                1000.0 * Device::DRoot::getInstance()->globalsettings()->expeditedSdoWriteTimeoutSeconds() :
+                1000.0 * m_expeditedWriteTimeoutSecondsFromConfig;
 
-        bool status = m_node->sdoEngine()->writeExpedited(
-            getFullName(),
-            m_index, 
-            m_subIndex, 
-            bytes, 
-            timeoutMs);    
-        return status ? OpcUa_Good : OpcUa_Bad;
+            bool status = m_node->sdoEngine()->writeExpedited(
+                getFullName(),
+                m_index, 
+                m_subIndex, 
+                bytes, 
+                timeoutMs);    
+            return status ? OpcUa_Good : OpcUa_Bad;
+        }
+        else
+        {
+            if (value.dataType() != UaNodeId(OpcUaType_ByteString))
+            {
+                LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "Segmented SDO is supported only for ByteString input data. Given encoding type was [" << wrapValue(value.dataType().toString().toUtf8()) << "]";
+                return OpcUa_BadDataEncodingInvalid;
+            }
+            UaByteString bs;
+            if (value.toByteString(bs) != OpcUa_Good)
+            {
+                LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "ByteString decoding error";
+                return OpcUa_BadDataEncodingInvalid;
+            }
+            bool status = m_node->sdoEngine()->writeSegmented(
+                getFullName(),
+                m_index,
+                m_subIndex,
+                std::vector<unsigned char>(bs.data(), bs.data() + bs.length()),
+                1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoWritePairTimeoutSeconds());
+            return status ? OpcUa_Good : OpcUa_Bad;
+        }
     }
-    else
+    catch (const std::exception& e)
     {
-        if (value.dataType() != UaNodeId(OpcUaType_ByteString))
-        {
-            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "Segmented SDO is supported only for ByteString input data. Given encoding type was [" << wrapValue(value.dataType().toString().toUtf8()) << "]";
-            return OpcUa_BadDataEncodingInvalid;
-        }
-        UaByteString bs;
-        if (value.toByteString(bs) != OpcUa_Good)
-        {
-            LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << "ByteString decoding error";
-            return OpcUa_BadDataEncodingInvalid;
-        }
-        bool status = m_node->sdoEngine()->writeSegmented(
-            getFullName(),
-            m_index,
-            m_subIndex,
-            std::vector<unsigned char>(bs.data(), bs.data() + bs.length()),
-            1000.0 * DRoot::getInstance()->globalsettings()->segmentedSdoWritePairTimeoutSeconds());
-        return status ? OpcUa_Good : OpcUa_Bad;
+       LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << " Exception in SDO write caught, exact error should have been logged";
+       return OpcUa_Bad; 
     }
-
 }
 
 /* delegators for methods */
@@ -240,6 +248,10 @@ void DSdoVariable::initialize (DBus* bus, DNode* node)
     m_node = node;
     if (!node->sdoEngine())
         throw_config_error_with_origin("SDO declared with a node that explicitly has no SDO support");
+    // Feature clause FS0.1: Features common to any mode of SDO usage: synchronization
+    // Synchronization: always use node's (e.g. ELMB's) mutex for SDO (cause assume there is at most one SDO transaction of any kind at any time per node)
+    getAddressSpaceLink()->configureWriteMutexOfValue(&node->getLock());
+    getAddressSpaceLink()->configureReadMutexOfValue(&node->getLock());
 }
 
 void DSdoVariable::setIndex (uint16_t _index)

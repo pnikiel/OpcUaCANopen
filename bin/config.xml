@@ -13,6 +13,7 @@
 				<ComponentLogLevel logLevel="TRC" componentName="Sdo"/>
 			</ComponentLogLevels>
 		</Log>
+		<SourceVariableThreadPool maxThreads="3" />
 	</StandardMetaData>
 	<GlobalSettings name="GlobalSettings" />
 	<Warnings name="Warnings" rxFromUnknownNode="false" tpdoSyncMismatch="true" unexpectedTpdo="false"/>
