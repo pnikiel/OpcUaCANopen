@@ -59,7 +59,7 @@ private:
 public:
     void initialize();
     std::vector<uint8_t>& getCache() { return m_cache; }
-    void propagateCache();
+    void propagateCache(bool sendRpdo=true);
 
 private:
     const std::string m_name;
