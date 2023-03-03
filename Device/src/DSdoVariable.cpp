@@ -119,6 +119,15 @@ UaStatus DSdoVariable::readValue (
         return OpcUa_BadOutOfService;
     }
 
+    /* Node state known to permit it? */
+    CANopen::NodeState state = m_node->nodeStateEngine().currentState();
+    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the node state is not ok (it is [" << 
+            wrapValue(CANopen::stateEnumToText(state)) << "])";
+        return OpcUa_BadOutOfService;   
+    }
+
     try
     {        
         std::vector<unsigned char> readData;
@@ -181,8 +190,17 @@ UaStatus DSdoVariable::writeValue (
     /* Not in spy mode? */
     if (m_bus->isInSpyMode())
     {
-        LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << ": SDO read was denied because the bus is currently in the spy mode.";
+        LOG(Log::ERR, "Sdo") << wrapId(getFullName()) << ": SDO write was denied because the bus is currently in the spy mode.";
         return OpcUa_BadOutOfService;
+    }
+
+    /* Node state known to permit it? */
+    CANopen::NodeState state = m_node->nodeStateEngine().currentState();
+    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << ": SDO write was denied because the node state is not ok (it is [" << 
+            wrapValue(CANopen::stateEnumToText(state)) << "])";
+        return OpcUa_BadOutOfService;   
     }
 
     try
