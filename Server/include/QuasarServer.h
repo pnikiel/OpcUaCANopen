@@ -25,6 +25,7 @@
 
 #include "BaseQuasarServer.h"
 
+namespace AddressSpace { class ASThreadPool; }
 namespace Configuration { class Configuration; }
 
 /*
@@ -77,6 +78,8 @@ private:
     bool m_printCobidsTables;
 
     static QuasarServer* s_instance;
+
+    AddressSpace::ASThreadPool* m_metaThreadPoolInfo;
 
 };
 

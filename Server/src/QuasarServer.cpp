@@ -42,6 +42,7 @@
 #include <ASEmergencyParser.h>
 #include <ASMeta.h>
 #include <ASNodeQueries.h>
+#include <ASThreadPool.h>
 
 #include <Configuration.hxx>
 #include <Configurator.h>
@@ -113,7 +114,8 @@ void printLogo()
 QuasarServer::QuasarServer() :
     BaseQuasarServer(),
     m_forceDontReconfigure(false),
-    m_mapToVcan(false)
+    m_mapToVcan(false),
+    m_metaThreadPoolInfo(nullptr)
 {
 
     QuasarServer::s_instance = this;
@@ -146,6 +148,8 @@ void QuasarServer::mainLoop()
         {
             bus->tick();
         }
+
+        m_metaThreadPoolInfo->setIngressJobRate(rand(), OpcUa_Good);
     }
     printServerMsg(" Shutting down server");
 }
@@ -165,6 +169,10 @@ void QuasarServer::initialize()
     AddressSpace::ASMeta* meta = AddressSpace::findByStringId<AddressSpace::ASMeta> (getNodeManager(), "Meta");
     if (meta)
         meta->setProductVersion(VERSION_STR, OpcUa_Good);
+
+    m_metaThreadPoolInfo = AddressSpace::findByStringId<AddressSpace::ASThreadPool> (getNodeManager(), "Meta.ThreadPool");
+    if (!m_metaThreadPoolInfo)
+        throw std::logic_error ("Sth wrong with Meta address-space ?? .. ??");
 
     // TODO make it a separate method to parse components
     for (auto &logComponent : LogComponents)

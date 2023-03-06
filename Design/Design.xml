@@ -114,6 +114,14 @@
   </d:class>
   <d:class name="Meta">
     <d:cachevariable name="productVersion" addressSpaceWrite="forbidden" dataType="UaString" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:hasobjects class="ThreadPool" instantiateUsing="design">
+      <d:object name="ThreadPool"/>
+    </d:hasobjects>
+  </d:class>
+  <d:class name="ThreadPool">
+    <d:cachevariable name="pendingJobs" addressSpaceWrite="forbidden" dataType="OpcUa_UInt32" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable name="ingressJobRate" addressSpaceWrite="forbidden" dataType="OpcUa_Double" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable name="egressJobRate" addressSpaceWrite="forbidden" dataType="OpcUa_Double" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
   </d:class>
   <d:class name="Bus">
     <d:devicelogic/>
