@@ -96,6 +96,9 @@ namespace CANopen
         //! This gets called when state information was obtained.
         void notifyState(uint8_t rawState, CANopen::NodeState state);
 
+        //! Identifies wrong/missing transitions of the Toggle bit, fires toggleViolationNotification
+        void checkToggleBit(uint8_t stateToggled);
+
         std::vector<NodeStateNotification> m_nodeStateNotifications;
         std::vector<NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
         BootUpNotification m_bootUpNotification;

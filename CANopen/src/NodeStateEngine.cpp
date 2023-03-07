@@ -217,21 +217,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         // Feature FN1.1.2
         // TODO implement actual NG reply logic
 
-        // Feature clause FN1.1.1: Toggle bit support
-        // TODO break into a sep function
-        ToggleBit currentToggleBit = stateToggled & 0x80 ? ON : OFF;
-        if (m_currentState != NodeState::DISCONNECTED) // DISCONNECTED is the only state where there is no toggling, so we don't check.
-        {
-            if (m_lastToggleBit != DUNNO)
-            {
-                if (m_lastToggleBit == currentToggleBit) // no toggle detected!
-                {          
-                    if (m_toggleViolationNotification)
-                        m_toggleViolationNotification(stateToggled);
-                }
-            }
-        }
-        m_lastToggleBit = currentToggleBit;
+        checkToggleBit(stateToggled);
 
         m_currentState = receivedState;
         notifyState(msg.c_data[0],   m_currentState);
@@ -265,6 +251,24 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
     }
 
 
+}
+
+void NodeStateEngine::checkToggleBit(uint8_t stateToggled)
+{
+    // Feature clause FN1.1.1: Toggle bit support
+    ToggleBit currentToggleBit = stateToggled & 0x80 ? ON : OFF;
+    if (m_currentState != NodeState::DISCONNECTED) // DISCONNECTED is the only state where there is no toggling, so we don't check.
+    {
+        if (m_lastToggleBit != DUNNO)
+        {
+            if (m_lastToggleBit == currentToggleBit) // no toggle detected!
+            {          
+                if (m_toggleViolationNotification)
+                    m_toggleViolationNotification(stateToggled);
+            }
+        }
+    }
+    m_lastToggleBit = currentToggleBit;
 }
 
 void NodeStateEngine::onBootupReceived (const CanMessage& msg)
