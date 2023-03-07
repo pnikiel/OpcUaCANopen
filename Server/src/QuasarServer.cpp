@@ -47,7 +47,6 @@
 #include <Configuration.hxx>
 #include <Configurator.h>
 
-
 #include <Warnings.hxx>
 #include <Utils.h>
 #include <Logging.hpp>
@@ -55,6 +54,7 @@
 #include <ConfigurationProcessing.hxx>
 #include "version.h"
 #include <MyLogComponents.h>
+#include <SourceVariables.h>
 
 using namespace Logging;
 
@@ -76,57 +76,86 @@ std::vector<LogComponent> LogComponents =
         {"Sdo"},
         {"Spooky"},
         {"Spy"},
-        {"SdoValidator"}
-    };
-
+        {"SdoValidator"}};
 
 void printLogo()
 {
-    std::string versionStr (VERSION_STR);
+    std::string versionStr(VERSION_STR);
     versionStr.resize(73, ' ');
 
-    std::string text [] = {
-    "                                                                                    ",
-    "  ▄██▀▀██▄  ▀▀▀███▀▀  ▐██▌      ▄██▀▀█▄▄  ▄██▀▀██▄  ▀████▀██▄▄  ▄██▀▀██▄  ▄▄█▀▀██▄  ",
-    "  ███  ███     ██▌    ▐██▌     ▐██▌ ▐██▌  ███▄▄▄     ▐██▌ ▐██▌  ██▌       ███▄▄▄▄   ",
-    "  ████████     ██▌    ▐██▌     ▐███████▌   ▀▀▀▀██▄   ▐██▌ ▐██▌  ██▌         ▀▀▀███  ",
-    "  ███  ███     ██▌    ▐███▄▄▄  ▐██▌ ▐██▌  ▀██▄▄██▀   ▐███▄▄█▀▀  ▀██▄▄██▀  ▀██▄▄██▀  ",
-    "                                                                                    ",
-    "  The CANopen NG OPCUA server by Piotr P. Nikiel et al., 2021-2023                  ",
-    "  The CanModule for device-independent CAN support by V. Filimonov, P.P. Nikiel,    ",
-    "    D. Abalo, M. Ludwig, 2012-2022                                                  ",
-    "                                                                                    ",
-    "  Version: " + versionStr,
-    "                                                                                    "};
+    std::string text[] = {
+        "                                                                                    ",
+        "  ▄██▀▀██▄  ▀▀▀███▀▀  ▐██▌      ▄██▀▀█▄▄  ▄██▀▀██▄  ▀████▀██▄▄  ▄██▀▀██▄  ▄▄█▀▀██▄  ",
+        "  ███  ███     ██▌    ▐██▌     ▐██▌ ▐██▌  ███▄▄▄     ▐██▌ ▐██▌  ██▌       ███▄▄▄▄   ",
+        "  ████████     ██▌    ▐██▌     ▐███████▌   ▀▀▀▀██▄   ▐██▌ ▐██▌  ██▌         ▀▀▀███  ",
+        "  ███  ███     ██▌    ▐███▄▄▄  ▐██▌ ▐██▌  ▀██▄▄██▀   ▐███▄▄█▀▀  ▀██▄▄██▀  ▀██▄▄██▀  ",
+        "                                                                                    ",
+        "  The CANopen NG OPCUA server by Piotr P. Nikiel et al., 2021-2023                  ",
+        "  The CanModule for device-independent CAN support by V. Filimonov, P.P. Nikiel,    ",
+        "    D. Abalo, M. Ludwig, 2012-2022                                                  ",
+        "                                                                                    ",
+        "  Version: " + versionStr,
+        "                                                                                    "};
 
     std::cout << "starting up... " << std::endl;
 
-    for (const std::string& line : text)
+    for (const std::string &line : text)
     {
         std::cout << "\033[1;97;44m" << line << "\033[0m" << std::endl;
     }
-
-
-
 }
 
-
-QuasarServer::QuasarServer() :
-    BaseQuasarServer(),
-    m_forceDontReconfigure(false),
-    m_mapToVcan(false),
-    m_metaThreadPoolInfo(nullptr)
+QuasarServer::QuasarServer() : BaseQuasarServer(),
+                               m_forceDontReconfigure(false),
+                               m_mapToVcan(false),
+                               m_metaThreadPoolInfo(nullptr),
+                               m_lastJobsAcceptedCounter(0),
+                               m_lastJobsFinishedCounter(0),
+                               m_lastMetaUpdate(std::chrono::steady_clock::now()),
+                               m_threadPoolIngressRate(0),
+                               m_threadPoolEgressRate(0)
 {
 
     QuasarServer::s_instance = this;
 
     // the check for LittleEndian arch. Reason for that is most ValueMapper algorithms base on this assumption.
     uint32_t checkWordU32 = 0x12345678;
-    uint8_t* checkPtr = reinterpret_cast<uint8_t*>(&checkWordU32);
+    uint8_t *checkPtr = reinterpret_cast<uint8_t *>(&checkWordU32);
     if (*checkPtr != (checkWordU32 & 0xff))
     {
         throw std::runtime_error("It seems that you're running this program on an architecture different from LittleEndian. With current ValueMapping algorithms this would deliver wrong results. Consider contributing or contact Piotr.");
     }
+}
+
+void QuasarServer::updateThreadPoolMetrics()
+{
+    auto now = std::chrono::steady_clock::now();
+    double secsSince = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastMetaUpdate).count() / 1000.0;
+    Quasar::ThreadPool *quasarThreadPool(AddressSpace::SourceVariables_getThreadPool());
+    size_t jobsAcceptedCtr = quasarThreadPool->getNumJobsAccepted();
+    m_threadPoolIngressRate = (jobsAcceptedCtr - m_lastJobsAcceptedCounter) / secsSince;
+    size_t jobsFinishedCtr = quasarThreadPool->getNumJobsFinished();
+    m_threadPoolEgressRate = (jobsFinishedCtr - m_lastJobsFinishedCounter) / secsSince;
+    
+    m_metaThreadPoolInfo->setIngressJobRate(m_threadPoolIngressRate, OpcUa_Good);
+    m_metaThreadPoolInfo->setEgressJobRate(m_threadPoolEgressRate, OpcUa_Good);
+    m_metaThreadPoolInfo->setNumPendingJobs(quasarThreadPool->getNumPendingJobs(), OpcUa_Good);
+
+    /* ... and for the new cycle ... */
+    m_lastJobsAcceptedCounter = jobsAcceptedCtr;
+    m_lastJobsFinishedCounter = jobsFinishedCtr;
+    m_lastMetaUpdate = now;
+}
+
+void QuasarServer::printThreadPoolMetrics()
+{
+    Quasar::ThreadPool *quasarThreadPool(AddressSpace::SourceVariables_getThreadPool());
+    if (!quasarThreadPool)
+        return;
+    std::cout << "Quasar ThreadPool: pending jobs:" << 
+        wrapValue(std::to_string(quasarThreadPool->getNumPendingJobs())) <<
+        " ingressRate[1/s]:" << wrapValue(std::to_string(m_threadPoolIngressRate)) <<
+        " egressRate[1/s]:" << wrapValue(std::to_string(m_threadPoolEgressRate)) <<   std::endl;
 }
 
 QuasarServer::~QuasarServer()
@@ -149,12 +178,12 @@ void QuasarServer::mainLoop()
             bus->tick();
         }
 
-        m_metaThreadPoolInfo->setIngressJobRate(rand(), OpcUa_Good);
+        updateThreadPoolMetrics();
     }
     printServerMsg(" Shutting down server");
 }
 
-QuasarServer* QuasarServer::s_instance = nullptr;
+QuasarServer *QuasarServer::s_instance = nullptr;
 
 void handleCtrlZ(int)
 {
@@ -166,13 +195,13 @@ void QuasarServer::initialize()
     LOG(Log::INF) << "Initializing Quasar server.";
 
     // fill up product version.
-    AddressSpace::ASMeta* meta = AddressSpace::findByStringId<AddressSpace::ASMeta> (getNodeManager(), "Meta");
+    AddressSpace::ASMeta *meta = AddressSpace::findByStringId<AddressSpace::ASMeta>(getNodeManager(), "Meta");
     if (meta)
         meta->setProductVersion(VERSION_STR, OpcUa_Good);
 
-    m_metaThreadPoolInfo = AddressSpace::findByStringId<AddressSpace::ASThreadPool> (getNodeManager(), "Meta.ThreadPool");
+    m_metaThreadPoolInfo = AddressSpace::findByStringId<AddressSpace::ASThreadPool>(getNodeManager(), "Meta.ThreadPool");
     if (!m_metaThreadPoolInfo)
-        throw std::logic_error ("Sth wrong with Meta address-space ?? .. ??");
+        throw std::logic_error("Sth wrong with Meta address-space ?? .. ??");
 
     // TODO make it a separate method to parse components
     for (auto &logComponent : LogComponents)
@@ -194,7 +223,6 @@ void QuasarServer::initialize()
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
         bus->initialize();
 
-    
     signal(SIGTSTP, handleCtrlZ);
 
     printLogo();
@@ -258,16 +286,16 @@ void QuasarServer::appendCustomCommandLineOptions(
     commandLineOptions.add_options()("Wnone", po::bool_switch(&Warnings::noWarnings), "Turn off all warnings");
 
     commandLineOptions.add_options()("force_dont_reconfigure", po::bool_switch(&m_forceDontReconfigure)->default_value(false), "Force DontReconfigure CanModule option per all declared buses which will avoid elevated privileges on some platforms");
-    commandLineOptions.add_options()("map_to_vcan",            po::bool_switch(&m_mapToVcan)->default_value(false), "Map to VCAN port names whenever possible");
-    commandLineOptions.add_options()("print_cobids_tables",    po::bool_switch(&m_printCobidsTables)->default_value(false), "Print cobid tables");
+    commandLineOptions.add_options()("map_to_vcan", po::bool_switch(&m_mapToVcan)->default_value(false), "Map to VCAN port names whenever possible");
+    commandLineOptions.add_options()("print_cobids_tables", po::bool_switch(&m_printCobidsTables)->default_value(false), "Print cobid tables");
 }
 
-bool readSdoAsAscii(const std::string& where, CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string& outString)
+bool readSdoAsAscii(const std::string &where, CANopen::SdoEngine &engine, uint16_t index, uint8_t subIndex, std::string &outString)
 {
     std::vector<uint8_t> output;
     try
     {
-        if (!engine.readExpeditedOrSegmented(where, index, subIndex, output, 50/*ms*/))
+        if (!engine.readExpeditedOrSegmented(where, index, subIndex, output, 50 /*ms*/))
             return false;
         outString.assign(output.size(), ' ');
         std::transform(output.begin(), output.end(), outString.begin(), [](uint8_t x)
@@ -280,14 +308,18 @@ bool readSdoAsAscii(const std::string& where, CANopen::SdoEngine &engine, uint16
     }
 }
 
-
 void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
 {
 
     fort::utf8_table table;
     table.set_border_style(FT_BOLD_STYLE);
 
-    table << fort::header << "Node name" << "ID" << "State info" << "SW Version" << "Serial#" << "OnlConfValidation" << fort::endr;
+    table << fort::header << "Node name"
+          << "ID"
+          << "State info"
+          << "SW Version"
+          << "Serial#"
+          << "OnlConfValidation" << fort::endr;
 
     for (Device::DBus *bus : Device::DRoot::getInstance()->buss())
     {
@@ -301,13 +333,12 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 std::string result;
                 std::string where;
             };
-            std::vector<SdoBasedInfo> sdoBasedInfos = 
-            {
-                {0x100A, 0x00, "?", "swVersion" },
-                {0x100A, 0x01, "?", "swVersionMinor"},
-                {0x3100, 0x00, "?", "serialNumber"}
-            };
-            for (SdoBasedInfo& info : sdoBasedInfos)
+            std::vector<SdoBasedInfo> sdoBasedInfos =
+                {
+                    {0x100A, 0x00, "?", "swVersion"},
+                    {0x100A, 0x01, "?", "swVersionMinor"},
+                    {0x3100, 0x00, "?", "serialNumber"}};
+            for (SdoBasedInfo &info : sdoBasedInfos)
             {
                 if (bus->isInSpyMode())
                     info.result = "N/A: spy mode";
@@ -323,31 +354,29 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
                 }
             }
 
-            std::string onlineConfigValidationResult ("no-tests-defined");
+            std::string onlineConfigValidationResult("no-tests-defined");
             if (node->onlineconfigvalidators().size() == 1)
             {
                 if (assumeSuccessful)
                 {
-                    Device::DOnlineConfigValidator* validator = node->onlineconfigvalidators()[0];
+                    Device::DOnlineConfigValidator *validator = node->onlineconfigvalidators()[0];
                     std::vector<UaString> testResults;
                     OpcUa_Boolean passed;
                     OpcUa_UInt32 numberOfFailures;
                     validator->callValidate(testResults, passed, numberOfFailures);
-                    onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)"; 
+                    onlineConfigValidationResult = (passed ? "✔" : "✖") + std::string(" (") + std::to_string(numberOfFailures) + " failed / " + std::to_string(validator->sdovalidators().size()) + " total)";
                 }
                 else
                 {
                     onlineConfigValidationResult = "✖ (skipped)";
                 }
             }
-            
+
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardIntervalMs())) + "ms ";
-            table << node->getFullName() << (unsigned int)node->id() << stateInfo << 
-                sdoBasedInfos[0].result+"."+sdoBasedInfos[1].result << 
-                sdoBasedInfos[2].result << 
-                onlineConfigValidationResult << fort::endr;
+            table << node->getFullName() << (unsigned int)node->id() << stateInfo << sdoBasedInfos[0].result + "." + sdoBasedInfos[1].result << sdoBasedInfos[2].result << onlineConfigValidationResult << fort::endr;
         }
         table << fort::separator;
     }
-    LOG(Log::INF) << "\n\n" << table.to_string() << std::endl;
+    LOG(Log::INF) << "\n\n"
+                  << table.to_string() << std::endl;
 }

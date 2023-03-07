@@ -23,6 +23,8 @@
 #ifndef QUASARSERVER_H_
 #define QUASARSERVER_H_
 
+#include <chrono>
+
 #include "BaseQuasarServer.h"
 
 namespace AddressSpace { class ASThreadPool; }
@@ -68,6 +70,8 @@ public:
     bool getMapToVcan () const { return m_mapToVcan; }
     bool shouldPrintCobidsTables () const { return m_printCobidsTables; }
 
+    void printThreadPoolMetrics();
+
 private:
     //Disable copy-constructor and assignment-operator
     QuasarServer( const QuasarServer& server );
@@ -80,6 +84,14 @@ private:
     static QuasarServer* s_instance;
 
     AddressSpace::ASThreadPool* m_metaThreadPoolInfo;
+
+    size_t m_lastJobsAcceptedCounter;
+    size_t m_lastJobsFinishedCounter;
+    std::chrono::steady_clock::time_point m_lastMetaUpdate;
+    double m_threadPoolIngressRate;
+    double m_threadPoolEgressRate;
+    void updateThreadPoolMetrics();
+    
 
 };
 

@@ -119,7 +119,7 @@
     </d:hasobjects>
   </d:class>
   <d:class name="ThreadPool">
-    <d:cachevariable name="pendingJobs" addressSpaceWrite="forbidden" dataType="OpcUa_UInt32" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
+    <d:cachevariable name="numPendingJobs" addressSpaceWrite="forbidden" dataType="OpcUa_UInt32" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable name="ingressJobRate" addressSpaceWrite="forbidden" dataType="OpcUa_Double" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
     <d:cachevariable name="egressJobRate" addressSpaceWrite="forbidden" dataType="OpcUa_Double" initializeWith="valueAndStatus" nullPolicy="nullAllowed" initialStatus="OpcUa_BadWaitingForInitialData"/>
   </d:class>

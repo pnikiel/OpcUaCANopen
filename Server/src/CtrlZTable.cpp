@@ -11,6 +11,8 @@
 #include <ASNode.h>
 #include <ASEmergencyParser.h>
 
+#include <QuasarServer.h>
+
 #include <fort.hpp>
 
 void printCtrlZTable ()
@@ -57,4 +59,5 @@ void printCtrlZTable ()
         table << fort::separator;
     }
     std::cout << table.to_string() << std::endl;
+    QuasarServer::instance()->printThreadPoolMetrics();
 }
