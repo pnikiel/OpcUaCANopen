@@ -99,6 +99,9 @@ namespace CANopen
         //! Identifies wrong/missing transitions of the Toggle bit, fires toggleViolationNotification
         void checkToggleBit(uint8_t stateToggled);
 
+        //! This will perform state transitions on mismatch
+        void actOnStateMismatch(CANopen::NodeState receivedState);
+
         std::vector<NodeStateNotification> m_nodeStateNotifications;
         std::vector<NodeStateChangeCallBack>  m_nodeStateChangeCallBacks;
         BootUpNotification m_bootUpNotification;

@@ -144,7 +144,6 @@ void NodeStateEngine::notifyState(uint8_t rawState, CANopen::NodeState state)
 }
 
 // TODO: this also handles NG request in the spy mode
-// TODO: shoud we split it into two functions?
 void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
 {
     // are we in the spy mode ?
@@ -222,32 +221,7 @@ void NodeStateEngine::onNodeManagementReplyReceived (const CanMessage& msg)
         m_currentState = receivedState;
         notifyState(msg.c_data[0],   m_currentState);
         
-        // TODO break the block above into separate function "maintaining state"
-        if (!m_inSpyMode && stateNoToggle != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
-        {
-            // Feature clause FN1.3: Maintaining state
-            LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
-                << wrapValue(CANopen::stateEnumToText(m_currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
-            // send therefore a message for correcting
-
-            uint8_t nmtCommand;
-
-            switch(m_requestedStateEnum)
-            {
-                case 5: // to be started
-                    nmtCommand = NmtRequests::START; break;
-                case 4: // to be stopped
-                    nmtCommand = 2; break; // stop remote node
-                case 127: // go to preoperational
-                    nmtCommand = 128; break;
-                default: throw std::logic_error("requested state as int is unsupported");
-            }
-
-            m_messageSendFunction(CANopen::makeNodeManagementServiceRequest(m_nodeId, nmtCommand));
-            LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " sent NMT service request to change state, CS was " << 
-                wrapValue(std::to_string((int)nmtCommand));
-
-        }
+        actOnStateMismatch(receivedState);
     }
 
 
@@ -269,6 +243,35 @@ void NodeStateEngine::checkToggleBit(uint8_t stateToggled)
         }
     }
     m_lastToggleBit = currentToggleBit;
+}
+
+void NodeStateEngine::actOnStateMismatch(CANopen::NodeState receivedState)
+{
+    if (!m_inSpyMode && receivedState != m_requestedStateEnum)  // maybe compare actual states rather than uint8_t with an enum // TODO IMPORTANY
+    {
+        // Feature clause FN1.3: Maintaining state
+        LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " state mismatch is seen; current state is " 
+            << wrapValue(CANopen::stateEnumToText(m_currentState)) << " requested is " << wrapValue(CANopen::stateEnumToText(m_requestedStateEnum));
+        // send therefore a message for correcting
+
+        uint8_t nmtCommand;
+
+        switch(m_requestedStateEnum)
+        {
+            case 5: // to be started
+                nmtCommand = NmtRequests::START; break;
+            case 4: // to be stopped
+                nmtCommand = 2; break; // stop remote node
+            case 127: // go to preoperational
+                nmtCommand = 128; break;
+            default: throw std::logic_error("requested state as int is unsupported");
+        }
+
+        m_messageSendFunction(CANopen::makeNodeManagementServiceRequest(m_nodeId, nmtCommand));
+        LOG(Log::INF, MyLogComponents::nodemgmt()) << "For node " << wrapId(m_nodeAddressForDebug) << " sent NMT service request to change state, CS was " << 
+            wrapValue(std::to_string((int)nmtCommand));
+
+    }
 }
 
 void NodeStateEngine::onBootupReceived (const CanMessage& msg)
