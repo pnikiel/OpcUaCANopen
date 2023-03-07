@@ -119,9 +119,9 @@ UaStatus DSdoVariable::readValue (
         return OpcUa_BadOutOfService;
     }
 
-    /* Node state known to permit it? */
+    /* Node state known to permit it? UNKNOWN here is a possible exception. */
     CANopen::NodeState state = m_node->nodeStateEngine().currentState();
-    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL)
+    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL && state != CANopen::NodeState::UNKNOWN)
     {
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO read was denied because the node state is not ok (it is [" << 
             wrapValue(CANopen::stateEnumToText(state)) << "])";
@@ -196,7 +196,7 @@ UaStatus DSdoVariable::writeValue (
 
     /* Node state known to permit it? */
     CANopen::NodeState state = m_node->nodeStateEngine().currentState();
-    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL)
+    if (state != CANopen::NodeState::OPERATIONAL && state != CANopen::NodeState::PREOPERATIONAL && state != CANopen::NodeState::UNKNOWN)
     {
         LOG(Log::ERR) << wrapId(getFullName()) << ": SDO write was denied because the node state is not ok (it is [" << 
             wrapValue(CANopen::stateEnumToText(state)) << "])";
