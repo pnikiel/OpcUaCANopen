@@ -258,12 +258,12 @@ void NodeStateEngine::actOnStateMismatch(CANopen::NodeState receivedState)
 
         switch(m_requestedStateEnum)
         {
-            case 5: // to be started
+            case CANopen::NodeState::OPERATIONAL: // to be started
                 nmtCommand = NmtRequests::START; break;
-            case 4: // to be stopped
-                nmtCommand = 2; break; // stop remote node
-            case 127: // go to preoperational
-                nmtCommand = 128; break;
+            case CANopen::NodeState::STOPPED: // to be stopped
+                nmtCommand = NmtRequests::STOP; break; // stop remote node
+            case CANopen::NodeState::PREOPERATIONAL: // go to preoperational
+                nmtCommand = NmtRequests::GOTO_PREOP; break;
             default: throw std::logic_error("requested state as int is unsupported");
         }
 

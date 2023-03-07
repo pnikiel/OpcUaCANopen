@@ -25,6 +25,8 @@ enum NodeState
 enum NmtRequests
 {
     START = 1,
+    STOP = 2,
+    GOTO_PREOP = 128,
     RESET = 129
 };
 
