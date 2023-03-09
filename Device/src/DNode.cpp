@@ -336,4 +336,10 @@ void DNode::propagateNullToTpdos ()
         multiplex->propagateNull();
 }
 
+void DNode::requestState (CANopen::NodeState state)
+{
+    //! Going via address-space to keep coherence.
+    getAddressSpaceLink()->setRequestedState(CANopen::stateEnumToText(state).c_str(), OpcUa_Good);  
+}
+
 }
