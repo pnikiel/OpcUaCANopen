@@ -80,13 +80,55 @@ UaStatus DStateSwitcher::callGoToPreOperational (
     std::vector<UaString>& affectedNodes
 )
 {
-    std::string nodeNamePatternStr;
-    if (nodeNamePattern == "")
+    try
+    {
+        this->requestSwitch(nodeNamePattern.toUtf8(), CANopen::NodeState::PREOPERATIONAL, &affectedNodes);
+        info = UaString("PREOP requestedState applied to ") + std::to_string(affectedNodes.size()).c_str() + " nodes";
+        return OpcUa_Good;
+    }
+    catch (const std::exception& e)
+    {
+        info = UaString("Fail: ") + e.what();
+        return OpcUa_Bad;
+    }
+}
+
+UaStatus DStateSwitcher::callGoToOperational (
+    const UaString&  nodeNamePattern,
+    UaString& info,
+    std::vector<UaString>& affectedNodes
+)
+{
+    try
+    {
+        this->requestSwitch(nodeNamePattern.toUtf8(), CANopen::NodeState::OPERATIONAL, &affectedNodes);
+        info = UaString("OP requestedState applied to ") + std::to_string(affectedNodes.size()).c_str() + " nodes";
+        return OpcUa_Good;
+    }
+    catch (const std::exception& e)
+    {
+        info = UaString("Fail: ") + e.what();
+        return OpcUa_Bad;
+    }
+}
+
+// 3333333333333333333333333333333333333333333333333333333333333333333333333
+// 3     FULLY CUSTOM CODE STARTS HERE                                     3
+// 3     Below you put bodies for custom methods defined for this class.   3
+// 3     You can do whatever you want, but please be decent.               3
+// 3333333333333333333333333333333333333333333333333333333333333333333333333
+
+void DStateSwitcher::requestSwitch(
+    const std::string& pattern,
+    CANopen::NodeState intendedState,
+    std::vector<UaString>* affectedNodes )
+{
+    std::string nodeNamePatternStr (pattern);
+    if (nodeNamePatternStr == "")
         nodeNamePatternStr = ".*";
     else
     {
-        nodeNamePatternStr = nodeNamePattern.toUtf8();
-        /* string replace */
+        /* string replace - * to .* - to use the common vanilla asterisk pattern search */
         size_t index = 0;
         while (true)
         {
@@ -95,13 +137,9 @@ UaStatus DStateSwitcher::callGoToPreOperational (
             nodeNamePatternStr.replace(index, 1, ".*");
             index += 2;
         }
-
-        /* replace every occurence of * by .* */
     }
 
-    unsigned int applyCounter = 0;
-
-    boost::regex re (nodeNamePatternStr); // TODO catch it
+    boost::regex re (nodeNamePatternStr);
 
     for (auto bus : Device::DRoot::getInstance()->buss())
     {
@@ -111,20 +149,12 @@ UaStatus DStateSwitcher::callGoToPreOperational (
             bool matched = boost::regex_match( node->getFullName(), matchResults, re );
             if (matched)
             {
-                node->requestState(CANopen::NodeState::PREOPERATIONAL);
-                affectedNodes.push_back(node->getFullName().c_str() );
+                node->requestState(intendedState);
+                if (affectedNodes)
+                    affectedNodes->push_back(node->getFullName().c_str() );
             }
         }
     }
-    info = UaString("PREOP requestedState applied to ") + std::to_string(affectedNodes.size()).c_str() + " nodes";
-
-    return OpcUa_Good;
 }
-
-// 3333333333333333333333333333333333333333333333333333333333333333333333333
-// 3     FULLY CUSTOM CODE STARTS HERE                                     3
-// 3     Below you put bodies for custom methods defined for this class.   3
-// 3     You can do whatever you want, but please be decent.               3
-// 3333333333333333333333333333333333333333333333333333333333333333333333333
 
 }

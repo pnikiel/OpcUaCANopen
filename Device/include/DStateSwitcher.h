@@ -22,6 +22,7 @@
 #define __DStateSwitcher__H__
 
 #include <Base_DStateSwitcher.h>
+#include <Definitions.hpp>
 
 namespace Device
 {
@@ -50,6 +51,11 @@ public:
         UaString& info,
         std::vector<UaString>& affectedNodes
     ) ;
+    UaStatus callGoToOperational (
+        const UaString&  nodeNamePattern,
+        UaString& info,
+        std::vector<UaString>& affectedNodes
+    ) ;
 
 private:
     /* Delete copy constructor and assignment operator */
@@ -63,6 +69,8 @@ private:
 
 public:
 
+    //! affectedNodes is an optional output.
+    void requestSwitch(const std::string& pattern, CANopen::NodeState intendedState, std::vector<UaString>* affectedNodes = nullptr);
 private:
 
 
