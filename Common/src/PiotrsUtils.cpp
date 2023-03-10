@@ -22,4 +22,13 @@ std::string CanMessageToString(const CanMessage &msg)
 	return result.str();
 }
 
+
+std::string bytesToHexString (const std::vector<uint8_t>& bytes)
+{
+    std::stringstream dataAsStr;
+    for ( uint8_t byte : bytes)
+        dataAsStr << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)byte << ",";
+    return dataAsStr.str(); 
+} 
+
 }

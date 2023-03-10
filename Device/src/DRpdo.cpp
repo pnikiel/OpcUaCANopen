@@ -27,8 +27,12 @@
 #include <DBus.h>
 
 #include <PdoCobidMapper.h>
+#include <PiotrsUtils.h>
 
 #include <CanMessage.h>
+#include <Logging.hpp>
+
+using namespace Logging;
 
 namespace Device
 {
@@ -123,6 +127,8 @@ void DRpdo::propagateCache(bool sendRpdo)
         rpdoMessage.c_id = m_cobid;
         rpdoMessage.c_dlc = m_cache.size();
         getParent()->getParent()->sendMessage(rpdoMessage);
+        LOG(Log::TRC, "Rpdo") << wrapId(getFullName()) <<
+            " dispatched RPDO cache 0x[" << wrapValue(Common::bytesToHexString(getCache())) << "]";
     }
 }
 

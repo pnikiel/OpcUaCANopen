@@ -13,17 +13,10 @@
 #include <FrameFactory.hpp>
 
 using namespace Logging;
+using namespace Common;
 
 namespace CANopen
 {
-
-static std::string bytesToHexString (const std::vector<uint8_t>& bytes)
-{
-    std::stringstream dataAsStr;
-    for ( uint8_t byte : bytes)
-        dataAsStr << std::setfill('0') << std::setw(2) << std::hex << (unsigned int)byte << ",";
-    return dataAsStr.str(); 
-} 
 
 SdoEngine::SdoEngine (
     uint8_t nodeId,

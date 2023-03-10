@@ -2,6 +2,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <vector>
 
 #include <CanMessage.h>
 #include <Utils.h>
@@ -35,5 +36,7 @@ static T bytesAsTypeNativeAlignSafeCast(const uint8_t* bufferStart, size_t buffe
     );
     return output;
 }
+
+std::string bytesToHexString (const std::vector<uint8_t>& bytes);
 
 }

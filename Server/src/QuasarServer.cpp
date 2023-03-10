@@ -73,6 +73,7 @@ std::vector<LogComponent> LogComponents =
         {"CanModule"},
         {"Emergency"},
         {"NodeMgmt"},
+        {"Rpdo"},
         {"Sdo"},
         {"Spooky"},
         {"Spy"},
