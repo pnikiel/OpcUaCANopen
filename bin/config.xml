@@ -3,6 +3,7 @@
 <!ENTITY STDELMB_FOUNDATIONS SYSTEM "CANopen_def_STDELMB_FOUNDATIONS.xmle">
 <!ENTITY STDELMB_DI_TPDO1_C SYSTEM "CANopen_def_STDELMB_DI_TPDO1_C.xmle">
 <!ENTITY STDELMB_AI_TPDO3 SYSTEM "CANopen_def_STDELMB_AI_TPDO3.xmle">
+<!ENTITY STDELMB_DO_RPDO SYSTEM "CANopen_def_STDELMB_DO_RPDO.xmle">
 ]>
 <configuration xmlns="http://cern.ch/quasar/Configuration" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://cern.ch/quasar/Configuration ../Configuration/Configuration.xsd ">
 	<StandardMetaData>
@@ -22,6 +23,7 @@
 			&STDELMB_FOUNDATIONS;
 			&STDELMB_DI_TPDO1_C;
       			&STDELMB_AI_TPDO3;
+			&STDELMB_DO_RPDO;
 			<SdoVariable index="1234" subIndex="1" name="NONEXISTENT" dataType="Byte" access="R"/>
 		</Node>
 
