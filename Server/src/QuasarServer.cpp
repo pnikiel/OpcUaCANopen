@@ -337,8 +337,10 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
             std::vector<SdoBasedInfo> sdoBasedInfos =
                 {
                     {0x100A, 0x00, "?", "swVersion"},
-                    {0x100A, 0x01, "?", "swVersionMinor"},
-                    {0x3100, 0x00, "?", "serialNumber"}};
+                    {0x3100, 0x00, "?", "serialNumber"},
+                    //! Sequence is as is because the first two are mandatory of CANopen 
+                    //! while swVersionMinor is a local extension.
+                    {0x100A, 0x01, "?", "swVersionMinor"}}; 
             for (SdoBasedInfo &info : sdoBasedInfos)
             {
                 if (bus->isInSpyMode())
@@ -374,7 +376,12 @@ void QuasarServer::printNiceSummary() // TODO maybe move to another file ?
             }
 
             std::string stateInfo = node->stateInfoSource() + " " + std::to_string(int(bus->getAddressSpaceLink()->getNodeGuardIntervalMs())) + "ms ";
-            table << node->getFullName() << (unsigned int)node->id() << stateInfo << sdoBasedInfos[0].result + "." + sdoBasedInfos[1].result << sdoBasedInfos[2].result << onlineConfigValidationResult << fort::endr;
+            table << node->getFullName() <<
+                (unsigned int)node->id() <<
+                stateInfo <<
+                sdoBasedInfos[0].result + "." + sdoBasedInfos[2].result <<
+                sdoBasedInfos[1].result <<
+                onlineConfigValidationResult << fort::endr;
         }
         table << fort::separator;
     }
