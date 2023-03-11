@@ -43,6 +43,7 @@ using namespace Logging;
 using namespace std::placeholders;
 
 const unsigned int MinimumNonLockedOutSyncIntervalMs = 1000;
+const unsigned int MaximumNonLockedOutSyncIntervalMs = 3600*1000;
 
 namespace Device
 {
@@ -129,6 +130,24 @@ DBus::~DBus ()
 
 /* delegates for cachevariables */
 
+/* Note: never directly call this function. */
+
+UaStatus DBus::writeSyncIntervalMs ( const OpcUa_UInt32& v)
+{
+    if (syncLockOut() && v != 0)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << " " << ERROR << "rejected syncIntervalMs change to [" <<
+            wrapValue(std::to_string(v)) << "]" << ERROR_ << " as bus is in syncLockOut configuration";
+        return OpcUa_BadOutOfRange;
+    }
+    if (v < MinimumNonLockedOutSyncIntervalMs || v > MaximumNonLockedOutSyncIntervalMs)
+    {
+        LOG(Log::ERR) << wrapId(getFullName()) << " " << ERROR << "rejected syncIntervalMs change to [" <<
+            wrapValue(std::to_string(v)) << "]" << ERROR_ << ": out of sane range";
+        return OpcUa_BadOutOfRange;
+    }
+    return OpcUa_Good;
+}
 /* Note: never directly call this function. */
 
 UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
@@ -266,6 +285,9 @@ void DBus::tickSync()
 {
     if (isInSpyMode())
         return; // we're not sending SYNC in the spy mode.
+
+    if (syncLockOut())
+        return; // by definition, syncLockOut locks out and SYNC
 
     std::chrono::steady_clock::time_point now = std::chrono::steady_clock::now();
     unsigned int millisecondsSinceLastSync = std::chrono::duration_cast<std::chrono::milliseconds> (now - m_lastSyncTimePoint).count();

@@ -34,6 +34,7 @@
 
 #include <Logging.hpp>
 #include <FrameFactory.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -78,8 +79,8 @@ DTpdo::DTpdo (
 {
     /* fill up constructor body here */
     // for the mode of on-sync supports rtr, we should send an RTR each time there is a state change towards preop
-    // TODO Mark the feature clause
-    if (config.transportMechanism() == "asyncSupportsRtr")
+    // Feature clause FP6.2: RTR and initialization of on-change data
+    if (m_transportMechanism == Enumerator::Tpdo::asyncSupportsRtr || m_transportMechanism == Enumerator::Tpdo::asyncPeriodicRtrWithRequests)
     {
         getParent()->addNodeStateChangeCallBack(
             [this](CANopen::NodeState previous, CANopen::NodeState current)
@@ -98,6 +99,10 @@ DTpdo::DTpdo (
                     }
                 }
             });
+    }
+    if (m_transportMechanism == Enumerator::Tpdo::sync && parent->getParent()->syncLockOut())
+    {
+        throw_config_error_with_origin("on-SYNC TPDO can not be used on buses with SYNC locked out (at TPDO " + m_name + " Node " + parent->getFullName() + ")");
     }
 }
 

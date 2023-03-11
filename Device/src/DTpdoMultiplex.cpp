@@ -31,6 +31,7 @@
 #include <DMultiplexedChannel.h>
 
 #include <Logging.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -69,6 +70,10 @@ DTpdoMultiplex::DTpdoMultiplex (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+    if (m_transportMechanism == Enumerator::TpdoMultiplex::sync && parent->getParent()->syncLockOut())
+    {
+        throw_config_error_with_origin("on-SYNC M-TPDO can not be used on buses with SYNC locked out (at TPDO " + m_name + " Node " + parent->getFullName() + ")");
+    }
 }
 
 /* sample dtr */

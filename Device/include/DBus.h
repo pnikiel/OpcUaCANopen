@@ -53,6 +53,8 @@ public:
     /* delegators for
     cachevariables and sourcevariables */
     /* Note: never directly call this function. */
+    UaStatus writeSyncIntervalMs ( const OpcUa_UInt32& v);
+    /* Note: never directly call this function. */
     UaStatus writeNodeGuardIntervalMs ( const OpcUa_UInt32& v);
 
 
