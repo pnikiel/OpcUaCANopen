@@ -620,11 +620,31 @@
     <d:configentry dataType="UaString" name="assertTrueFormula" storedInDeviceObject="true"/>
     <d:configentry name="description" dataType="UaString" storedInDeviceObject="true"/>
   </d:class>
+  <d:class name="StateSwitcher">
+    <d:devicelogic></d:devicelogic>
+    <d:method name="goToPreOperational" executionSynchronicity="synchronous">
+      <d:argument name="nodeNamePattern" dataType="UaString"/>
+      <d:returnvalue dataType="UaString" name="info"/>
+      <d:returnvalue dataType="UaString" name="affectedNodes">
+        <d:array />
+      </d:returnvalue>
+    </d:method>
+    <d:method name="goToOperational" executionSynchronicity="synchronous">
+      <d:argument name="nodeNamePattern" dataType="UaString"/>
+      <d:returnvalue dataType="UaString" name="info"/>
+      <d:returnvalue dataType="UaString" name="affectedNodes">
+        <d:array />
+      </d:returnvalue>
+    </d:method>
+  </d:class>
   <d:root>
     <d:hasobjects instantiateUsing="configuration" class="GlobalSettings" maxOccurs="1" minOccurs="1"/>
     <d:hasobjects instantiateUsing="configuration" class="Warnings" maxOccurs="1" minOccurs="1"/>
     <d:hasobjects class="Meta" instantiateUsing="design" minOccurs="1" maxOccurs="1">
       <d:object name="Meta" />
+    </d:hasobjects>
+    <d:hasobjects class="StateSwitcher" instantiateUsing="design">
+      <d:object name="StateSwitcher"/>
     </d:hasobjects>
     <d:hasobjects instantiateUsing="configuration" class="Bus"/>
   </d:root>

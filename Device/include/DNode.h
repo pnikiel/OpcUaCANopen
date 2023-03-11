@@ -105,6 +105,9 @@ public:
     void registerSdoByShortName (const std::string& shortName, DSdoVariable* sdoVariable);
     DSdoVariable* getSdoByShortName (const std::string& shortName);
 
+    //! For state change requests that originate from beyond.
+    void requestState (CANopen::NodeState state);
+
 private:
     void onBootupReceived ();
     void onEmergencyReceived (const CanMessage& msg);
