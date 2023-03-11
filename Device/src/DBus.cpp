@@ -42,6 +42,8 @@
 using namespace Logging;
 using namespace std::placeholders;
 
+const unsigned int MinimumNonLockedOutSyncIntervalMs = 1000;
+
 namespace Device
 {
 // 1111111111111111111111111111111111111111111111111111111111111111111111111
@@ -77,6 +79,12 @@ DBus::DBus (
     /* fill up constructor initialization list here */
 {
     /* fill up constructor body here */
+
+    if (config.syncLockOut() && config.syncIntervalMs() != 0)
+        throw_config_error_with_origin("SYNC lock out implies syncIntervalMs needs to be 0 (at bus ["+config.name()+"])");
+    if (config.syncIntervalMs() < MinimumNonLockedOutSyncIntervalMs && !config.syncLockOut())
+        throw_config_error_with_origin("SyncIntervalMs too low, consider disabling SYNC, see syncLockOut setting (at bus ["+config.name()+"])");
+
     //CanModule::CanLibLoader* loader = CanModule::CanLibLoader::createInstance("sock");
     //CanModule::CCanAccess* canAccess = loader->openCanBus("sock:vcan0", "Unspecified");
     CSockCanScan* sockCanAccess = new CSockCanScan;

@@ -172,15 +172,18 @@
 
     	</d:documentation>
     </d:configentry>
+    <d:configentry name="syncLockOut" dataType="OpcUa_Boolean" defaultValue="false" storedInDeviceObject="true">
+      <d:documentation>See FP7.1: SYNC lock-out in Piotr's CANopen bible.</d:documentation>
+    </d:configentry>
     <d:cachevariable initializeWith="valueAndStatus" dataType="OpcUa_UInt32" name="portError" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
       <d:documentation>Zero when port is believed to be in perfect operational condition (equivalent to OK in CAN status) and non-zero for ERROR_ACTIVE, ERROR_PASSIVE, BUS_OFF or their variants. Null when provider or port does not support or can't report its state (e.g. for VCAN interface).</d:documentation>
     </d:cachevariable>
     <d:cachevariable initializeWith="valueAndStatus" dataType="UaString" name="portErrorDescription" nullPolicy="nullAllowed" addressSpaceWrite="forbidden" initialStatus="OpcUa_BadWaitingForInitialData">
       <d:documentation>Textual description of the port status; might be provider-dependent.</d:documentation>
     </d:cachevariable>
-    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="regular">
+    <d:cachevariable initializeWith="configuration" dataType="OpcUa_UInt32" name="syncIntervalMs" nullPolicy="nullForbidden" addressSpaceWrite="delegated">
       <d:configRestriction>
-        <d:restrictionByBounds minInclusive="1000"/>
+        <d:restrictionByBounds maxInclusive="3600000"/>
       </d:configRestriction>
       <d:documentation>Sync cycle period in miliseconds. For average DCS systems, typical values are between 1000 and 60000.</d:documentation>
     </d:cachevariable>
