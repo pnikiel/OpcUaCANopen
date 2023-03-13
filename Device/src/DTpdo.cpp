@@ -172,7 +172,9 @@ void DTpdo::onReplyReceived(const CanMessage& msg)
     }
     std::lock_guard<std::mutex> lock (m_accessLock); // operating on shared data, e.g. m_receivedCtrSinceLastSync
 
-    LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO: Wrong log component
+    LOG(Log::TRC, MyLogComponents::nm_tpdo()) << wrapId(getFullName()) << 
+        " received: 0x[" << wrapValue(Common::bytesToHexString( std::vector<uint8_t>{msg.c_data, msg.c_data + msg.c_dlc} )) << "]";
+
     m_receivedCtrSinceLastSync++;
 
     // Feature clause FP2.1: TPDO (Transmit PDOs)
