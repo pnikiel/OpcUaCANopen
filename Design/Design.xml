@@ -451,7 +451,7 @@
   <d:class name="OnlineConfigValidator">
     <d:devicelogic/>
     <d:hasobjects instantiateUsing="configuration" class="SdoValidator"/>
-    <d:method name="validate" executionSynchronicity="asynchronous">
+    <d:method name="validate" executionSynchronicity="asynchronous" addressSpaceCallUseMutex="no">
       <d:returnvalue dataType="UaString" name="details">
         <d:array/>
       </d:returnvalue>
@@ -617,7 +617,7 @@
   </d:class>
   <d:class name="SdoValidator">
     <d:devicelogic/>
-    <d:method name="validate" executionSynchronicity="asynchronous">
+    <d:method name="validate" executionSynchronicity="asynchronous" addressSpaceCallUseMutex="no">
       <d:returnvalue dataType="OpcUa_Boolean" name="passed"/>
     </d:method>
     <d:configentry dataType="UaString" name="assertTrueFormula" storedInDeviceObject="true"/>
@@ -625,14 +625,14 @@
   </d:class>
   <d:class name="StateSwitcher">
     <d:devicelogic></d:devicelogic>
-    <d:method name="goToPreOperational" executionSynchronicity="synchronous">
+    <d:method name="goToPreOperational" executionSynchronicity="synchronous" addressSpaceCallUseMutex="no">
       <d:argument name="nodeNamePattern" dataType="UaString"/>
       <d:returnvalue dataType="UaString" name="info"/>
       <d:returnvalue dataType="UaString" name="affectedNodes">
         <d:array />
       </d:returnvalue>
     </d:method>
-    <d:method name="goToOperational" executionSynchronicity="synchronous">
+    <d:method name="goToOperational" executionSynchronicity="synchronous" addressSpaceCallUseMutex="no">
       <d:argument name="nodeNamePattern" dataType="UaString"/>
       <d:returnvalue dataType="UaString" name="info"/>
       <d:returnvalue dataType="UaString" name="affectedNodes">
