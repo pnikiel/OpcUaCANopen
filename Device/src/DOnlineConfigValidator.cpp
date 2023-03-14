@@ -90,7 +90,7 @@ UaStatus DOnlineConfigValidator::callValidate (
         }
     }
     getAddressSpaceLink()->setFailuresNumberLastRun(numberFailures, OpcUa_Good);
-    numberOfFailures = numberFailures; // TODO maybe optimize this one
+    numberOfFailures = numberFailures;
     return OpcUa_Good;
 }
 
