@@ -75,6 +75,7 @@ std::vector<LogComponent> LogComponents =
         {"NodeMgmt"},
         {"Rpdo"},
         {"Sdo"},
+        {"SdoValidator"},
         {"Spooky"},
         {"Spy"},
         {"SdoValidator"},

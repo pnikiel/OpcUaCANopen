@@ -111,7 +111,7 @@ bool DSdoValidator::validate()
         DSdoVariable* sdoVariable (nullptr);
         try
         {
-            sdoVariable = m_node->getSdoByShortName(nameValuePair.first); // TODO: protection for not having this short name
+            sdoVariable = m_node->getSdoByShortName(nameValuePair.first);
         }
         catch (...)
         {
@@ -122,7 +122,7 @@ bool DSdoValidator::validate()
         // try to obtain the value
         UaVariant sdoValueRead;
         UaDateTime sourceTime;
-        // TODO: we shall move it to a separate wrapper because of not being able to configure the reply time
+
         if (!sdoVariable->readValue(sdoValueRead, sourceTime).isGood())
         {
             LOG(Log::ERR, "SdoValidator") << wrapId(getFullName()) << " reading the SDO " << wrapId(nameValuePair.first) << " for validation failed.";
@@ -144,7 +144,7 @@ bool DSdoValidator::validate()
     {
         double evaluation = parser.Eval();
         if (evaluation != 0 && evaluation != 1)
-            throw std::runtime_error("Validator formula is badly constructed for validator [" + getFullName() + 
+            throw_config_error_with_origin("Validator formula is badly constructed for validator [" + getFullName() + 
                 "]. It must evaluate to 1 or 0, i.e. a boolean, it evaluated to [" + std::to_string(evaluation) + "]");
         bool validatedTrue = evaluation == 1.0;
         if (!validatedTrue)
