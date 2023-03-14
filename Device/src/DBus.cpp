@@ -199,7 +199,7 @@ void DBus::tick()
 
 void DBus::onMessageReceived (const CanMessage& msg)
 {
-    // TOD?O: option question, how do we deal with long msgs ?
+    // TODO: option question, how do we deal with long msgs ?
     //LOG(Log::INF) << "msg came, " << msg.c_id; // some separate levels ... ?
     // what is the message
     //unsigned int functionCode = msg.c_id >> 7;
@@ -248,22 +248,7 @@ void DBus::onMessageReceived (const CanMessage& msg)
         return;
     }
 
-    m_cobidCoordinator.dispatch(msg); // TODO maybe it shall return a bool if this cobid was consumed or not?
-
-    // unsigned int nodeId = msg.c_id & 0x7f;
-    // // TODO shall everything be passed to specific node
-    // DNode* node = getNodeById(nodeId);
-    // if (node)
-    //     node->onMessageReceived(msg);
-    // else
-    // {
-    //     if (DRoot::getInstance()->warningss()[0]->rxFromUnknownNode()) // TODO: the model to study warnings must be invincible to the situation when the object structure is not entirely ready
-    //     {
-    //         SPOOKY(getFullName()) << "received msg suggesting unknown node " << wrapValue(std::to_string(nodeId)) 
-    //             << ", fix your hardware or your configuration." << SPOOKY_ << " [WrxFromUnknownNode]" <<
-    //             " (the frame was: " << wrapValue(Common::CanMessageToString(msg)) << ")";
-    //     }
-    // }
+    m_cobidCoordinator.dispatch(msg); /* CobidCoord will complain if no match */
 }
 
 void DBus::sendMessage(const CanMessage& msg)
