@@ -170,7 +170,7 @@ void DBus::initialize()
     // Feature clause FN1.1.4: Node guarding timing and timing constraints
     if (getAddressSpaceLink()->getNodeGuardIntervalMs() <= 1000.0 * DRoot::getInstance()->globalsettings()->nodeGuardingReplyTimeout())
     {
-        throw std::runtime_error("Configuration error: clause FN1.1.4 not satisfied"); // TODO: change to config_error OPCUA-2894
+        throw_config_error_with_origin("Clause FN1.1.4 not satisfied: requires: NGIntervalMs > NGReplyTimeout");
     }
 
 

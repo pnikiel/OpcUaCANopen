@@ -202,7 +202,8 @@ UaStatus DNode::callReset (
     {
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
         replyReceived = getAddressSpaceLink()->getBootupCounter() != bootupsBeforeReset;
-        timePassed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() > 5000; // TODO configurable?
+        /* 5000 below is 5s that a node is given to send a bootup after a reset request. Piotr: maybe you want to make it configurable */
+        timePassed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - t0).count() > 5000;
     } while (!replyReceived && !timePassed);
 
     bootupReceived = replyReceived;
