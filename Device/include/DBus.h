@@ -89,7 +89,7 @@ public:
 
     void getStatistics(CanModule::CanStatistics& statistics) const;
 
-    CANopen::CobidCoordinator& cobidCoordinator() { return m_cobidCoordinator; } // TODO probably move it somehow.
+    CANopen::CobidCoordinator& cobidCoordinator() { return m_cobidCoordinator; }
 
 private:
     GhostPointer<CanModule::CCanAccess> m_canAccess;

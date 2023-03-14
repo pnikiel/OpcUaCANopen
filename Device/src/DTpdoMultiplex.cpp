@@ -110,12 +110,8 @@ void DTpdoMultiplex::initialize()
 void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
 {
     // Feature clause FP3.1: MPDO: multiplexing of TPDOs
-
-    // FP2.1.1 is missing here. TODO?
-
     LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
-    // getting the channel number ...
-    // Note: this is the standard channel demultiplexer
+    // Note: this is the standard channel demultiplexer, assuming the multiplex is on one byte.
 
     if (msg.c_dlc < 1)
     {
@@ -151,6 +147,7 @@ void DTpdoMultiplex::notifySync ()
     size_t mismatchCtr = 0;
     for (DMultiplexedChannel* channel : multiplexedchannels())
     {
+        // Feature clause FP2.1.1: Warning of missing data between SYNCs
         bool mismatch = channel->notifySyncAndCheckMismatch();
         if (mismatch)
             mismatchCtr++;

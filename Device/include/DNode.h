@@ -119,8 +119,7 @@ private:
     CANopen::NodeGuardingOperationsState m_nodeGuardingOperationsState;
     CANopen::StateInfoModel m_stateInfoModel;
 
-    // TODO: Piotr: learn how to make it boost-optional
-    // "Ptr" chunk is intended to clearly visualize the separation between sharedptr API and the SdoEngine API
+    // "Ptr" chunkof its name is intended to clearly visualize the separation between sharedptr API and the SdoEngine API
     std::shared_ptr<CANopen::SdoEngine> m_sdoEnginePtr; 
 
 
