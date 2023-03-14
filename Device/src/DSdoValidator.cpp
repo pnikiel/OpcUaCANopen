@@ -95,7 +95,7 @@ void DSdoValidator::initialize(DNode* node)
     m_node = node;
 }
 
-bool DSdoValidator::validate(std::string* outDescription) // TODO remove out description
+bool DSdoValidator::validate()
 {
     mu::Parser parser;
     parser.DefineNameChars("0123456789_abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ.");

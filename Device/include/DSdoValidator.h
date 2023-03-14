@@ -64,7 +64,7 @@ private:
 
 public:
     void initialize(DNode* node);
-    bool validate(std::string* outDescription = nullptr);
+    bool validate();
 
 private:
     DNode* m_node;
