@@ -43,6 +43,7 @@
 
 #include <Logging.hpp>
 #include <MyLogComponents.h>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 using namespace std::placeholders;
@@ -252,7 +253,7 @@ void DNode::initialize()
     for (Device::DSdoVariable* variable : sdovariables())
     {
         if (variable->index() == Configuration::SdoVariable::index_default_value())
-            throw std::runtime_error("Stage2 Configuration error: Independent SDO variable needs exact SDO index. (at [" + variable->getFullName() + "]"); // TODO Config error
+            throw_config_error_with_origin("Stage2 Configuration error: Independent SDO variable needs exact SDO index. (at [" + variable->getFullName() + "]");
         registerSdoByShortName(variable->name(), variable);
         variable->initialize(getParent(), this);
     }
