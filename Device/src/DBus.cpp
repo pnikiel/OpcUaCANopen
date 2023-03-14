@@ -153,7 +153,7 @@ UaStatus DBus::writeSyncIntervalMs ( const OpcUa_UInt32& v)
 UaStatus DBus::writeNodeGuardIntervalMs ( const OpcUa_UInt32& v)
 {
     // NEEDS CHECKING IF THE VALUE WRITTEN IS LARGER THEN THE TIMEOUT -> Fn1.1.4
-    return OpcUa_BadNotImplemented; // TODO
+    return OpcUa_BadNotImplemented; // TODO Piotr really has no time left
 }
 
 
@@ -199,13 +199,12 @@ void DBus::tick()
 
 void DBus::onMessageReceived (const CanMessage& msg)
 {
-    // TODO: option question, how do we deal with long msgs ?
-    //LOG(Log::INF) << "msg came, " << msg.c_id; // some separate levels ... ?
-    // what is the message
-    //unsigned int functionCode = msg.c_id >> 7;
-
-    // TODO Msg=0x0 is the NMT control (e.g.  [id=0x0 dlc=2 data=[01 06 ]])
-    // This would be legal in the spy mode! --> Spy Mode INFORMATION
+    if (msg.c_id > 0x7ff)
+    {
+        LOG(Log::WRN) << wrapId(getFullName()) <<
+            "Seeing messages with extended(long) COBID, this is not supported, ignoring [" <<
+            wrapId(msg.toString()) << "]";
+    }
 
     if (msg.c_id == 0x00) // NMT Control
     {
