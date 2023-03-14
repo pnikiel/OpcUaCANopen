@@ -26,6 +26,7 @@
 #include <DSdoVariable.h>
 
 #include <Logging.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -114,7 +115,9 @@ bool DSdoValidator::validate()
         }
         catch (...)
         {
-            LOG(Log::ERR, "SdoValidator") << wrapId(getFullName()) << " SDO " << wrapId(nameValuePair.first) << " is not in the short-list (suggests configuratoin file/ model issues?)";
+            LOG(Log::ERR, "SdoValidator") << wrapId(getFullName()) << " SDO " << wrapId(nameValuePair.first)
+                << " is not in the short-list (suggests configuration issue)";
+            throw_config_error_with_origin("Configuration issue detected in the OnlineConfigValidator, the exact issue should have been logged");
         }
         // try to obtain the value
         UaVariant sdoValueRead;

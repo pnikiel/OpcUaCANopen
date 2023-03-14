@@ -326,7 +326,7 @@ void DNode::registerSdoByShortName (const std::string& shortName, DSdoVariable* 
 
 DSdoVariable* DNode::getSdoByShortName (const std::string& shortName)
 {
-    return m_sdosByShortName[shortName];
+    return m_sdosByShortName.at(shortName);
 }
 
 void DNode::propagateNullToTpdos ()
