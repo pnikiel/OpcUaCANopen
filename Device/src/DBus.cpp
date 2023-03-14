@@ -326,7 +326,8 @@ bool DBus::isInSpyMode () const
 {
     // Feature clause FC4.1: Spy mode
     Device::DGlobalSettings* globalSettings = DRoot::getInstance()->globalsettings();
-    // TODO implement
+    /* Yea I'm not entirely satisfied with enforceTrue as I wanted the spyMode settings to be much more complex,
+    but just haven't got time to do it better. It's either "enforceTrue" or nothing. (Piotr) */
     if (globalSettings->spyMode() == "enforceTrue")
         return true;
     return false;
