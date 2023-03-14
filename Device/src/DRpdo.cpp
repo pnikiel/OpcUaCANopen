@@ -99,7 +99,7 @@ void DRpdo::initialize()
     propagateCache(false); /* Do not automatically send out the cache at startup */
 }
 
-//! sends and publishes to the address-space
+//! sends out (CAN) and publishes the cache to the address-space
 void DRpdo::propagateCache(bool sendRpdo)
 {
     // this can certainly be done better!!
@@ -115,7 +115,7 @@ void DRpdo::propagateCache(bool sendRpdo)
 
         if (getCache().size() > sizeof(rpdoMessage.c_data))
         {
-            throw std::runtime_error("TODO: Problem! Size of messages"); // TODO
+            throw std::logic_error("Generated cache is larger than possible to ship via CAN frame");
         }
 
         std::copy(
