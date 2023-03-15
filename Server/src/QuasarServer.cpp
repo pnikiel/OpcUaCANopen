@@ -79,7 +79,9 @@ std::vector<LogComponent> LogComponents =
         {"Spooky"},
         {"Spy"},
         {"SdoValidator"},
-        {"NmTpdo"}};
+        {"NmTpdo"},
+        {"MTpdo"}
+    };
 
 void printLogo()
 {
@@ -255,6 +257,8 @@ void QuasarServer::initializeLogIt()
             MyLogComponents::s_spy = logComponent.handle;
         if (logComponent.name == "NmTpdo")
             MyLogComponents::s_nm_tpdo = logComponent.handle;
+        if (logComponent.name == "MTpdo")
+            MyLogComponents::s_m_tpdo = logComponent.handle;
     }
     LOG(Log::INF) << "Logging initialized.";
 }

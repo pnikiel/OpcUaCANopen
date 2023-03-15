@@ -110,7 +110,8 @@ void DTpdoMultiplex::initialize()
 void DTpdoMultiplex::onReplyReceived(const CanMessage& msg)
 {
     // Feature clause FP3.1: MPDO: multiplexing of TPDOs
-    LOG(Log::TRC) << "received TPDO reply: " << msg.toString(); // TODO move to PDO Log component
+    LOG(Log::TRC, MyLogComponents::m_tpdo()) <<
+        wrapId(getFullName()) << " received: 0x[" << wrapValue(Common::bytesToHexString( std::vector<uint8_t>{msg.c_data, msg.c_data + msg.c_dlc} )) << "]";
     // Note: this is the standard channel demultiplexer, assuming the multiplex is on one byte.
 
     if (msg.c_dlc < 1)
