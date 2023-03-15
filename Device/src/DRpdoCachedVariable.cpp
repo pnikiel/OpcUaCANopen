@@ -28,6 +28,7 @@
 
 #include <ValueMapper.h>
 #include <Logging.hpp>
+#include <PiotrsUtils.h>
 
 using namespace Logging;
 
@@ -117,10 +118,12 @@ UaStatus DRpdoCachedVariable::writeValue (
     else
     {
         std::vector<uint8_t> bytes = ValueMapper::packVariantToBytes(value, dataType());
+        if (offset() + bytes.size() > getParent()->getCache().size())
+            throw_config_error_with_origin(getFullName() + " payload at this offset would stick out of the CAN frame payload");
         std::copy(
             bytes.begin(),
             bytes.end(),
-            getParent()->getCache().begin()); // TODO: we're missiing cache there!
+            getParent()->getCache().begin() + offset());
     }
        
     getParent()->propagateCache();
